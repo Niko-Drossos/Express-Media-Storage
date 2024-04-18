@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
     },
     // TODO: Add more fields
     // Other fields
+}, {
+    timestamps: true,
+    collection: 'users'
 });
 
 module.exports = mongoose.model('User', userSchema);

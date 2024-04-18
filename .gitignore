@@ -1,4 +1,4 @@
 node_modules/
-public/files/
+/src/public/files/
 
 .env

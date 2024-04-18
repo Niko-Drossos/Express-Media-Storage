@@ -1,3 +1,4 @@
 # Routes
 
 ## User Routes
+- GET 
