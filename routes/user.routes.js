@@ -47,6 +47,39 @@ router.get("/", (req, res) => {
   })
 })
 
+// Define route to stream MP4 file
+router.get('/video', (req, res) => {
+  const filePath = 'path_to_your_mp4_file.mp4'; // Specify the path to your MP4 file
+
+  // Get file stats (to determine file size)
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+
+  // Set the content type and range headers
+  const range = req.headers.range;
+  const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+  };
+
+  // If there's a range specified in the request, set the appropriate headers
+  if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunksize = (end - start) + 1;
+      head['Content-Range'] = `bytes ${start}-${end}/${fileSize}`;
+      head['Accept-Ranges'] = 'bytes';
+      head['Content-Length'] = chunksize;
+      res.writeHead(206, head);
+      fs.createReadStream(filePath, { start, end }).pipe(res);
+  } else { // If no range is specified, stream the entire file
+      res.writeHead(200, head);
+      fs.createReadStream(filePath).pipe(res);
+  }
+});
+
+
 //! -------------------------------------------------------------------------- */
 
 router.post("/create", (req, res) => {
@@ -74,30 +107,6 @@ router.post("/create", (req, res) => {
     res.json({
       success: false,
       message: "Failed to create user",
-      errorMessage: error.message,
-      error
-    })
-  }
-})
-
-/* -------------------------------------------------------------------------- */
-
-// Currently this just returns the folder path 
-router.get("/:folder", (req, res) => {
-  try {
-    res.status(200)
-    res.json({
-      success: true,
-      message: "Retrieved folder path",
-      data: {
-        folder: req.folder
-      }
-    })
-  } catch (error) {
-    res.status(500)
-    res.json({
-      success: false,
-      message: "Failed to fetch folder",
       errorMessage: error.message,
       error
     })
