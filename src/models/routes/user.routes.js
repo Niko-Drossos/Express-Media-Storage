@@ -3,6 +3,10 @@ const router = express.Router()
 const path = require("path")
 const fs = require("fs")
 
+/* --------------------------------- Schemas -------------------------------- */
+const User = require("../schemas/User")
+/* ------------------------------- Middleware ------------------------------- */
+
 // Folder middleware to create the correct path
 router.param("folder", (req, res, next, folder) => {
   req.folder = path.join(process.cwd(), "/public/files", folder)
@@ -48,63 +52,79 @@ router.get("/", (req, res) => {
 })
 
 // Define route to stream MP4 file
-router.get('/video', (req, res) => {
-  const filePath = 'path_to_your_mp4_file.mp4'; // Specify the path to your MP4 file
+/* router.get('/video', (req, res) => {
+  const filePath = 'path_to_your_mp4_file.mp4' // Specify the path to your MP4 file
 
   // Get file stats (to determine file size)
-  const stat = fs.statSync(filePath);
-  const fileSize = stat.size;
+  const stat = fs.statSync(filePath)
+  const fileSize = stat.size
 
   // Set the content type and range headers
-  const range = req.headers.range;
+  const range = req.headers.range
   const head = {
       'Content-Length': fileSize,
       'Content-Type': 'video/mp4',
-  };
+  }
 
   // If there's a range specified in the request, set the appropriate headers
   if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunksize = (end - start) + 1;
-      head['Content-Range'] = `bytes ${start}-${end}/${fileSize}`;
-      head['Accept-Ranges'] = 'bytes';
-      head['Content-Length'] = chunksize;
-      res.writeHead(206, head);
-      fs.createReadStream(filePath, { start, end }).pipe(res);
+      const parts = range.replace(/bytes=/, '').split('-')
+      const start = parseInt(parts[0], 10)
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+      const chunksize = (end - start) + 1
+      head['Content-Range'] = `bytes ${start}-${end}/${fileSize}`
+      head['Accept-Ranges'] = 'bytes'
+      head['Content-Length'] = chunksize
+      res.writeHead(206, head)
+      fs.createReadStream(filePath, { start, end }).pipe(res)
   } else { // If no range is specified, stream the entire file
-      res.writeHead(200, head);
-      fs.createReadStream(filePath).pipe(res);
+      res.writeHead(200, head)
+      fs.createReadStream(filePath).pipe(res)
   }
-});
-
+})
+ */
 
 //! -------------------------------------------------------------------------- */
 
-router.post("/create", (req, res) => {
+router.post("/create", async (req, res) => {
   try {
-    console.log(req.body)
-    const username = req.body.username
-    const folderName = path.join(process.cwd(), "/public/files", username)
+    const { folderId } = req.body
+    const folderName = path.join(process.cwd(), "/src/public/files", folderId)
+
+    // Check if the folder already exists
+    const folderExists = await new Promise((resolve) => {
+      fs.stat(folderName, (err) => {
+        resolve(!err)
+      })
+    })
+
+    // return 409 if the folder already exists
+    if (folderExists) {
+      return res.status(409).json({
+        success: false,
+        message: "Folder already exists",
+      });
+    }
 
     // Create the users folder
     fs.mkdir(folderName, (err) => {
-      if (err) throw new Error("Folder not created for user")
-      console.log("Folder created")
+      if (err) {
+        new Error("Folder not created for user")
+      } else {
+        console.log("Folder created")
+      }
     })
-
-    res.status(200)
-    res.json({
+  
+    res.status(201).json({
       success: true,
       message: "Successfully created user folder!",
       data: {
-
+        folder: folderName,
+        folderId
       }
     })
   } catch (error) {
-    res.status(500)
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to create user folder",
       errorMessage: error.message,
@@ -125,8 +145,7 @@ router.post("/:folder/upload/:date", (req, res) => {
       console.log(`Folder created with date: ${req.params.date}`)
     })
     
-    res.status(200)
-    res.json({
+    res.status(201).json({
       success: true,
       message: "Uploaded files to folder",
       data: {
@@ -134,8 +153,7 @@ router.post("/:folder/upload/:date", (req, res) => {
       }
     })
   } catch (error) {
-    res.status(500)
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to fetch folder",
       errorMessage: error.message,

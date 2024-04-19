@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
 const Schema = mongoose.Schema
+
+/* --------------------------------- Helpers -------------------------------- */
+const calculateVoteCount = require('../../helpers/calculateVoteCount')
+const generateRouteId = require('../../helpers/generateRouteId')
+/* -------------------------------------------------------------------------- */
 
 const imageSchema = new Schema({
   date: {
@@ -52,6 +56,9 @@ const imageSchema = new Schema({
   fileSize: {
     type: Number,
     required: true
+  },
+  fileId: {
+    type: String
   }
 }, {
   timestamps: true,
@@ -61,6 +68,9 @@ const imageSchema = new Schema({
 // Middleware to update voteCount when votes array is modified
 imageSchema.pre('save', function(next) {
   this.voteCount = calculateVoteCount(this.votes)
+  if (this.isNew) {
+    this.fileId = generateRouteId()
+  }
   next()
 })
 

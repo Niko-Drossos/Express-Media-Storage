@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
 const Schema = mongoose.Schema
+
+/* --------------------------------- Helpers -------------------------------- */
+const calculateVoteCount = require('../../helpers/calculateVoteCount')
+/* -------------------------------------------------------------------------- */
 
 const commentSchema = new Schema({
   date: {

@@ -24,8 +24,6 @@ router.post("/register", async (req, res) => {
       email
     })
 
-    console.log(newUser)
-
     const userData = {
       userId: newUser._id,
       username: req.body.username,

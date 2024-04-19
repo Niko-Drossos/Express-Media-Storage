@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
 const Schema = mongoose.Schema
+
+/* --------------------------------- Helpers -------------------------------- */
+const calculateVoteCount = require('../../helpers/calculateVoteCount')
+const generateRouteId = require('../../helpers/generateRouteId')
+/* -------------------------------------------------------------------------- */
 
 const userSchema = new Schema({
   username: {
@@ -39,6 +43,9 @@ const userSchema = new Schema({
   voteCount: {
     type: Number,
     default: 0
+  },
+  folderId: {
+    type: String,
   }
 }, {
   timestamps: true,
@@ -47,6 +54,10 @@ const userSchema = new Schema({
 
 userSchema.pre('save', function(next) {
 	this.voteCount = calculateVoteCount(this.votes)
+  // Create a folderId if the document is new
+  if (this.isNew) {
+    this.folderId = generateRouteId()
+  }
 	next()
 })
 

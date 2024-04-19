@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
 const Schema = mongoose.Schema
+
+/* --------------------------------- Helpers -------------------------------- */
+const calculateVoteCount = require('../../helpers/calculateVoteCount')
+const generateRouteId = require('../../helpers/generateRouteId')
+/* -------------------------------------------------------------------------- */
 
 const videoSchema = new Schema({
   date: {
@@ -66,7 +70,9 @@ const videoSchema = new Schema({
     type: Number,
     default: 0
   },
-
+  fileId: {
+    type: String
+  }
 }, {
   timestamps: true,
   collection: 'videos'
@@ -75,6 +81,9 @@ const videoSchema = new Schema({
 // Middleware to update likeCount when votes array is modified
 videoSchema.pre('save', function(next) {
   this.likeCount = calculateVoteCount(this.votes)
+  if (this.isNew) {
+    this.fileId = generateRouteId()
+  }
   next()
 })
 
