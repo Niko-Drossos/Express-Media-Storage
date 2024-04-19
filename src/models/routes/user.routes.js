@@ -39,7 +39,7 @@ router.param("folder", (req, res, next, folder) => {
   }
 }) */
 
-//! ------------------------ This is not yet necessary ----------------------- */
+//! ----------------- This is not yet necessary, just testing ------------------- */
 
 router.get("/", (req, res) => {
   res.json({
@@ -106,7 +106,7 @@ router.post("/create", (req, res) => {
     res.status(500)
     res.json({
       success: false,
-      message: "Failed to create user",
+      message: "Failed to create user folder",
       errorMessage: error.message,
       error
     })
@@ -117,8 +117,6 @@ router.post("/create", (req, res) => {
 // TODO: Make this accept FormData object
 router.post("/:folder/upload/:date", (req, res) => {
   try {
-    console.log(req)
-
     const dateFolder = path.join(req.folder, req.params.date)
 
     // Create the users folder

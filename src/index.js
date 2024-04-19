@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 
 /* ------------------------------- App router ------------------------------- */
 app.use("/auth", require("./models/routes/auth.routes"));
-app.use("/users", require("./models/routes/user.routes"));
+app.use("/user", require("./models/routes/user.routes"));
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, () => console.log(`server started at http://localhost:${port}`))
