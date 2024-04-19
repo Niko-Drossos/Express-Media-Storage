@@ -4,7 +4,7 @@ const path = require("path")
 const fs = require("fs")
 
 /* --------------------------------- Schemas -------------------------------- */
-const User = require("../schemas/User")
+const User = require("../models/schemas/User")
 /* ------------------------------- Middleware ------------------------------- */
 
 // Folder middleware to create the correct path

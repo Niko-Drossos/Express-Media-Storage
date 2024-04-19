@@ -1,2 +1,3 @@
 Create upload api
 Make user/create update the database with the folder name
+Move the correct logic to the controller folder

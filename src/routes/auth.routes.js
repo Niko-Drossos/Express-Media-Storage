@@ -2,12 +2,12 @@ const express = require("express")
 const router = express.Router()
 
 /* --------------------------------- Schemas -------------------------------- */
-const User = require("../../models/schemas/User")
+const User = require("../models/schemas/User")
 /* --------------------------------- Helpers -------------------------------- */
-const generateJWT = require("../../helpers/generateJWT")
-const decryptJWT = require("../../helpers/decryptJWT")
-const compareHash = require("../../helpers/compareHash")
-const hash = require("../../helpers/hash")
+const generateJWT = require("../helpers/generateJWT")
+const decryptJWT = require("../helpers/decryptJWT")
+const compareHash = require("../helpers/compareHash")
+const hash = require("../helpers/hash")
 /* -------------------------------------------------------------------------- */
 
 router.post("/register", async (req, res) => {
