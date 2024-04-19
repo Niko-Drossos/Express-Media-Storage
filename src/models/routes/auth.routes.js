@@ -1,16 +1,15 @@
 const express = require("express")
 const router = express.Router()
-/* const path = require("path")
-const fs = require("fs") */
 
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../../models/schemas/User")
 /* --------------------------------- Helpers -------------------------------- */
 const generateJWT = require("../../helpers/generateJWT")
+const decryptJWT = require("../../helpers/decryptJWT")
+const compareHash = require("../../helpers/compareHash")
 const hash = require("../../helpers/hash")
 /* -------------------------------------------------------------------------- */
 
-// TODO: make this authenticate the login
 router.post("/register", async (req, res) => {
   try {
     if (!req.body.username || !req.body.password) {
@@ -35,8 +34,7 @@ router.post("/register", async (req, res) => {
 
     const loginToken = generateJWT(userData)
 
-    res.status(200)
-    res.json({
+    res.status(201).json({
       success: true,
       message: "Successfully registered user",
       data: {
@@ -44,8 +42,7 @@ router.post("/register", async (req, res) => {
       }
     })
   } catch (error) {
-    res.status(500)
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to register user",
       errorMessage: error.message,
@@ -56,24 +53,30 @@ router.post("/register", async (req, res) => {
 
 /* -------------------------------------------------------------------------- */
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   try {
-    if (!req.body.username || !req.body.password) {
-      throw new Error("Missing username or password")
-    }
+    const { username, password } = req.body
 
-    // TODO: Make this authenticate the login
+    if (!username || !password) throw new Error("Missing username or password")
+
+    // Find the user in the database and throw an error if none found
+    const foundUser = await User.findOne({ username })
+    if (!foundUser) throw new Error(`No user with username: ${username} found`)
+
+    // Check if password is a match 
+    const passwordMatch = await compareHash(password, foundUser.password)
+    if (!passwordMatch) throw new Error(`Incorrect credentials`)
 
     const userData = {
-      // userId: ,
-      username: req.body.username,
-      password: req.body.password
+      userId: foundUser._id,
+      email: foundUser.email,
+      password: foundUser.password,
+      username: username
     }
 
     const loginToken = generateJWT(userData)
 
-    res.status(200)
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Successfully logged in",
       data: {
@@ -81,8 +84,7 @@ router.post("/login", (req, res) => {
       }
     })
   } catch (error) {
-    res.status(500)
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to login",
       errorMessage: error.message,

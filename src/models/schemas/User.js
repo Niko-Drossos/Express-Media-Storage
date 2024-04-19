@@ -40,6 +40,9 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   }
+}, {
+  timestamps: true,
+  collection: 'users'
 })
 
 userSchema.pre('save', function(next) {
