@@ -13,11 +13,12 @@ const hash = require("../helpers/hash")
 
 exports.registerUser = async (req, res) => {
   try {
-    if (!req.body.username || !req.body.password) {
-      throw new Error("Missing username or password")
+    const { username, password, email } = req.body
+
+    if (!username || !email || !password) {
+      throw new Error("Missing username, password or email")
     }
 
-    const { username, password, email } = req.body
 
     const newUser = await User.create({
       username,
@@ -27,8 +28,8 @@ exports.registerUser = async (req, res) => {
 
     const userData = {
       userId: newUser._id,
-      username: req.body.username,
-      password: req.body.password
+      username,
+      email
     }
 
     const loginToken = generateJWT(userData)
@@ -37,6 +38,7 @@ exports.registerUser = async (req, res) => {
       success: true,
       message: "Successfully registered user",
       data: {
+        user: userData,
         JWT: loginToken
       }
     })
@@ -79,6 +81,9 @@ exports.loginUser = async (req, res) => {
       success: true,
       message: "Successfully logged in",
       data: {
+        user: {
+          folderId: foundUser.folderId
+        },
         JWT: loginToken
       }
     })

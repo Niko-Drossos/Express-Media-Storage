@@ -11,6 +11,10 @@ const videoSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  title: {
+    type: String,
+    required: false
+  },
   uploader: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -26,7 +30,8 @@ const videoSchema = new Schema({
     ref: 'Comment',
   }],
   thumbnailImage: {
-    type: String // TODO: This will probably be a base 64 string
+    type: String, // TODO: This will probably be a base 64 string
+    required: false //Change later
   },
   tags: [{
     type: String // TODO: change this to an enum once tags are added
@@ -34,26 +39,27 @@ const videoSchema = new Schema({
   privacy: {
     type: String,
     enum: ['Public', 'Private', 'Unlisted'],
-    default: 'Public',
+    default: 'Private',
     required: true
   },
   dimensions: {
     width: {
       type: Number,
-      required: true
+      // required: true
     },
     height: {
       type: Number,
-      required: true
+      // required: true
     }
   },
   length: {
     type: Number,
-    required: true
+    // TODO: uncomment these after testing
+    // required: true 
   },
   fileSize: {
     type: Number,
-    required: true
+    // required: true
   },
   votes: [{
     user: {
@@ -80,9 +86,22 @@ const videoSchema = new Schema({
 
 // Middleware to update likeCount when votes array is modified
 videoSchema.pre('save', function(next) {
+  // Get the date in the format MM-DD-YYYY instead of MM/DD/YYYY
+  const dateString = this.date.toLocaleDateString().replace(/(\d+)\/(\d+)\/(\d+)/, "$1-$2-$3");
+
+  // const hostServer = "http://localhost:3000" Possibly add this functionality in the future
+
   this.likeCount = calculateVoteCount(this.votes)
   if (this.isNew) {
     this.fileId = generateRouteId()
+  }
+
+  if (!this.title) {
+    this.title ?? dateString + '-Untitled'
+  }
+
+  if (!this.url) {
+    this.url = path.join(dateString, this.fileId + '.mp4')
   }
   next()
 })

@@ -1,6 +1,6 @@
 const express = require('express')
 const dotenv = require('dotenv')
-const connectDB = require('./models/connection');
+const connectDB = require('./models/connection')
 dotenv.config()
 
 const app = express()
@@ -13,8 +13,9 @@ app.use(express.static('src/public'))
 app.use(express.urlencoded({ extended: true }))
 
 /* ------------------------------- App router ------------------------------- */
-app.use("/auth", require("./routes/auth.routes"));
-app.use("/user", require("./routes/user.routes"));
+app.use("/auth", require("./routes/auth.routes"))
+app.use("/user", require("./routes/user.routes"))
+app.use("/file", require("./routes/file.routes"))
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, () => console.log(`server started at http://localhost:${port}`))

@@ -3,6 +3,8 @@ const router = express.Router()
 
 /* ------------------------------- Controller ------------------------------- */
 const userController = require("../controllers/userController")
+/* --------------------------------- Helpers -------------------------------- */
+const decryptJWT = require("../helpers/decryptJWT")
 /* -------------------------------------------------------------------------- */
 
 /* -------------- Folder middleware to create the correct path -------------- */
@@ -21,9 +23,6 @@ router.get('/video/:folder/:date/:file', userController.streamVideo)
 
 router.post("/create", userController.createFolder)
 // TODO: Make this accept FormData object
-router.get("/:folder", userController.retrieveFolder)
-router.post("/:folder/upload/:date", userController.uploadToDateFolder) 
-
 
 // Not yet sure if this is necessary
 /* router.get("/:folder/view", (req, res) => {

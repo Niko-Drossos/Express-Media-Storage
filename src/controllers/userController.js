@@ -9,8 +9,9 @@ const User = require("../models/schemas/User")
 
 exports.createFolder = async (req, res) => {
   try {
-    const { folderId } = req.body
-    const folderName = path.join(process.cwd(), "/src/public/files", folderId)
+    const { username } = req.body
+    const foundUser = await User.findOne({ username })
+    const folderName = path.join(process.cwd(), "/src/public/files", foundUser.folderId)
 
     // Check if the folder already exists
     const folderExists = await new Promise((resolve) => {
@@ -41,65 +42,13 @@ exports.createFolder = async (req, res) => {
       message: "Successfully created user folder!",
       data: {
         folder: folderName,
-        folderId
+        folderId: foundUser.folderId
       }
     })
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Failed to create user folder",
-      errorMessage: error.message,
-      error
-    })
-  }
-}
-
-/* --------------------- Upload to folder with name date -------------------- */
-
-exports.uploadToDateFolder = (req, res) => {
-  try {
-    const dateFolder = path.join(req.folder, req.params.date)
-
-    // Create the users folder
-    fs.mkdir(dateFolder, (err) => {
-      if (err) throw new Error("Folder not created for user")
-      console.log(`Folder created with date: ${req.params.date}`)
-    })
-    
-    res.status(201).json({
-      success: true,
-      message: "Uploaded files to folder",
-      data: {
-        folder: req.folder
-      }
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch folder",
-      errorMessage: error.message,
-      error
-    })
-  }
-}
-
-exports.retrieveFolder = (req, res) => {
-  try {
-    res.status(200)
-    res.json({
-      success: true,
-      message: "Retrieved folder",
-      data: {
-        folder: req.folder,
-        fileCount: "Something",
-        folderCount: "Something"
-      }
-    })
-  } catch (error) {
-    res.status(500)
-    res.json({
-      success: false,
-      message: "Failed to fetch folder",
       errorMessage: error.message,
       error
     })
