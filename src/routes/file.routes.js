@@ -24,9 +24,7 @@ const storage = multer.diskStorage({
 
     // Create the folder if it doesn't exist
     try {
-      // const folderStats = fs.statSync(uploadPath)
-      const folderStats = fs.statSync(uploadPath)
-
+      fs.statSync(uploadPath)
     } catch (error) {
       console.log(error)
       fs.mkdirSync(uploadPath, { recursive: true })
@@ -46,10 +44,13 @@ const upload = multer({ storage: storage })
 
 /* -------------------------------------------------------------------------- */
 
-// router.post("/upload-single/:folder/:date/", upload.single('file'), fileController.uploadToDateFolder)
-router.get("/get-folder/:username", fileController.retrieveFolder)
-router.get("/get-folder/:username/:date", fileController.retrieveFolder)
-router.post("/upload-batch/folder/:username/:date/", upload.array('files'), fileController.batchUpload)
+router.get("/get/:username", fileController.retrieveFolder)
+router.get("/get/:username/:date", fileController.retrieveFolder)
+
+// router.put("/edit/:folder/:date/:fileId", upload.single('file'), fileController.uploadToDateFolder)
+
+router.post("/upload/folder/:username/:date", upload.array('files'), fileController.batchUpload)
+
 router.get("/stream-video/:username/:date/:fileId", fileController.streamVideo)
 
 module.exports = router

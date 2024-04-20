@@ -4,7 +4,6 @@ const router = express.Router()
 /* ------------------------------- Controller ------------------------------- */
 const userController = require("../controllers/userController")
 /* --------------------------------- Helpers -------------------------------- */
-const decryptJWT = require("../helpers/decryptJWT")
 /* -------------------------------------------------------------------------- */
 
 /* -------------- Folder middleware to create the correct path -------------- */
@@ -22,32 +21,7 @@ router.get('/video/:folder/:date/:file', userController.streamVideo)
 //! -------------------------------------------------------------------------- */
 
 router.post("/create", userController.createFolder)
-// TODO: Make this accept FormData object
-
-// Not yet sure if this is necessary
-/* router.get("/:folder/view", (req, res) => {
-  try {
-    res.status(200)
-    res.json({
-      success: true,
-      message: "Retrieved folder",
-      data: {
-        folder: req.folder,
-        fileCount: "Something",
-        folderCount: "Something"
-      }
-    })
-  } catch (error) {
-    res.status(500)
-    res.json({
-      success: false,
-      message: "Failed to fetch folder",
-      errorMessage: error.message,
-      error
-    })
-  }
-}) */
-
+// router.get('/:username/:date', userController.)
 // GET /:folder/view/:date/
 
 module.exports = router

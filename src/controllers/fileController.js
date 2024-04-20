@@ -1,4 +1,3 @@
-// Move all file related logic to this controller
 const path = require("path")  
 const fs = require("fs")
 

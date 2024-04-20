@@ -1,6 +1,11 @@
 const path = require("path")
 
-module.exports = createPathWithUsername = (req, res, next) => {
-  req.folder = path.join(process.cwd(), "/uploads", req.userId);
+/* --------------------------------- Schemas -------------------------------- */
+const User = require("../schemas/User")
+/* -------------------------------------------------------------------------- */
+
+module.exports = createPathWithUsername = async (req, res, next) => {
+  const foundUser = await User.findById(req.userId)
+  req.folder = path.join(process.cwd(), "/uploads", foundUser.folderId)
   next();
 }

@@ -24,10 +24,15 @@ exports.registerUser = async (req, res) => {
       username,
       password: await hash(password), 
       email
+    }, {
+      new: true
     })
 
+    const { _id, folderId } = newUser
+
     const userData = {
-      userId: newUser._id,
+      userId: _id,
+      folderId: folderId,
       username,
       email
     }
@@ -43,6 +48,7 @@ exports.registerUser = async (req, res) => {
       }
     })
   } catch (error) {
+    console.error(error)
     res.status(500).json({
       success: false,
       message: "Failed to register user",
@@ -68,10 +74,12 @@ exports.loginUser = async (req, res) => {
     const passwordMatch = await compareHash(password, foundUser.password)
     if (!passwordMatch) throw new Error(`Incorrect credentials`)
 
+    const { _id, email, folderId } = foundUser
+
     const userData = {
-      userId: foundUser._id,
-      email: foundUser.email,
-      password: foundUser.password,
+      userId: _id,
+      email: email,
+      password: password,
       username: username
     }
 
@@ -82,12 +90,13 @@ exports.loginUser = async (req, res) => {
       message: "Successfully logged in",
       data: {
         user: {
-          folderId: foundUser.folderId
+          folderId: folderId
         },
         JWT: loginToken
       }
     })
   } catch (error) {
+    console.error(error)
     res.status(500).json({
       success: false,
       message: "Failed to login",
