@@ -79,8 +79,8 @@ exports.loginUser = async (req, res) => {
     const userData = {
       userId: _id,
       email: email,
-      password: password,
-      username: username
+      username: username,
+      folderId: folderId
     }
 
     const loginToken = generateJWT(userData)

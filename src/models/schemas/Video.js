@@ -38,6 +38,7 @@ const videoSchema = new Schema({
   }],
   privacy: {
     type: String,
+    // This will later change to allow levels of friends to see
     enum: ['Public', 'Private', 'Unlisted'],
     default: 'Private',
     required: true

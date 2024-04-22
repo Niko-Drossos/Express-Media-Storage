@@ -10,6 +10,7 @@ const fileController = require("../controllers/fileController")
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 const createPathWithUsername = require("../models/middleware/createPathWithUsername")
 // const addDateToUrl = require("../models/middleware/addDateToUrl")
+const decryptJWT = require("../helpers/decryptJWT")
 /* -------------- Folder middleware to create the correct path -------------- */
 router.all("/*", authenticateUserJWT)
 router.param("username", createPathWithUsername)
@@ -17,8 +18,9 @@ router.param("username", createPathWithUsername)
 // Define a custom destination function for multer
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    // Use req.params.folderName to dynamically determine the upload location
-    const folderName = req.params.folder || 'defaultFolder'
+    const userPayload = decryptJWT(req.headers.authorization).payload
+
+    const folderName = userPayload.folderId || 'defaultFolder'
     const folderDate = req.params.date || 'defaultDate'
     const uploadPath = path.join(process.cwd(), `uploads/`, folderName, folderDate)
 
