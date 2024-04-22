@@ -126,6 +126,12 @@ exports.batchUpload = async (req, res) => {
       return acceptedImageExt.includes(getFileExt(upload.url))
     })
 
+    // Separate Audios
+    const acceptedAudioExt = ["mp3", "ma4", "wav"]
+    const audios = completedUploads.filter(upload => {
+      return acceptedAudioExt.includes(getFileExt(upload.url))
+    })
+
 
     res.status(201).json({
       success: true,
@@ -134,7 +140,8 @@ exports.batchUpload = async (req, res) => {
         uploadedFiles: {
           // separate the images and videos
           images,
-          videos
+          videos,
+          audios
         }
       }
     })
