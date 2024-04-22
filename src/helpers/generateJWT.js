@@ -6,7 +6,7 @@ const JwtSecretKey = process.env.JWT_SECRET_KEY
 
 function generateJWT(payload) {
   const options = {
-    expiresIn: '5h', // Token expiration time
+    expiresIn: '24h', // Token expiration time
   };
   return jwt.sign(payload, JwtSecretKey, options);
 }

@@ -8,7 +8,10 @@ const Image = require("../models/schemas/Image")
 
 /* --------------------------------- Helpers -------------------------------- */
 const generateRouteId = require('../helpers/generateRouteId')
+const getVideoDetails = require('../helpers/getVideoDetails')
+const getFileExt = require('../helpers/getFileExt')
 /* --------------------- Upload to folder with name date -------------------- */
+/* -------------------------------------------------------------------------- */
 
 exports.uploadToDateFolder = (req, res) => {
   try {
@@ -79,32 +82,66 @@ exports.retrieveFolder = (req, res) => {
   }
 }
 
-
 /* ---------------------------- Upload file batch --------------------------- */
 
 exports.batchUpload = async (req, res) => {
   try {
     // TODO: fix this taking batches but only one document
-    const { title, description } = req.body
+    const newUploads = req.uploads.map(async file => {
+      const fileExtension = getFileExt(file.originalname)
+      const fileDetails = await getVideoDetails(file.path)
 
-    const newVideo = await Video.create({
-      title,
-      description,
-      uploader: req.userId,
-      url: req.fileUrl
+      const { width, height } = fileDetails.streams[0]
+      const documentBody = {
+        dimensions: {
+          width, 
+          height
+        },
+        uploader: req.userId,
+        title: file.originalname,
+        description: "",
+        uploader: req.userId,
+        url: file.path,
+        fileSize: file.size,
+      }
+
+      if (fileExtension === "jpg") {
+        return await Image.create(documentBody)
+      } else if (fileExtension === "mp4") {
+        return await Video.create({ ...documentBody, length: fileDetails.format.duration })
+      }
     })
+    
+    const completedUploads = await Promise.all(newUploads)
+
+    // Separate Videos
+    const acceptedVideoExt = ["mp4"]
+    const videos = completedUploads.filter(upload => {
+      return acceptedVideoExt.includes(getFileExt(upload.url))
+    }) 
+
+    // Separate Images
+    const acceptedImageExt = ["jpg", "jpeg", "png"]
+    const images = completedUploads.filter(upload => {
+      return acceptedImageExt.includes(getFileExt(upload.url))
+    })
+
 
     res.status(201).json({
       success: true,
       message: "Uploaded files to folder",
       data: {
-        file: newVideo
+        uploadedFiles: {
+          // separate the images and videos
+          images,
+          videos
+        }
       }
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch folder",
+      message: "Failed to upload files",
       errorMessage: error.message,
       error
     })

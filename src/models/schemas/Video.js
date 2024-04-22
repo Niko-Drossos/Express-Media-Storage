@@ -45,21 +45,21 @@ const videoSchema = new Schema({
   dimensions: {
     width: {
       type: Number,
-      // required: true
+      required: false
     },
     height: {
       type: Number,
-      // required: true
+      required: false
     }
   },
   length: {
     type: Number,
     // TODO: uncomment these after testing
-    // required: true 
+    required: false 
   },
   fileSize: {
-    type: Number,
-    // required: true
+    type: String,
+    required: false
   },
   votes: [{
     user: {
