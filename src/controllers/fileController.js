@@ -44,13 +44,14 @@ exports.retrieveFolder = (req, res) => {
     const folderContents = fs.readdirSync(req.folder)
 
     // Add the folder stats to the folder if they supply a date
-    if (req.dateFolder) {
-      const dateContents = fs.readdirSync(req.dateFolder)
-      //* --------------------------- April 20 2024 02:38 -------------------------- */
+    const date = req.params.date 
+    if (date) {
+      const dateContents = fs.readdirSync(`${req.folder}/${date}`)
+      // * --------------------------- April 20 2024 02:38 -------------------------- 
       // This is the first time I have used var intentionally.
       // I think this is more efficient than using a block scoped variable
       var dateFolder = {
-        date: req.params.date,
+        date,
         fileCount: dateContents.length,
         contents: dateContents
       }
@@ -61,7 +62,6 @@ exports.retrieveFolder = (req, res) => {
       message: "Retrieved folder",
       data: {
         folder: req.folder,
-        
         dateFolder,
         folder: {
           folderDirectories: folderContents,
@@ -84,14 +84,45 @@ exports.retrieveFolder = (req, res) => {
 
 exports.batchUpload = async (req, res) => {
   try {
-    // TODO: fix this taking batches but only one document
-    const { title, description } = req.body
+    const acceptedVideoExt = ["mp4"]
+    const acceptedImageExt = ["jpg", "jpeg", "png", "webp"] 
+    const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
-    const newVideo = await Video.create({
-      title,
-      description,
-      uploader: req.userId,
-      url: req.fileUrl
+    const newUploads = req.uploads.map(async file => {
+      const fileExtension = getFileExt(file.originalname)
+      const fileDetails = await getVideoDetails(file.path)
+
+      const { width, height } = fileDetails.streams[0]
+      const documentBody = {
+        dimensions: {
+          width, 
+          height
+        },
+        uploader: req.userId,
+        title: file.originalname,
+        description: "",
+        url: file.path,
+        fileSize: file.size,
+      }
+
+      // Create exactly one document per upload
+      if (acceptedImageExt.includes(fileExtension)) {
+        return await Image.create(documentBody)
+      } else if (acceptedVideoExt.includes(fileExtension)) {
+        return await Video.create({ ...documentBody, length: fileDetails.format.duration })
+      } else if (acceptedAudioExt.includes(fileExtension)) {
+        return await Audio.create({ ...documentBody, length: fileDetails.format.duration })
+      }
+    })
+    
+    const completedUploads = await Promise.all(newUploads)
+
+    // Sort the uploads into videos, images, and audios
+    let videos = [], images = [], audios = [];
+    completedUploads.map(upload => {
+      if (acceptedVideoExt.includes(getFileExt(upload.url))) videos.push(upload)
+      if (acceptedImageExt.includes(getFileExt(upload.url))) images.push(upload)
+      if (acceptedAudioExt.includes(getFileExt(upload.url))) audios.push(upload)
     })
 
     res.status(201).json({
