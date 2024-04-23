@@ -1,4 +1,9 @@
 slogan: ©Where your story become his-story
 Create upload api
+
+
+Add view routes for posts, videos, images, audios and maybe comments
+add comment routes
+
 Make user/create update the database with the folder name
 Move the correct logic to the controller folder

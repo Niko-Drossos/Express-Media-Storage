@@ -17,6 +17,7 @@ app.use("/auth", require("./routes/auth.routes"))
 app.use("/user", require("./routes/user.routes"))
 app.use("/file", require("./routes/file.routes"))
 app.use("/search", require("./routes/search.routes"))
+app.use("/post", require("./routes/post.routes"))
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, () => console.log(`server started at http://localhost:${port}`))

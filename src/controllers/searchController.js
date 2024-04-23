@@ -7,31 +7,36 @@ const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
 /* --------------------------------- Helpers -------------------------------- */
-const decryptJWT = require("../helpers/decryptJWT")
+const searchDateRange = require("../helpers/searchDateRange")
 /* -------------------------------------------------------------------------- */
 
 /* --------------------------- Search for users by name ----------------------- */
 
 /* ------------------ Search for posts within a time frame ------------------ */
 
-// ! NOT FINISHED 
 exports.searchPosts = async (req, res) => {
   try {
     const query = req.query
 
     // Object that will be searched for in the db
     const searchQuery = {}
+    
+    const { posterId, tags, startDate, endDate, title } = query
 
-    if (query?.posterId) searchQuery._id = query.posterId
+    if (posterId) searchQuery.user = posterId
+    if (tags) searchQuery.tags = tags.split(",")
+    if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
+    if (title) searchQuery.title = new RegExp(title, 'i')
 
-    // const searchResults = await Post.find(searchQuery)
+    const searchResults = await Post.find(searchQuery)
     
     res.status(200).json({ 
       success: true, 
       message: "Successfully searched for posts" ,
       data: {
-        // searchResults,
-        query
+        postCount: searchResults.length,
+        query,
+        searchResults
       }
     })
   } catch (error) {
@@ -43,3 +48,6 @@ exports.searchPosts = async (req, res) => {
     })
   }
 }
+
+/* ------------------------------ Search videos ----------------------------- */
+

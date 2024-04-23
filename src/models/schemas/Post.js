@@ -11,6 +11,15 @@ const postSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  title: {
+    type: String,
+    required: false,
+    default: `Untitled ${Date.now()}`
+  },
+  description: {
+    type: String,
+    required: false
+  },
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -27,6 +36,10 @@ const postSchema = new Schema({
   images: [{
     type: Schema.Types.ObjectId,
     ref: 'Image'
+  }],
+  audios: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Audio'
   }],
   tags: [{
     type: String // TODO: change this to an enum once tags are added
