@@ -14,26 +14,24 @@ const decryptJWT = require("../helpers/decryptJWT")
 
 /* ------------------ Search for posts within a time frame ------------------ */
 
+// ! NOT FINISHED 
 exports.searchPosts = async (req, res) => {
   try {
-    const { query } = req.query
-    console.log(query)
-    const searchQuery = {
-      
-    }
+    const query = req.query
 
-    // const search = await Post.find(searchQuery)
+    // Object that will be searched for in the db
+    const searchQuery = {}
+
+    if (query?.posterId) searchQuery._id = query.posterId
+
+    // const searchResults = await Post.find(searchQuery)
     
     res.status(200).json({ 
       success: true, 
       message: "Successfully searched for posts" ,
       data: {
-        searchResults: [
-          
-        ],
-        query: {
-          query: req.query
-        }
+        // searchResults,
+        query
       }
     })
   } catch (error) {
