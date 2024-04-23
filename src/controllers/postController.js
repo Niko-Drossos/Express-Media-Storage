@@ -10,6 +10,8 @@ const Audio = require("../models/schemas/Audio")
 
 /* -------------------------------------------------------------------------- */
 
+/* ------------------------------ Create a post ----------------------------- */
+
 exports.createPost = async (req, res) => {
   try {
     const { title, description, privacy, images, videos, audios, tags } = req.body
@@ -34,6 +36,46 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ 
       success: false,
       message: "Failed to create post",
+      errorMessage: error.message,
+      error 
+    })
+  }
+}
+
+/* ------------------------------ Update a post ----------------------------- */
+
+exports.editPost = async (req, res) => {
+  try {
+    const { title, description, privacy, images, videos, audios, tags } = req.body
+
+    const updatedInformation = {
+      title,
+      description,  
+      images, 
+      videos, 
+      audios, 
+      tags
+    }
+
+    if (privacy) updatedInformation.privacy = privacy
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.postId, 
+      updatedInformation,
+      { new: true }
+    )
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully updated post",
+      data: {
+        newPost: updatedPost
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to update post",
       errorMessage: error.message,
       error 
     })

@@ -12,7 +12,7 @@ const commentSchema = new Schema({
   },
   originType: {
     type: String,
-    enum: ['Post', 'Comment', 'User', 'Video', 'Image'],
+    enum: ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'],
     required: true
   },
   user: {

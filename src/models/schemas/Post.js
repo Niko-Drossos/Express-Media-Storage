@@ -25,6 +25,13 @@ const postSchema = new Schema({
     ref: 'User',
     required: true
   },
+  privacy: {
+    type: String,
+    // TODO: This will later change to allow levels of friends to see
+    enum: ['Public', 'Private', 'Unlisted'],
+    default: 'Private',
+    required: true
+  },
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment'
