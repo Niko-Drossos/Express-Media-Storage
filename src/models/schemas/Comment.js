@@ -6,18 +6,23 @@ const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const commentSchema = new Schema({
-  date: {
-    type: Date,
-    default: Date.now
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   originType: {
     type: String,
     enum: ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'],
     required: true
   },
-  user: {
+  originId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    refPath: 'originType',
+    required: true
+  },
+  content: {
+    type: String,
     required: true
   },
   comments: [{
@@ -49,6 +54,12 @@ commentSchema.pre('save', function(next) {
   this.voteCount = calculateVoteCount(this.votes)
   next()
 })
+
+commentSchema.path('originId').validate(function(value) {
+  // Validate that the originType and originId combination is valid
+  const modelNames = ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'];
+  return modelNames.includes(this.originType) && value != null;
+}, 'Invalid combination of originType and originId');
 
 const Comment = mongoose.model('Comment', commentSchema)
 
