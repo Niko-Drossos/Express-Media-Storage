@@ -3,7 +3,8 @@ Create upload api
 
 
 Add view routes for posts, videos, images, audios and maybe comments
-add comment routes
+
+add comment routes for deleting and updating
 
 Make user/create update the database with the folder name
 Move the correct logic to the controller folder

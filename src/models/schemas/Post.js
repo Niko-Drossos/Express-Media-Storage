@@ -51,17 +51,20 @@ const postSchema = new Schema({
   tags: [{
     type: String // TODO: change this to an enum once tags are added
   }],
-  votes: [{
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    vote: {
-      type: Boolean,
-      required: true
-    }
-  }],
+  votes: {
+    type: [{
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      vote: {
+        type: Boolean,
+        required: true
+      }
+    }],
+    select: false
+  },
   voteCount: {
     type: Number,
     default: 0

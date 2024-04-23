@@ -62,17 +62,20 @@ const videoSchema = new Schema({
     type: String,
     required: false
   },
-  votes: [{
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    vote: {
-      type: Boolean,
-      required: true
-    }
-  }],
+  votes: {
+    type: [{
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      vote: {
+        type: Boolean,
+        required: true
+      }
+    }],
+    select: false
+  },
   voteCount: {
     type: Number,
     default: 0

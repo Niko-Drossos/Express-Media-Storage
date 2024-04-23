@@ -14,7 +14,8 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    select: false
   },
   email: {
     type: String,
@@ -29,17 +30,20 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Post'
   }],
-  votes: [{
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    vote: {
-      type: Boolean,
-      required: true
-    }
-  }],
+  votes: {
+    type: [{
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      vote: {
+        type: Boolean,
+        required: true
+      }
+    }],
+    select: false
+  },
   voteCount: {
     type: Number,
     default: 0

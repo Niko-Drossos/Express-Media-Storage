@@ -8,9 +8,8 @@ const fs = require("fs")
 const searchController = require("../controllers/searchController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
-const createPathWithUsername = require("../models/middleware/createPathWithUsername")
-/* -------------- Folder middleware to create the correct path -------------- */
 router.all("/*", authenticateUserJWT)
+/* -------------- Folder middleware to create the correct path -------------- */
 
 router.get("/posts", searchController.searchPosts)
 

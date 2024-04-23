@@ -20,16 +20,23 @@ const imageSchema = new Schema({
     type: String,
     required: true
   },
-  votes: [{
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    type: {
-      type: Boolean,
-      required: true
-    }
+  comments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Comment',
   }],
+  votes: {
+    type: [{
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      type: {
+        type: Boolean,
+        required: true
+      }
+    }],
+    select: false
+  },
   voteCount: {
     type: Number,
     default: 0
