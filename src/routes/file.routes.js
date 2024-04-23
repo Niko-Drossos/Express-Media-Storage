@@ -10,6 +10,7 @@ const fileController = require("../controllers/fileController")
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 const createPathWithUsername = require("../models/middleware/createPathWithUsername")
 // const addDateToUrl = require("../models/middleware/addDateToUrl")
+const decryptJWT = require("../helpers/decryptJWT")
 /* -------------- Folder middleware to create the correct path -------------- */
 router.all("/*", authenticateUserJWT)
 router.param("username", createPathWithUsername)
@@ -17,8 +18,9 @@ router.param("username", createPathWithUsername)
 // Define a custom destination function for multer
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    // Use req.params.folderName to dynamically determine the upload location
-    const folderName = req.params.folder || 'defaultFolder'
+    const userPayload = decryptJWT(req.headers.authorization).payload
+
+    const folderName = userPayload.folderId || 'defaultFolder'
     const folderDate = req.params.date || 'defaultDate'
     const uploadPath = path.join(process.cwd(), `uploads/`, folderName, folderDate)
 
@@ -26,11 +28,8 @@ const storage = multer.diskStorage({
     try {
       fs.statSync(uploadPath)
     } catch (error) {
-      console.log(error)
       fs.mkdirSync(uploadPath, { recursive: true })
     }
-
-    req.fileUrl = path.join(uploadPath, file.originalname)
 
     cb(null, uploadPath)
   },
@@ -42,6 +41,23 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
+// Middleware to process uploaded files
+const processUploads = (req, res, next) => {
+  if (!req.files) {
+    return res.status(400).json({ message: 'No files uploaded' })
+  }
+
+  // Store uploaded files in req.uploads array
+  req.uploads = req.files.map(file => ({
+    filename: file.filename,
+    originalname: file.originalname,
+    path: file.path, // Temporary path where the file was uploaded
+    size: file.size
+  }))
+
+  next()
+}
+
 /* -------------------------------------------------------------------------- */
 
 router.get("/get/:username", fileController.retrieveFolder)
@@ -49,7 +65,7 @@ router.get("/get/:username/:date", fileController.retrieveFolder)
 
 // router.put("/edit/:folder/:date/:fileId", upload.single('file'), fileController.uploadToDateFolder)
 
-router.post("/upload/folder/:username/:date", upload.array('files'), fileController.batchUpload)
+router.post("/upload/folder/:username/:date", upload.array('files'), processUploads, fileController.batchUpload)
 
 router.get("/stream-video/:username/:date/:fileId", fileController.streamVideo)
 

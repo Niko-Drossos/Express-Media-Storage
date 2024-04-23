@@ -8,7 +8,10 @@ const Image = require("../models/schemas/Image")
 
 /* --------------------------------- Helpers -------------------------------- */
 const generateRouteId = require('../helpers/generateRouteId')
+const getVideoDetails = require('../helpers/getVideoDetails')
+const getFileExt = require('../helpers/getFileExt')
 /* --------------------- Upload to folder with name date -------------------- */
+/* -------------------------------------------------------------------------- */
 
 exports.uploadToDateFolder = (req, res) => {
   try {
@@ -79,7 +82,6 @@ exports.retrieveFolder = (req, res) => {
   }
 }
 
-
 /* ---------------------------- Upload file batch --------------------------- */
 
 exports.batchUpload = async (req, res) => {
@@ -129,13 +131,18 @@ exports.batchUpload = async (req, res) => {
       success: true,
       message: "Uploaded files to folder",
       data: {
-        file: newVideo
+        uploadedFiles: {
+          // separate the images and videos
+          images,
+          videos,
+          audios
+        }
       }
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch folder",
+      message: "Failed to upload files",
       errorMessage: error.message,
       error
     })
