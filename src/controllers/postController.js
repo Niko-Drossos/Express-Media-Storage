@@ -81,3 +81,32 @@ exports.editPost = async (req, res) => {
     })
   }
 }
+
+/* ------------------------------ Delete a post ----------------------------- */
+
+exports.deletePost = async (req, res) => {
+  try {
+    const deletedPost = await Post.findOneAndDelete({
+      _id: req.params.postId,
+      // This is to prevent users from deleting other users' posts
+      user: req.userId
+    })
+
+    if (!deletedPost) throw new Error("Post not found")
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully deleted post",
+      data: {
+        deletedPost
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to delete post",
+      errorMessage: error.message,
+      error 
+    })
+  }
+}

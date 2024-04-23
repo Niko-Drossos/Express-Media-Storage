@@ -15,6 +15,8 @@ router.post("/create", postController.createPost)
 
 router.put("/edit/:postId", postController.editPost)
 
+router.delete("/delete/:postId", postController.deletePost)
+
 // create update post route
 
 module.exports = router
