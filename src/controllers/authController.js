@@ -19,6 +19,12 @@ exports.registerUser = async (req, res) => {
       throw new Error("Missing username, password or email")
     }
 
+    // 1 uppercase, 1 lowercase, 1 number, 1 special character and at least 8 characters
+    const isStrongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
+
+    if (!isStrongPassword) {
+      throw new Error("Password is not strong enough")
+    }
 
     const newUser = await User.create({
       username,
@@ -48,7 +54,6 @@ exports.registerUser = async (req, res) => {
       }
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       success: false,
       message: "Failed to register user",
@@ -96,7 +101,6 @@ exports.loginUser = async (req, res) => {
       }
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       success: false,
       message: "Failed to login",
