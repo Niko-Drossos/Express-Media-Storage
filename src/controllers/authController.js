@@ -4,7 +4,6 @@ const path = require("path")
 const User = require("../models/schemas/User")
 /* --------------------------------- Helpers -------------------------------- */
 const generateJWT = require("../helpers/generateJWT")
-const decryptJWT = require("../helpers/decryptJWT")
 const compareHash = require("../helpers/compareHash")
 const hash = require("../helpers/hash")
 /* -------------------------------------------------------------------------- */
@@ -25,31 +24,29 @@ exports.registerUser = async (req, res) => {
     if (!isStrongPassword) {
       throw new Error("Password is not strong enough")
     }
-
+    
     const newUser = await User.create({
       username,
       password: await hash(password), 
       email
-    }, {
-      new: true
     })
 
     const { _id, folderId } = newUser
 
-    const userData = {
+    const payload = {
       userId: _id,
       folderId: folderId,
       username,
       email
     }
 
-    const loginToken = generateJWT(userData)
+    const loginToken = generateJWT(payload)
 
     res.status(201).json({
       success: true,
       message: "Successfully registered user",
       data: {
-        user: userData,
+        user: payload,
         JWT: loginToken
       }
     })
@@ -73,7 +70,7 @@ exports.loginUser = async (req, res) => {
 
     // Find the user in the database and throw an error if none found
     const foundUser = await User.findOne({ username })
-    if (!foundUser) throw new Error(`No user with username: ${username} found`)
+    if (!foundUser || foundUser == undefined) throw new Error(`No user with username: ${username} found`)
 
     // Check if password is a match 
     const passwordMatch = await compareHash(password, foundUser.password)
@@ -81,14 +78,14 @@ exports.loginUser = async (req, res) => {
 
     const { _id, email, folderId } = foundUser
 
-    const userData = {
+    const payload = {
       userId: _id,
       email: email,
       username: username,
       folderId: folderId
     }
 
-    const loginToken = generateJWT(userData)
+    const loginToken = generateJWT(payload)
 
     res.status(200).json({
       success: true,
