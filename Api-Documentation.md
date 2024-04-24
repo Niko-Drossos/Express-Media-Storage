@@ -5,12 +5,13 @@ auth
 
 view
 (all routes return a populated document to be rendered , all GET requests)
-/user/:userId
 /post/:postId
 /comment/:commentId
 /video/:videoId
 /image/:imageId
 /audio/:audioId
+(Maybe use users in view, probably in the user routes though)
+/user/:userId
 
 user
 (Im not sure what im going to add yet)
@@ -21,6 +22,38 @@ GET
 /get/:username/:date
 POST
 /upload/folder/:username/:date  (Uploads a group of files)
+
+post
+POST
+/create
+
+PUT
+/edit/:postId
+
+DELETE
+/delete/:postId
+
+comment
+POST
+/create/post/:postId
+/create/user/:userId
+/create/comment/:commentId
+/create/video/:videoId
+/create/image/:imageId
+/create/audio/:audioId
+
+search
+GET
+/posts query's: tags, posterId, startDate, endDate
+
+(not added yet)
+/videos
+/images
+/audios
+
+vote (future plan)
+
+
 
 # Middleware
 all routes besides the auth routes use the authenticateUserJWT to verify login status
