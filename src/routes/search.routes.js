@@ -13,6 +13,8 @@ router.all("/*", authenticateUserJWT)
 
 router.get("/posts", searchController.searchPosts)
 
+router.get("/comments", searchController.searchComments)
+
 // Add later
 // router.get("/videos", searchController.searchPosts)
 // router.get("/images", searchController.searchPosts)

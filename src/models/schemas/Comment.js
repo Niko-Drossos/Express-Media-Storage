@@ -11,6 +11,10 @@ const commentSchema = new Schema({
     ref: 'User',
     required: true
   },
+  date: {
+    type: Date,
+    default: Date.now
+  },
   originType: {
     type: String,
     enum: ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'],
