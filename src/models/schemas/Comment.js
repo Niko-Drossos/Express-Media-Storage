@@ -68,6 +68,28 @@ commentSchema.path('originId').validate(function(value) {
   return modelNames.includes(this.originType) && value != null;
 }, 'Invalid combination of originType and originId');
 
+// Changes the text of the content to indicate deletion
+commentSchema.pre('remove', { document: true, query: false }, async function(next) {
+  try {
+    // Update the content of the document to indicate deletion
+    this.content = `[This comment was deleted on ${new Date(Date.now()).toLocaleDateString()}]`;
+    await this.save();
+
+    // Access the model associated with the document
+    const Model = mongoose.model(this.originType);
+
+    // Remove reference to this comment from other documents
+    await Model.updateMany(
+      { comments: this._id },
+      { $pull: { comments: this._id } }
+    );
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 const Comment = mongoose.model('Comment', commentSchema)
 
 module.exports = Comment

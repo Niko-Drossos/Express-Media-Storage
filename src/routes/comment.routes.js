@@ -8,6 +8,10 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
+/* -------------------------------------------------------------------------- */
+/*                            Create comment routes                           */
+/* -------------------------------------------------------------------------- */
+
 router.post("/create/post/:postId", commentController.commentOnPost)
 
 router.post("/create/comment/:commentId", commentController.commentOnComment)
@@ -19,5 +23,11 @@ router.post("/create/video/:videoId", commentController.commentOnVideo)
 router.post("/create/image/:imageId", commentController.commentOnImage)
 
 router.post("/create/audio/:audioId", commentController.commentOnAudio)
+
+/* -------------------------------------------------------------------------- */
+/*                            Delete comment routes                           */
+/* -------------------------------------------------------------------------- */
+
+router.delete("/delete/:commentId", commentController.deleteComment)
 
 module.exports = router

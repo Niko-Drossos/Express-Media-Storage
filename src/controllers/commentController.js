@@ -218,3 +218,33 @@ exports.commentOnAudio = async (req, res) => {
 }
 
 /* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                                Delete routes                               */
+/* -------------------------------------------------------------------------- */
+
+exports.deleteComment = async (req, res) => {
+  try {
+    const deletedComment = await Comment.findOneAndDelete({
+      _id: req.params.commentId,
+      user: req.userId
+    })  
+
+    if (!deletedComment) throw new Error("Comment not found")
+
+    res.status(200).json({
+      success: true,
+      message: "Deleted comment",
+      data: {
+        comment: deletedComment
+      }
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete comment",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
