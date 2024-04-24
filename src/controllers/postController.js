@@ -27,6 +27,12 @@ exports.createPost = async (req, res) => {
       tags: tags || []
     })
 
+    await User.findByIdAndUpdate(req.userId, {
+      $push: {
+        posts: createdPost._id
+      }
+    })
+
     res.status(201).json({
       success: true,
       message: "Successfully created post",
@@ -59,8 +65,9 @@ exports.editPost = async (req, res) => {
 
     if (privacy) updatedInformation.privacy = privacy
 
-    const updatedPost = await Post.findByIdAndUpdate(
-      req.params.postId, 
+    // Make sure that the person updating the post is the one who created it
+    const updatedPost = await Post.findOneAndUpdate(
+      { _id: req.params.postId, user: req.userId }, 
       updatedInformation,
       { new: true }
     )

@@ -17,6 +17,7 @@ const postSchema = new Schema({
     default: `Untitled ${Date.now()}`
   },
   description: {
+    // This is stored as a markdown string
     type: String,
     required: false
   },

@@ -46,12 +46,16 @@ const processUploads = (req, res, next) => {
   }
 
   // Store uploaded files in req.uploads array
-  req.uploads = req.files.map(file => ({
-    filename: file.filename,
-    originalname: file.originalname,
-    path: file.path, // Temporary path where the file was uploaded
-    size: file.size
-  }))
+  req.uploads = req.files.map(file => {
+    file.path = file.path.split('uploads/')[1]
+    
+    return {
+      filename: file.filename,
+      originalname: file.originalname,
+      path: file.path, // Temporary path where the file was uploaded
+      size: file.size
+    }
+  })
 
   next()
 }
