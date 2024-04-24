@@ -1,28 +1,79 @@
 # Routes
+auth
+/login   (Both return the JWT, both POST)
+/register
 
-## Auth
-### POST: /auth/register
-BODY: 
-```json
-{
-  username<String>,
-  password<String>,
-  email<String>
-}
-```
+view
+(all routes return a populated document to be rendered , all GET requests)
+/user/:userId
+/post/:postId
+/comment/:commentId
+/video/:videoId
+/image/:imageId
+/audio/:audioId
 
-### POST: /auth/login
-BODY: 
-```json
+user
+(Im not sure what im going to add yet)
+
+file
+GET
+/get/:username      (Gets and returns the folder data)
+/get/:username/:date
+POST
+/upload/folder/:username/:date  (Uploads a group of files)
+
+# Middleware
+all routes besides the auth routes use the authenticateUserJWT to verify login status
+
+# Auth
+Auth routes are used to create and login users, this is the only route that DOESN'T use the `authenticateUserJWT` middleware
+## POST: /auth/register
+<p>The body must contain a <code>username</code>, <code>password</code> and <code>email</code> to register a user.  Email is not currently being used for user validation but in the future will be used for password resetting</p>
+
+```javascript
 {
-  username<String>,
-  password<String>
+    username: String,
+    password: String,
+    email: String
 }
 ```
 
 ### RESPONSE
-SUCCESS:
-```json
+<p>There are 2 possible responses, <code>success</code> and <code>error</code>.</p>
+<p>An error is only thrown when any of the required body values are missing or the password does not match the requirements.</p>
+
+**Success:**
+```javascript
+{
+    success: true,
+    message: "Successfully registered user",
+    data: {
+      JWT: jwtToken
+    } 
+}
+```
+**Error:**
+```javascript
+{
+    success: false,
+    message: "Failed to register user",
+    errorMessage: error.message,
+    error
+}
+```
+
+## POST: /auth/login
+**Body:** 
+```javascript
+{
+    username: String,
+    password: String
+}
+```
+
+### RESPONSE
+**Success:**
+```javascript
 {
     success: true,
     message: "Successfully logged in",
@@ -31,8 +82,8 @@ SUCCESS:
     } 
 }
 ```
-ERROR:
-```json
+**Error:**
+```javascript
 {
     success: false,
     message: "Failed to login",
@@ -40,19 +91,19 @@ ERROR:
     error
 }
 ```
-
+<!-- 
 ## User
 ### POST: /user/create
 
 BODY: 
-```json
+```javascript
 {
   username<String>
 }
 ```
 
 ### RESPONSE
-SUCCESS:
+**Success:**
 ```json
 {
   success: true,
@@ -62,7 +113,7 @@ SUCCESS:
   }
 }
 ```
-ERROR:
+**Error:**
 ```json
 {
   success: false,
@@ -83,7 +134,7 @@ date - current day in MM-DD-YYYY format
 ```
 
 ### RESPONSE
-SUCCESS:
+**Success:**
 ```json
 {
   success: true,
@@ -93,7 +144,7 @@ SUCCESS:
   }
 }
 ```
-ERROR:
+**Error:**
 ```json
 {
   success: false,
@@ -101,4 +152,4 @@ ERROR:
   errorMessage: error.message,
   error
 }
-```
+``` -->

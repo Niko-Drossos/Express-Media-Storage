@@ -1,6 +1,8 @@
 slogan: ©Where your story become his-story
 Create upload api
 
+Add backend password strength validation
+
 
 Add view routes for posts, videos, images, audios and maybe comments
 
