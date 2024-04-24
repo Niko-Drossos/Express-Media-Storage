@@ -9,12 +9,10 @@ const fileController = require("../controllers/fileController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 const createPathWithUsername = require("../models/middleware/createPathWithUsername")
-// const addDateToUrl = require("../models/middleware/addDateToUrl")
 const decryptJWT = require("../helpers/decryptJWT")
-/* -------------- Folder middleware to create the correct path -------------- */
 router.all("/*", authenticateUserJWT)
 router.param("username", createPathWithUsername)
-
+/* ---------------------- Multer file upload middleware --------------------- */
 // Define a custom destination function for multer
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -67,6 +65,7 @@ router.get("/get/:username/:date", fileController.retrieveFolder)
 
 router.post("/upload/folder/:username/:date", upload.array('files'), processUploads, fileController.batchUpload)
 
+// Still working on this one
 router.get("/stream-video/:username/:date/:fileId", fileController.streamVideo)
 
 module.exports = router

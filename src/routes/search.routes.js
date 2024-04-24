@@ -18,6 +18,4 @@ router.get("/posts", searchController.searchPosts)
 // router.get("/images", searchController.searchPosts)
 // router.get("/audios", searchController.searchPosts)
 
-
-
 module.exports = router
