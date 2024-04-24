@@ -56,18 +56,49 @@ vote (future plan)
 
 
 # Middleware
-all routes besides the auth routes use the authenticateUserJWT to verify login status
+This is a list of all the middlewares used in the server. <br>
+[authenticateUserJWT](#authenticateUserJWT)
+## authenticateUserJWT
+<p>This middleware is used to validate that a JWT token send the the header <code>authorization</code> is valid.</p>
+<p>all routes besides the auth routes use the <code>authenticateUserJWT</code> to verify login status.</p>
+<p>The <code>authenticateUserJWT</code> middleware only returns error responses if there are problems with JWT, like <code>expired</code>, <code>invalid</code> or <code>not provided</code></p>
+
+**returns** <br>
+`req.userId`: document _id of user <br>
+`req.username`: username <br>
+`req.email`: email
+
+**Error** `401`
+```javascript
+{
+  success: false,
+  message: "No token provided, please log in",
+}
+```
+
+**Error** `403`
+```javascript
+{
+  success: false,
+  message: "Failed to validate user",
+  errorMessage: error.message,
+  error
+}
+```
+<!-- ! HOLD OFF ON THIS ONE, MIGHT BE DUMB -->
+## createPathWithUsername
+<p>This middleware is used to create the absolute path of a folder using someones <code>username</code>.</p>
 
 # Auth
-Auth routes are used to create and login users, this is the only route that DOESN'T use the `authenticateUserJWT` middleware
+Auth routes are used to create and login users, this is the only route that <b>DOESN'T</b> use the `authenticateUserJWT` middleware
 ## POST: /auth/register
-<p>The body must contain a <code>username</code>, <code>password</code> and <code>email</code> to register a user.  Email is not currently being used for user validation but in the future will be used for password resetting</p>
+<p>The body must contain a <code>username</code>, <code>password</code> and <code>email</code> to register a user.  Email is not currently being used for user validation but in the future will be used for password resetting.</p>
 
 ```javascript
 {
-    username: String,
+    username: String unique,
     password: String,
-    email: String
+    email: String unique
 }
 ```
 
@@ -75,7 +106,7 @@ Auth routes are used to create and login users, this is the only route that DOES
 <p>There are 2 possible responses, <code>success</code> and <code>error</code>.</p>
 <p>An error is only thrown when any of the required body values are missing or the password does not match the requirements.</p>
 
-**Success:**
+**Success:** `201`
 ```javascript
 {
     success: true,
@@ -85,7 +116,7 @@ Auth routes are used to create and login users, this is the only route that DOES
     } 
 }
 ```
-**Error:**
+**Error:** `500`
 ```javascript
 {
     success: false,
@@ -96,7 +127,8 @@ Auth routes are used to create and login users, this is the only route that DOES
 ```
 
 ## POST: /auth/login
-**Body:** 
+<p>To login to need to provide a <code>username</code> and <code>password</code>.  Then the <code>jwtToken</code> will contain your, <code>username</code>, <code>email</code>, and <code>doc_id</code>.</p>
+
 ```javascript
 {
     username: String,
@@ -105,7 +137,7 @@ Auth routes are used to create and login users, this is the only route that DOES
 ```
 
 ### RESPONSE
-**Success:**
+**Success:** `200`
 ```javascript
 {
     success: true,
@@ -115,7 +147,7 @@ Auth routes are used to create and login users, this is the only route that DOES
     } 
 }
 ```
-**Error:**
+**Error:** `500`
 ```javascript
 {
     success: false,
