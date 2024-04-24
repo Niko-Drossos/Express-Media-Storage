@@ -6,10 +6,11 @@ const userController = require("../controllers/userController")
 /* --------------------------------- Helpers -------------------------------- */
 
 /* ------------------------------- Middlewares ------------------------------ */
-router.param("folder", (req, res, next, folder) => {
+// Remove later
+/* router.param("folder", (req, res, next, folder) => {
   req.folder = path.join(process.cwd(), "/public/files", folder)
   next()
-})
+}) */
 // TODO: Logging middleware, maybe
 /* -------------------------------------------------------------------------- */
 

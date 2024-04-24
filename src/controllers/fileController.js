@@ -11,7 +11,6 @@ const generateRouteId = require('../helpers/generateRouteId')
 const getVideoDetails = require('../helpers/getVideoDetails')
 const getFileExt = require('../helpers/getFileExt')
 /* --------------------- Upload to folder with name date -------------------- */
-/* -------------------------------------------------------------------------- */
 
 exports.uploadToDateFolder = (req, res) => {
   try {
