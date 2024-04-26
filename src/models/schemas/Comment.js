@@ -15,6 +15,18 @@ const commentSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  edited: {
+    type: {
+      isEdited: {
+        type: Boolean,
+        default: false
+      },
+      date: {
+        type: Date,
+        default: Date.now()
+      }
+    }
+  },
   deleted: {
     type: {
       isDeleted: {
@@ -23,7 +35,7 @@ const commentSchema = new Schema({
       },
       date: { 
         type: Date,
-        default: false
+        default: Date.now()
       }
     },
   },

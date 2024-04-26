@@ -253,3 +253,41 @@ exports.deleteComment = async (req, res) => {
     })
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                             Edit comment routes                            */
+/* -------------------------------------------------------------------------- */
+
+exports.updateComment = async (req, res) => {
+  try {
+    const updatedComment = await Comment.findOneAndUpdate({
+      _id: req.params.commentId,
+      user: req.userId
+    }, {
+      content: req.body.content,
+      edited: {
+        isEdited: true,
+        date: Date.now()
+      }
+    }, {
+      new: true
+    })
+
+    if (!updatedComment) throw new Error("Comment not found")
+
+    res.status(200).json({
+      success: true,
+      message: "Updated comment",
+      data: {
+        comment: updatedComment
+      }
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update comment",
+      errorMessage: error.message,
+      error
+    })
+  }
+}

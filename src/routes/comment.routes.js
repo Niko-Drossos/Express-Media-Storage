@@ -30,4 +30,10 @@ router.post("/create/audio/:audioId", commentController.commentOnAudio)
 
 router.delete("/delete/:commentId", commentController.deleteComment)
 
+/* -------------------------------------------------------------------------- */
+/*                             Edit comment routes                            */
+/* -------------------------------------------------------------------------- */
+
+router.put("/edit/:commentId", commentController.updateComment)
+
 module.exports = router
