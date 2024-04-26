@@ -218,19 +218,24 @@ exports.commentOnAudio = async (req, res) => {
 }
 
 /* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
 /*                                Delete routes                               */
 /* -------------------------------------------------------------------------- */
 
 exports.deleteComment = async (req, res) => {
   try {
-    const deletedComment = await Comment.findOneAndDelete({
+    const deletedComment = await Comment.findOneAndUpdate({
       _id: req.params.commentId,
-      user: req.userId
+      user: req.userId,
+      deleted: { $ne: true } // Make sure the comment is not already deleted
+    }, {
+      content: `[This comment was deleted on ${new Date(Date.now()).toLocaleDateString()}, ${new Date(Date.now()).toLocaleTimeString()}]`,
+      deleted: {
+        isDeleted: true,
+        date: Date.now()
+      }
     })  
 
-    if (!deletedComment) throw new Error("Comment not found")
+    if (!deletedComment) throw new Error("Comment not found or already deleted")
 
     res.status(200).json({
       success: true,

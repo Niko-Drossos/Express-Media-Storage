@@ -15,6 +15,18 @@ const commentSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  deleted: {
+    type: {
+      isDeleted: {
+        type: Boolean,
+        default: false
+      },
+      date: { 
+        type: Date,
+        default: false
+      }
+    },
+  },
   originType: {
     type: String,
     enum: ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'],
@@ -56,11 +68,30 @@ const commentSchema = new Schema({
   collection: 'comments'
 })
 
-// Middleware to update voteCount when votes array is modified
+/* ------------- Update the voteCount when the document is saved ------------ */
+
 commentSchema.pre('save', function(next) {
   this.voteCount = calculateVoteCount(this.votes)
   next()
 })
+
+/* ------------------ Make deleting a comment a soft delete ----------------- */
+
+// This wont work yet, i don't know why
+/* commentSchema.pre('findOneAndDelete', { document: true, query: false }, async function(next) {
+  try {
+    console.log("DELETING COMMENT!")
+    // Update the content of the document to indicate deletion
+    this.content = `[This comment was deleted on ${new Date(Date.now()).toLocaleDateString()}]`;
+    await this.save();
+
+    next(new Error('Document deletion prevented'));
+  } catch (error) {
+    next(error);
+  }
+}); */
+
+/* --- Validate that that the originType and originId combination is valid -- */
 
 commentSchema.path('originId').validate(function(value) {
   // Validate that the originType and originId combination is valid
@@ -68,27 +99,7 @@ commentSchema.path('originId').validate(function(value) {
   return modelNames.includes(this.originType) && value != null;
 }, 'Invalid combination of originType and originId');
 
-// Changes the text of the content to indicate deletion
-commentSchema.pre('remove', { document: true, query: false }, async function(next) {
-  try {
-    // Update the content of the document to indicate deletion
-    this.content = `[This comment was deleted on ${new Date(Date.now()).toLocaleDateString()}]`;
-    await this.save();
-
-    // Access the model associated with the document
-    const Model = mongoose.model(this.originType);
-
-    // Remove reference to this comment from other documents
-    await Model.updateMany(
-      { comments: this._id },
-      { $pull: { comments: this._id } }
-    );
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+/* -------------------------------------------------------------------------- */
 
 const Comment = mongoose.model('Comment', commentSchema)
 
