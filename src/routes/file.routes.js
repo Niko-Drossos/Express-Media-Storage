@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router()
+
 const multer = require("multer")
 const path = require("path")
 const fs = require("fs")
@@ -8,36 +9,7 @@ const fs = require("fs")
 const fileController = require("../controllers/fileController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
-const createPathWithUsername = require("../models/middleware/createPathWithUsername")
-const decryptJWT = require("../helpers/decryptJWT")
-router.all("/*", authenticateUserJWT)
-router.param("username", createPathWithUsername)
-/* ---------------------- Multer file upload middleware --------------------- */
-// Define a custom destination function for multer
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    const userPayload = decryptJWT(req.headers.authorization).payload
-
-    const folderName = userPayload.folderId || 'defaultFolder'
-    const folderDate = req.params.date || 'defaultDate'
-    const uploadPath = path.join(process.cwd(), `uploads/`, folderName, folderDate)
-
-    // Create the folder if it doesn't exist
-    try {
-      fs.statSync(uploadPath)
-    } catch (error) {
-      fs.mkdirSync(uploadPath, { recursive: true })
-    }
-
-    cb(null, uploadPath)
-  },
-  filename: function(req, file, cb) {
-    // You can customize the filename if needed
-    cb(null, file.originalname)
-  }
-})
-
-const upload = multer({ storage: storage })
+const { upload, uploadFile, uploadMultipleFiles } = require("../models/middleware/fileUploading")
 
 // Middleware to process uploaded files
 const processUploads = (req, res, next) => {
@@ -46,24 +18,16 @@ const processUploads = (req, res, next) => {
   }
 
   // Store uploaded files in req.uploads array
-  req.uploads = req.files.map(file => {
-    file.path = file.path.split('uploads/')[1]
-    
-    return {
-      filename: file.filename,
-      originalname: file.originalname,
-      path: file.path, // Temporary path where the file was uploaded
-      size: file.size
-    }
-  })
-
+  req.uploads = req.files.map(file => file)
+  
   next()
 }
 
+router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.get("/get/:username", fileController.retrieveFolder)
-router.get("/get/:username/:date", fileController.retrieveFolder)
+// router.get("/get/:username", fileController.retrieveFolder)
+// router.get("/get/:username/:date", fileController.retrieveFolder)
 
 // router.put("/edit/:folder/:date/:fileId", upload.single('file'), fileController.uploadToDateFolder)
 

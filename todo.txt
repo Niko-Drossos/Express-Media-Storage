@@ -2,4 +2,8 @@ slogan: ©Where your story becomes His-Story
 
 Create upload api
 
+remove create path with username middleware
+
+pipe data from video compression to gridfs
+
 Move the correct logic to the controller folder

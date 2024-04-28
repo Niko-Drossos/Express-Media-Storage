@@ -10,9 +10,10 @@ const Image = require("../models/schemas/Image")
 const generateRouteId = require('../helpers/generateRouteId')
 const getVideoDetails = require('../helpers/getVideoDetails')
 const getFileExt = require('../helpers/getFileExt')
+const { uploadFile } = require("../models/middleware/fileUploading")
 /* --------------------- Upload to folder with name date -------------------- */
 
-exports.uploadToDateFolder = (req, res) => {
+/* exports.uploadToDateFolder = (req, res) => {
   try {
     const dateFolder = path.join(req.folder, req.params.date)
 
@@ -37,11 +38,11 @@ exports.uploadToDateFolder = (req, res) => {
       error
     })
   }
-}
+} */
 
 /* -------------------------- Fetch the folder path ------------------------- */
 
-exports.retrieveFolder = (req, res) => {
+/* exports.retrieveFolder = (req, res) => {
   try {
     const folderContents = fs.readdirSync(req.folder)
 
@@ -79,7 +80,7 @@ exports.retrieveFolder = (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ---------------------------- Upload file batch --------------------------- */
 
@@ -89,7 +90,9 @@ exports.batchUpload = async (req, res) => {
     const acceptedImageExt = ["jpg", "jpeg", "png", "webp"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
-    const newUploads = req.uploads.map(async file => {
+
+
+    /* const newUploads = req.uploads.map(async file => {
       const fileExtension = getFileExt(file.originalname)
       const fileDetails = await getVideoDetails(file.path)
 
@@ -114,17 +117,22 @@ exports.batchUpload = async (req, res) => {
       } else if (acceptedAudioExt.includes(fileExtension)) {
         return await Audio.create({ ...documentBody, length: fileDetails.format.duration })
       }
-    })
+    }) */
     
-    const completedUploads = await Promise.all(newUploads)
+    const newUploads = req.uploads.map(async file => {
+      await uploadFile(req, res, file)
+      console.log("Finished upload")
+    })
+
+    // const completedUploads = await Promise.all(newUploads)
 
     // Sort the uploads into videos, images, and audios
     let videos = [], images = [], audios = [];
-    completedUploads.map(upload => {
+    /* completedUploads.map(upload => {
       if (acceptedVideoExt.includes(getFileExt(upload.url))) videos.push(upload)
       if (acceptedImageExt.includes(getFileExt(upload.url))) images.push(upload)
       if (acceptedAudioExt.includes(getFileExt(upload.url))) audios.push(upload)
-    })
+    }) */
 
     res.status(201).json({
       success: true,

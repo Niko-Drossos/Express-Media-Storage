@@ -1,24 +1,32 @@
 const ffmpeg = require('fluent-ffmpeg');
-const fs = require('fs');
 
 // Function to compress a video
-function videoCompressor(inputPath, outputPath) {
-  // Create FFmpeg command
-  const command = ffmpeg(inputPath)
-    .videoCodec('libx264') // Set video codec
-    .audioCodec('aac')     // Set audio codec
-    .outputOptions('-preset veryfast') // Set encoding preset for faster compression
-    .on('error', (err) => {
-      console.error('Error:', err);
-    })
-    .on('end', () => {
-      console.log('Compression complete');
+async function videoCompressor(inputBuffer) {
+  return new Promise((resolve, reject) => {
+    // Create FFmpeg command
+    const command = ffmpeg()
+      .input(inputBuffer) // Input from buffer
+      .videoCodec('libx264') // Set video codec
+      .audioCodec('aac')     // Set audio codec
+      .outputOptions('-preset veryfast') // Set encoding preset for faster compression
+      .on('error', (err) => {
+        console.error('Error:', err);
+        reject(err);
+      })
+      .on('end', () => {
+        console.log('Compression complete');
+        resolve(outputBuffer);
+      });
+
+    // Output to buffer
+    const outputBuffer = Buffer.from([]);
+    command.outputFormat('mp4').on('data', (chunk) => {
+      outputBuffer = Buffer.concat([outputBuffer, chunk]);
     });
 
-  // Create output stream
-  const outputStream = command.pipe(fs.createWriteStream(outputPath));
-
-  return outputStream;
+    // Run FFmpeg command
+    command.run();
+  });
 }
 
 module.exports = videoCompressor;

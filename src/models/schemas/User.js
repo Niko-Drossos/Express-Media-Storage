@@ -46,9 +46,6 @@ const userSchema = new Schema({
   voteCount: {
     type: Number,
     default: 0
-  },
-  folderId: {
-    type: String,
   }
 }, {
   timestamps: true,
