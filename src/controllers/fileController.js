@@ -104,20 +104,3 @@ exports.batchUpload = async (req, res) => {
     })
   }
 }
-
-/* ------------------------------ Stream video ------------------------------ */
-
-exports.streamVideo = (req, res) => {
-  try {
-    const filename = req.params.filename;
-
-    streamFile(req, res, filename)
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch folder",
-      errorMessage: error.message,
-      error
-    })
-  }
-}

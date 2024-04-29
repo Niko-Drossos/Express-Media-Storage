@@ -31,7 +31,4 @@ router.get("/get/:username/:date", fileController.retrieveFolder)
 
 router.post("/upload/folder/:username/:date", upload.array('files'), processUploads, fileController.batchUpload)
 
-// Still working on this one
-router.get("/stream-video/:username/:date/:filename", fileController.streamVideo)
-
 module.exports = router
