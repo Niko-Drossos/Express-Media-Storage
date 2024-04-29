@@ -14,14 +14,14 @@ const audioSchema = new Schema({
     type: String,
     required: false
   },
+  filename: {
+    type: String,
+    required: true,
+    unique: true
+  },
   uploader: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  // An absolute path to the audio file
-  url: {
-    type: String,
     required: true
   },
   comments: [{

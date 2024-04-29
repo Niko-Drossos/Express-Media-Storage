@@ -1,4 +1,4 @@
-const { Readable, pipeline } = require('stream');
+const { Readable, pipeline } = require('stream')
 const mongodb = require("mongodb")
 const multer = require('multer')
 
@@ -18,26 +18,26 @@ const upload = multer({
   storage: storage,
   fileFilter: function(req, file, cb) {
     // Add any file filtering logic here if needed
-    cb(null, true);
+    cb(null, true)
   }
-});
+})
 
 /* -------------------------------------------------------------------------- */
 
 // Middleware function to handle video compression upon upload
 
 const uploadFile = async function(req, res, file) {
-  const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri);
+  const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
 
   // Either video, image, or audio
-  const dbName = file.mimetype.split("/")[0];
-  const db = client.db(dbName);
-  const bucket = new mongodb.GridFSBucket(db);
+  const dbName = file.mimetype.split("/")[0]
+  const db = client.db(dbName)
+  const bucket = new mongodb.GridFSBucket(db)
 
   // Create a promise to wrap the pipeline operation
   return new Promise((resolve, reject) => {
     // Create a readable stream from the buffer
-    const bufferStream = Readable.from(file.buffer);
+    const bufferStream = Readable.from(file.buffer)
 
     // Pipe the buffer stream through the video compressor
     const uploadStream = bufferStream.pipe(bucket.openUploadStream(file.originalname, {
@@ -48,23 +48,22 @@ const uploadFile = async function(req, res, file) {
         // TODO: Add more tags like dimensions
         uploader: req.userId
       }
-    }));
+    }))
 
     // Listen for the 'finish' event on the upload stream
     uploadStream.on('finish', () => {
-      // Retrieve the metadata of the uploaded file
-      const metadata = uploadStream.file;
-      console.log("Upload complete:", metadata);
-      resolve(metadata);
-    });
+      // Retrieve the ID of the uploaded file
+      const fileId = uploadStream.id // Use uploadStream.id to access the _id property
+      resolve(fileId) // Resolve with the file ID
+    })
 
     // Listen for errors on the upload stream
     uploadStream.on('error', (error) => {
-      console.error("Error:", error);
-      reject(error);
-    });
-  });
-};
+      console.error("Error:", error)
+      reject(error)
+    })
+  })
+}
 
 /* -------------------------------------------------------------------------- */
 
@@ -114,7 +113,7 @@ const streamFile = async function(req, res, fileName) {
   try {
     const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
     // Get the mimetype from the url
-    const dbName = req.originalUrl.split("/")[2];
+    const dbName = req.originalUrl.split("/")[2]
     const db = client.db(dbName)
     const bucket = new mongodb.GridFSBucket(db)
     
@@ -128,12 +127,12 @@ const streamFile = async function(req, res, fileName) {
         })
       })
     
-    fileStream.pipe(res);
+    fileStream.pipe(res)
 
     // Close the MongoDB connection once the response is finished
     res.on('finish', () => {
-      client.close();
-    });
+      client.close()
+    })
   }
    catch (error) {
     res.status(500).json({

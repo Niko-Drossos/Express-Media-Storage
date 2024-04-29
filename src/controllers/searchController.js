@@ -91,6 +91,112 @@ exports.searchComments = async (req, res) => {
 
 /* ------------------------------ Search videos ----------------------------- */
 
+exports.searchVideos = async (req, res) => {
+  try {
+    const query = req.query
+
+    // Object that will be searched for in the db
+    const searchQuery = {}
+    
+    const { uploader, title, startDate, endDate } = query
+
+    // Add the search query's properties to the searchQuery object
+    if (uploader) searchQuery.user = uploader
+    if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
+    if (title) searchQuery.content = new RegExp(title, 'i')
+
+    const searchResults = await Video.find(searchQuery)
+    
+    res.status(200).json({
+      success: true, 
+      message: "Successfully searched for videos" ,
+      data: {
+        imageCount: searchResults.length,
+        query,
+        searchResults
+      }
+    })
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Failed to search for videos",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+
 /* ------------------------------ Search images ----------------------------- */
 
+exports.searchImages = async (req, res) => {
+  try {
+    const query = req.query
+
+    // Object that will be searched for in the db
+    const searchQuery = {}
+    
+    const { uploader, title, startDate, endDate } = query
+
+    // Add the search query's properties to the searchQuery object
+    if (uploader) searchQuery.user = uploader
+    if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
+    if (title) searchQuery.content = new RegExp(title, 'i')
+
+    const searchResults = await Image.find(searchQuery)
+    
+    res.status(200).json({
+      success: true, 
+      message: "Successfully searched for images" ,
+      data: {
+        imageCount: searchResults.length,
+        query,
+        searchResults
+      }
+    })
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Failed to search for images",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
 /* ------------------------------ Search audios ----------------------------- */
+
+exports.searchAudios = async (req, res) => {
+  try {
+    const query = req.query
+
+    // Object that will be searched for in the db
+    const searchQuery = {}
+    
+    const { uploader, title, startDate, endDate } = query
+
+    // Add the search query's properties to the searchQuery object
+    if (uploader) searchQuery.user = uploader
+    if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
+    if (title) searchQuery.content = new RegExp(title, 'i')
+
+    const searchResults = await Audio.find(searchQuery)
+    
+    res.status(200).json({
+      success: true, 
+      message: "Successfully searched for audios" ,
+      data: {
+        imageCount: searchResults.length,
+        query,
+        searchResults
+      }
+    })
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Failed to search for audios",
+      errorMessage: error.message,
+      error
+    })
+  }
+}

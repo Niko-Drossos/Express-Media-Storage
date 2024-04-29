@@ -14,6 +14,11 @@ const videoSchema = new Schema({
     type: String,
     required: false
   },
+  filename: {
+    type: String,
+    required: true,
+    unique: true
+  },
   uploader: {
     type: Schema.Types.ObjectId,
     ref: 'User',

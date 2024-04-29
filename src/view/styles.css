@@ -1,0 +1,41 @@
+body {
+  background-color: #222222;
+  color: white
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+h1 {
+  text-align: center;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#results {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+.mediaContainer {
+  width: 400px;
+  height: auto;
+  box-sizing: border-box;
+  padding: 15px;
+  border: 2px solid white;
+  border-radius: 5px;
+}
+
+.mediaContainer > * {
+  width: 100%;
+}

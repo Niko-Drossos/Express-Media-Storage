@@ -15,9 +15,10 @@ router.get("/posts", searchController.searchPosts)
 
 router.get("/comments", searchController.searchComments)
 
-// Add later
-// router.get("/videos", searchController.searchPosts)
-// router.get("/images", searchController.searchPosts)
-// router.get("/audios", searchController.searchPosts)
+router.get("/videos", searchController.searchVideos)
+
+router.get("/images", searchController.searchImages)
+
+router.get("/audios", searchController.searchAudios)
 
 module.exports = router

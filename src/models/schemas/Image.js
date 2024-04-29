@@ -6,13 +6,18 @@ const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const imageSchema = new Schema({
-  filename: {
-    type: String,
-    required: true
-  },
   date: {
     type: Date,
     default: Date.now
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  filename: {
+    type: String,
+    required: true,
+    unique: true
   },
   uploader: {
     type: Schema.Types.ObjectId,
