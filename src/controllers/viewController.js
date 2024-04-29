@@ -1,18 +1,10 @@
-const path = require("path")
-const fs = require("fs")
-
-/* --------------------------------- Schemas -------------------------------- */
-const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Post")
-const Comment = require("../models/schemas/Comment")
-const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
-const Audio = require("../models/schemas/Audio")
+/* --------------------------------- Helpers -------------------------------- */
+const { streamFile } = require("../helpers/fileUploading")
 /* -------------------------------------------------------------------------- */
 
 /* ------------------------------ Populate post ----------------------------- */
-
-exports.viewPost = async (req, res) => {
+// Move
+/* exports.viewPost = async (req, res) => {
   try {
     const foundPost = await Post.findById(req.params.postId).populate(['comments', 'videos', 'images', 'audios'])
 
@@ -31,11 +23,11 @@ exports.viewPost = async (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ---------------------------- Populate comment ---------------------------- */
-
-exports.viewComment = async (req, res) => {
+// Move the correct logic to the controller folder
+/* exports.viewComment = async (req, res) => {
   try {
     const foundComment = await Comment.findById(req.params.commentId).populate('comments') // maybe add "originId"
 
@@ -54,21 +46,13 @@ exports.viewComment = async (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ----------------------------- Populate video ----------------------------- */
 
 exports.viewVideo = async (req, res) => {
   try {
-    const foundVideo = await Video.findById(req.params.videoId).populate('comments') // maybe add "originId"
-
-    res.status(200).json({
-      success: true,
-      message: "Successfully viewed video",
-      data: {
-        video: foundVideo
-      }
-    })
+    streamFile(req, res, req.params.filename)
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -83,15 +67,7 @@ exports.viewVideo = async (req, res) => {
 
 exports.viewImage = async (req, res) => {
   try {
-    const foundImage = await Image.findById(req.params.imageId).populate('comments')
-
-    res.status(200).json({
-      success: true,
-      message: "Successfully viewed image",
-      data: {
-        image: foundImage
-      }
-    })
+    streamFile(req, res, req.params.filename)
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -106,15 +82,7 @@ exports.viewImage = async (req, res) => {
 
 exports.viewAudio = async (req, res) => {
   try {
-    const foundAudio = await Audio.findById(req.params.audioId).populate('comments')
-
-    res.status(200).json({
-      success: true,
-      message: "Successfully viewed audio",
-      data: {
-        audio: foundAudio
-      }
-    })
+    streamFile(req, res, req.params.filename)
   } catch (error) {
     res.status(500).json({
       success: false,

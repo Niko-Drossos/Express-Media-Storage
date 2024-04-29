@@ -9,8 +9,10 @@ const port = 3000
 connectDB()
 
 app.use(express.json())
-app.use(express.static('src/public'))
+app.set("view engine", "ejs")
+app.use(express.static('src/view'))
 app.use(express.urlencoded({ extended: true }))
+
 
 /* ------------------------------- App router ------------------------------- */
 app.use("/auth", require("./routes/auth.routes"))

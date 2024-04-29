@@ -9,7 +9,7 @@ const fs = require("fs")
 const fileController = require("../controllers/fileController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
-const { upload, uploadFile, uploadMultipleFiles } = require("../models/middleware/fileUploading")
+const { upload, uploadFile, uploadMultipleFiles } = require("../helpers/fileUploading")
 
 // Middleware to process uploaded files
 const processUploads = (req, res, next) => {
@@ -27,13 +27,13 @@ router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
 // router.get("/get/:username", fileController.retrieveFolder)
-// router.get("/get/:username/:date", fileController.retrieveFolder)
+router.get("/get/:username/:date", fileController.retrieveFolder)
 
 // router.put("/edit/:folder/:date/:fileId", upload.single('file'), fileController.uploadToDateFolder)
 
 router.post("/upload/folder/:username/:date", upload.array('files'), processUploads, fileController.batchUpload)
 
 // Still working on this one
-router.get("/stream-video/:username/:date/:fileId", fileController.streamVideo)
+router.get("/stream-video/:username/:date/:filename", fileController.streamVideo)
 
 module.exports = router

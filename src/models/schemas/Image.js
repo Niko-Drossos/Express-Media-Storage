@@ -7,6 +7,10 @@ const generateRouteId = require('../../helpers/generateRouteId')
 /* -------------------------------------------------------------------------- */
 
 const imageSchema = new Schema({
+  filename: {
+    type: String,
+    required: true
+  },
   date: {
     type: Date,
     default: Date.now
@@ -14,10 +18,6 @@ const imageSchema = new Schema({
   uploader: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  url: {
-    type: String,
     required: true
   },
   comments: [{
@@ -51,22 +51,10 @@ const imageSchema = new Schema({
     default: 'Private',
     required: true
   },
-  dimensions: {
-    width: {
-      type: Number,
-      required: true
-    },
-    height: {
-      type: Number,
-      required: true
-    }
-  },
-  fileSize: {
-    type: Number,
-    required: true
-  },
   fileId: {
-    type: String
+    type: String,
+    required: true,
+    unique: true
   }
 }, {
   timestamps: true,
