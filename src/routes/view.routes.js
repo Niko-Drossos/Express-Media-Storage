@@ -5,7 +5,7 @@ const router = express.Router()
 const viewController = require("../controllers/viewController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
-// Uncomment when you figure out how to send headers from html
+// TODO: Uncomment when you figure out how to send headers from html
 // router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 

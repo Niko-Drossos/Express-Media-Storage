@@ -9,6 +9,12 @@ router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
+/*                                Get comments                                */
+/* -------------------------------------------------------------------------- */
+
+router.get("/:commentId", commentController.getComments)
+
+/* -------------------------------------------------------------------------- */
 /*                            Create comment routes                           */
 /* -------------------------------------------------------------------------- */
 
@@ -25,15 +31,17 @@ router.post("/create/image/:imageId", commentController.commentOnImage)
 router.post("/create/audio/:audioId", commentController.commentOnAudio)
 
 /* -------------------------------------------------------------------------- */
+/*                             Edit comment routes                            */
+/* -------------------------------------------------------------------------- */
+
+router.put("/edit/:commentId", commentController.updateComment)
+
+/* -------------------------------------------------------------------------- */
 /*                            Delete comment routes                           */
 /* -------------------------------------------------------------------------- */
 
 router.delete("/delete/:commentId", commentController.deleteComment)
 
 /* -------------------------------------------------------------------------- */
-/*                             Edit comment routes                            */
-/* -------------------------------------------------------------------------- */
-
-router.put("/edit/:commentId", commentController.updateComment)
 
 module.exports = router

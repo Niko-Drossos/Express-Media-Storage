@@ -2,53 +2,9 @@
 const { streamFile } = require("../helpers/fileUploading")
 /* -------------------------------------------------------------------------- */
 
-/* ------------------------------ Populate post ----------------------------- */
-// Move
-/* exports.viewPost = async (req, res) => {
-  try {
-    const foundPost = await Post.findById(req.params.postId).populate(['comments', 'videos', 'images', 'audios'])
+// These are all separate controllers for each type of media because i might add to them
 
-    res.status(200).json({
-      success: true,
-      message: "Successfully viewed post",
-      data: {
-        post: foundPost
-      }
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to view post",
-      errorMessage: error.message,
-      error
-    })
-  }
-} */
-
-/* ---------------------------- Populate comment ---------------------------- */
-// Move the correct logic to the controller folder
-/* exports.viewComment = async (req, res) => {
-  try {
-    const foundComment = await Comment.findById(req.params.commentId).populate('comments') // maybe add "originId"
-
-    res.status(200).json({
-      success: true,
-      message: "Successfully viewed comment",
-      data: {
-        comment: foundComment
-      }
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to view comment",
-      errorMessage: error.message,
-      error
-    })
-  }
-} */
-
-/* ----------------------------- Populate video ----------------------------- */
+/* ----------------------------- Stream a video ----------------------------- */
 
 exports.viewVideo = async (req, res) => {
   try {
@@ -63,7 +19,7 @@ exports.viewVideo = async (req, res) => {
   }
 }
 
-/* ----------------------------- Populate image ----------------------------- */
+/* ----------------------------- Stream an image ---------------------------- */
 
 exports.viewImage = async (req, res) => {
   try {
@@ -78,7 +34,7 @@ exports.viewImage = async (req, res) => {
   }
 }
 
-/* ----------------------------- Populate audio ----------------------------- */
+/* ----------------------------- Stream an audio ---------------------------- */
 
 exports.viewAudio = async (req, res) => {
   try {
@@ -92,3 +48,5 @@ exports.viewAudio = async (req, res) => {
     })
   }
 }
+
+/* -------------------------------------------------------------------------- */

@@ -9,7 +9,9 @@ const postController = require("../controllers/postController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
-/* -------------- Folder middleware to create the correct path -------------- */
+/* -------------------------------------------------------------------------- */
+
+router.get("/:postId", postController.getPost)
 
 router.post("/create", postController.createPost)
 

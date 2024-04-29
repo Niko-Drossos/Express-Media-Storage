@@ -8,7 +8,29 @@ const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
 /* --------------------------------- Helpers -------------------------------- */
 
-/* -------------------------------------------------------------------------- */
+/* ------------------------------- Get a post ------------------------------- */
+
+exports.getPost = async (req, res) => {
+  try {
+    const foundPost = await Post.findById(req.params.postId).populate(['comments', 'videos', 'images', 'audios'])
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched post",
+      data: {
+        post: foundPost
+      }
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to get post",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
 
 /* ------------------------------ Create a post ----------------------------- */
 

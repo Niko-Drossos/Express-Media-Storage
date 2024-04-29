@@ -9,6 +9,29 @@ const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 /* -------------------------------------------------------------------------- */
 
+exports.getComments = async (req, res) => {
+  try {
+    const comments = await Comment.findById(req.params.commentId).populate("comments")
+
+    res.status(200).json({
+      success: true,
+      message: "Fetched comments",
+      data: {
+        comments
+      }
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch comments",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
 exports.commentOnPost = async (req, res) => {
   try {
     const postedComment = await Comment.create({
