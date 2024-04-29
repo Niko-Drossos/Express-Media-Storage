@@ -3,7 +3,6 @@ const Schema = mongoose.Schema
 
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
-const generateRouteId = require('../../helpers/generateRouteId')
 /* -------------------------------------------------------------------------- */
 
 const videoSchema = new Schema({
@@ -18,11 +17,6 @@ const videoSchema = new Schema({
   uploader: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  // An absolute path to the video file
-  url: {
-    type: String,
     required: true
   },
   comments: [{
@@ -81,7 +75,9 @@ const videoSchema = new Schema({
     default: 0
   },
   fileId: {
-    type: String
+    type: String,
+    required: true,
+    unique: true
   }
 }, {
   timestamps: true,
@@ -96,17 +92,11 @@ videoSchema.pre('save', function(next) {
   // const hostServer = "http://localhost:3000" Possibly add this functionality in the future
 
   this.likeCount = calculateVoteCount(this.votes)
-  if (this.isNew) {
-    this.fileId = generateRouteId()
-  }
 
   if (!this.title) {
     this.title ?? dateString + '-Untitled'
   }
 
-  if (!this.url) {
-    this.url = path.join(dateString, this.fileId + '.mp4')
-  }
   next()
 })
 

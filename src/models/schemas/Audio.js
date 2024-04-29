@@ -3,7 +3,6 @@ const Schema = mongoose.Schema
 
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
-const generateRouteId = require('../../helpers/generateRouteId')
 /* -------------------------------------------------------------------------- */
 
 const audioSchema = new Schema({
@@ -71,7 +70,9 @@ const audioSchema = new Schema({
     default: 0
   },
   fileId: {
-    type: String
+    type: String,
+    required: true,
+    unique: true
   }
 }, {
   timestamps: true,
@@ -84,10 +85,6 @@ audioSchema.pre('save', function(next) {
   const dateString = this.date.toLocaleDateString().replace(/(\d+)\/(\d+)\/(\d+)/, "$1-$2-$3");
 
   this.likeCount = calculateVoteCount(this.votes)
-  if (this.isNew) {
-    this.fileId = generateRouteId()
-  }
-
   if (!this.title) {
     this.title ?? dateString + '-Untitled'
   }

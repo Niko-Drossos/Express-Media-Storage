@@ -29,8 +29,6 @@ router.all("/*", authenticateUserJWT)
 // router.get("/get/:username", fileController.retrieveFolder)
 router.get("/get/:username/:date", fileController.retrieveFolder)
 
-// router.put("/edit/:folder/:date/:fileId", upload.single('file'), fileController.uploadToDateFolder)
-
 router.post("/upload/folder/:username/:date", upload.array('files'), processUploads, fileController.batchUpload)
 
 // Still working on this one

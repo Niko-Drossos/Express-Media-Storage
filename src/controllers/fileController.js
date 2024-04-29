@@ -7,7 +7,6 @@ const Image = require("../models/schemas/Image")
 /* ------------------------------ Middle wares ------------------------------ */
 
 /* --------------------------------- Helpers -------------------------------- */
-const generateRouteId = require('../helpers/generateRouteId')
 const getVideoDetails = require('../helpers/getVideoDetails')
 const getFileExt = require('../helpers/getFileExt')
 const { uploadFile, retrieveFiles, streamFile } = require("../helpers/fileUploading")
@@ -67,9 +66,9 @@ exports.batchUpload = async (req, res) => {
         return await Image.create(documentBody)
       } else if (acceptedVideoExt.includes(fileExtension)) {
         // TODO: make function to determine media length with byte size
-        return await Video.create({ ...documentBody, length: uploadedFile.length })
+        return await Video.create({ ...documentBody })
       } else if (acceptedAudioExt.includes(fileExtension)) {
-        return await Audio.create({ ...documentBody, length: fileDetails.format.duration })
+        return await Audio.create({ ...documentBody })
       }
     })
 
@@ -93,7 +92,7 @@ exports.batchUpload = async (req, res) => {
           videos,
           audios */
         },
-        completedUploads
+        completedUploads: await completedUploads
       }
     })
   } catch (error) {

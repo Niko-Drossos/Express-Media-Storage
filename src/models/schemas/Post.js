@@ -3,7 +3,6 @@ const Schema = mongoose.Schema
 
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
-const generateRouteId = require('../../helpers/generateRouteId')
 /* -------------------------------------------------------------------------- */
 
 const postSchema = new Schema({
@@ -81,9 +80,7 @@ const postSchema = new Schema({
 // Middleware to update voteCount when likes array is modified
 postSchema.pre('save', function(next) {
   this.voteCount = calculateVoteCount(this.votes)
-  if (this.isNew) {
-    this.postId = generateRouteId()
-  }
+
   next()
 })
 
