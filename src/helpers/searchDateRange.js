@@ -7,7 +7,8 @@ module.exports = searchDateRange = (query, startDate, endDate) => {
 
   const midnightStartDate = setMidnight(new Date(startDate));
   // Sets the end date to midnight of the next day so that it includes the entire day
-  const midnightEndDate = setMidnight(new Date(endDate)).setDate(new Date(endDate).getDate() + 1);
+  const endDay = setMidnight(new Date(endDate))
+  const midnightEndDate = endDay.setDate(new Date(endDay).getDate() + 1);
 
   if (startDate && endDate) {
 
