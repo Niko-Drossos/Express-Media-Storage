@@ -74,7 +74,6 @@
       .then(res => res.json())
       .then(data => {
         // Process the response data
-        console.log(collection)
         renderResults(data.data.searchResults)
       })
       .catch(error => {

@@ -1,6 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const { connectDB } = require('./models/connection')
+const bodyParser = require('body-parser')
 dotenv.config()
 
 const app = express()
@@ -13,7 +14,7 @@ app.use(express.json())
 app.set("view engine", "ejs")
 app.set("views", "src/view")
 app.use(express.static('src/view'))
-app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }))
 /* ------------------------------- App router ------------------------------- */
 app.use("/auth", require("./routes/auth.routes"))
 app.use("/user", require("./routes/user.routes"))
@@ -35,6 +36,9 @@ app.get("/posts", (req, res) => {
   res.render("posts.ejs")
 })
 
+app.get("/upload", (req, res) => {
+  res.render("upload.ejs")
+})
 
 /* -------------------------------------------------------------------------- */
 

@@ -1,6 +1,27 @@
 body {
-  background-color: #222222;
-  color: white
+  background-color: #181a1b;
+  color: white;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 300px;
+}
+
+a {
+  padding: 10px;
+  background-color: #3a3f41;
+  border-radius: 5px;
+  color: white;
+  transition: 0.1s;
+}
+
+a:hover {
+  background-color: #5f6367;
 }
 
 .container {
@@ -14,6 +35,15 @@ body {
   font-size: xx-large;
 }
 
+.nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 60vh;
+  font-size: 40px;
+}
+
 h1 {
   text-align: center;
 }
@@ -23,6 +53,11 @@ h1 {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  width: 250px;
+  border: 2px solid #3a3f41;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 5px
 }
 
 #results {
@@ -31,6 +66,20 @@ h1 {
   flex-direction: row;
   align-items: center;
   gap: 20px;
+  margin-bottom: 30px;
+}
+
+input[type="submit"] {
+  width: min-content;
+  padding: 10px;
+  background-color: #3a3f41;
+  border-radius: 5px;
+  color: white;
+  transition: 0.1s;
+}
+
+input[type="submit"]:hover {
+  background-color: #5f6367;
 }
 
 .mediaContainer {

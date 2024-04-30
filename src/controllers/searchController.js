@@ -139,7 +139,7 @@ exports.searchVideos = async (req, res) => {
     // Add the search query's properties to the searchQuery object
     if (uploader) searchQuery.user = uploader
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
-    if (title) searchQuery.content = new RegExp(title, 'i')
+    if (title) searchQuery.title = new RegExp(title, 'i')
 
     const searchResults = await Video.find(searchQuery)
     
@@ -177,7 +177,7 @@ exports.searchImages = async (req, res) => {
     // Add the search query's properties to the searchQuery object
     if (uploader) searchQuery.user = uploader
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
-    if (title) searchQuery.content = new RegExp(title, 'i')
+    if (title) searchQuery.title = new RegExp(title, 'i')
 
     const searchResults = await Image.find(searchQuery)
     
