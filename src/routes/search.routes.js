@@ -11,6 +11,8 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------- Folder middleware to create the correct path -------------- */
 
+router.get("/users", searchController.searchUsers)
+
 router.get("/posts", searchController.searchPosts)
 
 router.get("/comments", searchController.searchComments)

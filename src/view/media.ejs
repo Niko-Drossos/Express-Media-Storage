@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Beth Kavod Storage</title>
+</head>
+<body>
+  <h1>Media routes</h1>
+  <div class="container">
+    <hr>
+    <form method="GET" onsubmit="fetchFiles(event, { fileType: 'image' })">
+      <h1>Search Images</h1>
+      <div class="formGroup">
+        <label for="search">Title:</label>
+        <input id="search" name="title" type="search">
+      </div>
+      <input type="submit">
+    </form>
+    <hr>
+    <form method="GET" onsubmit="fetchFiles(event, { fileType: 'video' })">
+      <h1>Search Videos</h1>
+      <div class="formGroup">
+        <label for="search">Title:</label>
+        <input id="search" name="title" type="search">
+      </div>
+      <input type="submit">
+    </form>
+    <hr>
+    <form method="GET" onsubmit="fetchFiles(event, { fileType: 'audio' })">
+      <h1>Search Audios</h1>
+      <div class="formGroup">
+        <label for="search">Title:</label>
+        <input id="search" name="title" type="search">
+      </div>
+      <input type="submit">
+    </form>
+    <hr>
+  </div>
+  <br>
+  <br>
+  <h1 id="resultCount">Results: 0</h1>
+  <div id="results"></div>
+  <div style="text-align: center; font-size: xx-large;">
+    <a href="/">Back</a>
+  </div>
+  
+  <script>
+    const JWT = localStorage.getItem("JWT-Test")
+
+    if (!JWT) {
+      const newToken = prompt("Enter your JWT")
+      localStorage.setItem("JWT-Test", newToken)
+    }
+
+    function fetchFiles(event, options) {
+      event.preventDefault() // Prevent default form submission behavior
+
+      const { fileType } = options
+
+      const searchInput = event.target[0].value
+      const inputName = event.target[0].name
+
+      let queryString = ``
+
+      queryString += `${inputName}=${searchInput}`
+
+      fetch(`http://localhost:3000/search/${fileType}s?${queryString}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "authorization": JWT
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Process the response data
+        console.log(fileType)
+        renderResults(data.data.searchResults, fileType)
+      })
+      .catch(error => {
+        console.error("Error:", error)
+      })
+    }
+
+    function renderResults(data, fileType) {
+      const resultsContainer = document.getElementById('results');
+
+      // Clear previous results
+      resultsContainer.innerHTML = '';
+
+      const tagName = fileType === 'image' ? 'img' : 'video';
+      // Render new results
+      data.forEach(item => {
+        console.log(item)
+        const container = document.createElement('div')
+        container.className = 'mediaContainer';
+
+        const fileName = document.createElement('h3');
+        fileName.textContent = item.filename
+
+        const resultItem = document.createElement(tagName);
+        if (fileType === 'video') {
+          resultItem.controls = true
+        }
+        resultItem.src = `/view/${fileType}/${item.filename}` // Adjust this to match the structure of your data
+        container.appendChild(fileName)
+        container.appendChild(resultItem)
+        resultsContainer.appendChild(container);
+      });
+
+      const resultCount = document.getElementById('resultCount');
+      resultCount.textContent = `Results: ${data.length}`
+    }
+  </script>
+</body>
+</html>

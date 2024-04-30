@@ -42,6 +42,8 @@ exports.batchUpload = async (req, res) => {
     const acceptedVideoExt = ["mp4"]
     const acceptedImageExt = ["jpg", "jpeg", "png", "webp"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
+
+    const { date } = req.params
     
     const newUploads = req.uploads.map(async file => {
       const uploadedFileId = await uploadFile(req, res, file)
@@ -53,7 +55,8 @@ exports.batchUpload = async (req, res) => {
         filename: file.originalname,
         uploader: req.userId,
         description: "",
-        fileId: uploadedFileId
+        fileId: uploadedFileId,
+        date: new Date(date)
       }
 
       // Create exactly one document per upload

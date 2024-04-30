@@ -69,7 +69,7 @@ exports.loginUser = async (req, res) => {
     if (!username || !password) throw new Error("Missing username or password")
 
     // Find the user in the database and throw an error if none found
-    const foundUser = await User.findOne({ username })
+    const foundUser = await User.findOne({ username }, { password: 1 })
     if (!foundUser || foundUser == undefined) throw new Error(`No user with username: ${username} found`)
 
     // Check if password is a match 

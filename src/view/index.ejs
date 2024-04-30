@@ -4,100 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
-  <title>Beth Kavod Storage</title>
+  <title>Home</title>
 </head>
 <body>
-  <h1>Welcome to Beth Kavod!</h1>
+  <h1>Routes</h1>
   <div class="container">
-    <hr>
-    <form method="GET" onsubmit="fetchFiles(event, { fileType: 'image' })">
-      <h1>Search Images</h1>
-      <div class="formGroup">
-        <label for="search">Title:</label>
-        <input id="search" type="search">
-      </div>
-      <input type="submit">
-    </form>
-    <hr>
-    <form method="GET" onsubmit="fetchFiles(event, { fileType: 'video' })">
-      <h1>Search Videos</h1>
-      <div class="formGroup">
-        <label for="search">Title:</label>
-        <input id="search" type="search">
-      </div>
-      <input type="submit">
-    </form>
-    <hr>
-    <form method="GET" onsubmit="fetchFiles(event, { fileType: 'audio' })">
-      <h1>Search Audios</h1>
-      <div class="formGroup">
-        <label for="search">Title:</label>
-        <input id="search" type="search">
-      </div>
-      <input type="submit">
-    </form>
-    <hr>
+    <div><a href="/media">Media</a></div>
+    <div><a href="/posts">Posts</a></div>
   </div>
-  <br>
-  <br>
-  <h1 id="resultCount">Results: 0</h1>
-  <div id="results"></div>
-  <script>
-    function fetchFiles(event, options) {
-      event.preventDefault() // Prevent default form submission behavior
-
-      const { fileType } = options
-
-      const searchInput = event.target[0].value
-      const query = searchInput.value || ""
-
-      fetch(`http://localhost:3000/search/${fileType}s?title=${query}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjJkYTQ2MjQ4MTZkNmZmN2M4YThmMWQiLCJlbWFpbCI6ImRyb25pY283NzdAZ21haWwuY29tIiwidXNlcm5hbWUiOiJOaWtvLURyb3Nzb3MiLCJpYXQiOjE3MTQzNzQ1MDIsImV4cCI6MTcxNDQ2MDkwMn0.mQmmnLpmdFp4TAGCkaeEaTEPL_MQ0yDc0Jz07dP0tns"
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        // Process the response data
-        console.log(fileType)
-        renderResults(data.data.searchResults, fileType)
-      })
-      .catch(error => {
-        console.error("Error:", error)
-      })
-    }
-
-    function renderResults(data, fileType) {
-      const resultsContainer = document.getElementById('results');
-
-      // Clear previous results
-      resultsContainer.innerHTML = '';
-
-      const tagName = fileType === 'image' ? 'img' : 'video';
-      // Render new results
-      data.forEach(item => {
-        console.log(item)
-        const container = document.createElement('div')
-        container.className = 'mediaContainer';
-
-        const fileName = document.createElement('h3');
-        fileName.textContent = item.filename
-
-        const resultItem = document.createElement(tagName);
-        if (fileType === 'video') {
-          resultItem.controls = true
-        }
-        resultItem.src = `/view/${fileType}/${item.filename}` // Adjust this to match the structure of your data
-        container.appendChild(fileName)
-        container.appendChild(resultItem)
-        resultsContainer.appendChild(container);
-      });
-
-      const resultCount = document.getElementById('resultCount');
-      resultCount.textContent = `Results: ${data.length}`
-    }
-  </script>
 </body>
 </html>

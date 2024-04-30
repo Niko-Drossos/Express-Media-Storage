@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Posts</title>
+</head>
+<body>
+  <h1>Posts routes</h1>
+  <div class="container">
+    <hr>
+    <form method="GET" onsubmit="fetchFiles(event, { collection: 'post' })">
+      <h1>Search Posts</h1>
+      <div class="formGroup">
+        <label for="search">Title:</label>
+        <input id="search" name="title" type="search">
+      </div>
+      <input type="submit">
+    </form>
+    <hr>
+    <form method="GET" onsubmit="fetchFiles(event, { collection: 'comment' })">
+      <h1>Search Comments</h1>
+      <div class="formGroup">
+        <label for="search">Content:</label>
+        <input id="search" name="content" type="search">
+      </div>
+      <input type="submit">
+    </form>
+    <hr>
+    <form method="GET" onsubmit="fetchFiles(event, { collection: 'user' })">
+      <h1>Search Users</h1>
+      <div class="formGroup">
+        <label for="search">Username:</label>
+        <input id="search" name="username" type="search">
+      </div>
+      <input type="submit">
+    </form>
+    <hr>
+  </div>
+  <h1 id="resultCount">Results: 0</h1>
+  <div id="results"></div>
+  <div style="text-align: center; font-size: xx-large;">
+    <a href="/">Back</a>
+  </div>
+
+  <script>
+    const JWT = localStorage.getItem("JWT-Test")
+
+    if (!JWT) {
+      const newToken = prompt("Enter your JWT")
+      localStorage.setItem("JWT-Test", newToken)
+    }
+
+    function fetchFiles(event, options) {
+      event.preventDefault() // Prevent default form submission behavior
+
+      const { collection } = options
+
+      const searchInput = event.target[0].value
+      const inputName = event.target[0].name
+
+      let queryString = ``
+
+      queryString += `${inputName}=${searchInput}`
+
+      fetch(`http://localhost:3000/search/${collection}s?${queryString}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "authorization": JWT
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Process the response data
+        console.log(collection)
+        renderResults(data.data.searchResults)
+      })
+      .catch(error => {
+        console.error("Error:", error)
+      })
+    }
+
+    function renderResults(data) {
+      const resultsContainer = document.getElementById('results');
+
+      // Clear previous results
+      resultsContainer.innerHTML = '';
+
+      // Render new results
+      Object.keys(data).forEach(key => {
+        const container = document.createElement('div');
+        container.className = 'docContainer';
+
+        Object.keys(data[key]).forEach(field => {
+          const fieldValue = data[key][field];
+          const fieldElement = document.createElement('p');
+          fieldElement.textContent = `${field}: ${fieldValue}`;
+          container.appendChild(fieldElement);
+        });
+
+        resultsContainer.appendChild(container);
+      });
+
+      const resultCount = document.getElementById('resultCount');
+      resultCount.textContent = `Results: ${Object.keys(data).length}`;
+    }
+
+  </script>
+</body>
+</html>

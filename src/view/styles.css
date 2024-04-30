@@ -8,6 +8,12 @@ body {
   flex-direction: row;
 }
 
+.container > div {
+  width: 100%;
+  text-align: center;
+  font-size: xx-large;
+}
+
 h1 {
   text-align: center;
 }
@@ -38,4 +44,13 @@ h1 {
 
 .mediaContainer > * {
   width: 100%;
+}
+
+.docContainer {
+  width: 400px;
+  height: auto;
+  box-sizing: border-box;
+  padding: 15px;
+  border: 2px solid white;
+  border-radius: 5px;
 }

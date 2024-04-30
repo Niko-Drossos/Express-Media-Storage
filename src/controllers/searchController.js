@@ -13,6 +13,42 @@ const searchDateRange = require("../helpers/searchDateRange")
 
 /* --------------------------- Search for users by name ----------------------- */
 
+exports.searchUsers = async (req, res) => {
+  try {
+    const query = req.query
+
+    // Object that will be searched for in the db
+    const searchQuery = {}
+    
+    const { username } = query
+
+    // Add the search query's properties to the searchQuery object
+    if (username) searchQuery.username = new RegExp(username, 'i')
+
+    // TODO: Add tags to users later
+    // if (tags) searchQuery.tags = tags.split(",")
+
+    const searchResults = await User.find(searchQuery)
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully searched for users",
+      data: {
+        userCount: searchResults.length,
+        query,
+        searchResults
+      }
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to search for users",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
 /* ------------------ Search for posts within a time frame ------------------ */
 
 exports.searchPosts = async (req, res) => {
