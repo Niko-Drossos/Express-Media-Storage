@@ -1,3 +1,6 @@
+// Find a way to not have to import here for seperation of concerns
+const mongoose = require("mongoose")
+
 /* --------------------------------- Schemas -------------------------------- */
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
@@ -38,15 +41,21 @@ exports.retrieveFolder = async (req, res) => {
 /* ---------------------------- Upload file batch --------------------------- */
 
 exports.batchUpload = async (req, res) => {
+  let session
   try {
     const acceptedVideoExt = ["mp4"]
     const acceptedImageExt = ["jpg", "jpeg", "png", "webp"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
-    const { date } = req.params
+    const { username } = req.body 
+
+    let date = req.body.date || Date.now()    
     
+    session = await mongoose.startSession();
+    session.startTransaction();
+
     const newUploads = req.uploads.map(async file => {
-      const uploadedFileId = await uploadFile(req, res, file)
+      const uploadedFileId = await uploadFile(req, res, file, session)
 
       const fileExtension = getFileExt(file.originalname)
       
@@ -61,12 +70,12 @@ exports.batchUpload = async (req, res) => {
 
       // Create exactly one document per upload
       if (acceptedImageExt.includes(fileExtension)) {
-        return await Image.create(documentBody)
+        return await Image.create([documentBody], { session })
       } else if (acceptedVideoExt.includes(fileExtension)) {
         // TODO: make function to determine media length with byte size
-        return await Video.create({ ...documentBody })
+        return await Video.create([{ ...documentBody }], { session })
       } else if (acceptedAudioExt.includes(fileExtension)) {
-        return await Audio.create({ ...documentBody })
+        return await Audio.create([{ ...documentBody }], { session })
       }
     })
 
@@ -82,6 +91,9 @@ exports.batchUpload = async (req, res) => {
       if (acceptedAudioExt.includes(getFileExt(title))) audios.push(upload)
     })
 
+    await session.commitTransaction();
+    session.endSession();
+
     res.status(201).json({
       success: true,
       message: "Uploaded files to folder",
@@ -95,6 +107,11 @@ exports.batchUpload = async (req, res) => {
       }
     })
   } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+
     res.status(500).json({
       success: false,
       message: "Failed to upload files",

@@ -26,7 +26,7 @@ const upload = multer({
 
 // Middleware function to handle video compression upon upload
 
-const uploadFile = async function(req, res, file) {
+const uploadFile = async function(req, res, file, session) {
   const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
 
   // Either video, image, or audio
@@ -47,7 +47,8 @@ const uploadFile = async function(req, res, file) {
 
         // TODO: Add more tags like dimensions
         uploader: req.userId
-      }
+      },
+      session
     }))
 
     // Listen for the 'finish' event on the upload stream
