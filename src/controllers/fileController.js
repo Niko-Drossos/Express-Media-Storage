@@ -84,7 +84,7 @@ exports.batchUpload = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Uploaded files to folder",
+      message: "Uploaded files to account",
       data: {
         uploadedFiles: {
           // separate the images and videos

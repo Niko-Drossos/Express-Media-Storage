@@ -4,6 +4,10 @@ body {
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
+body > h1 {
+  font-size: 70px;
+}
+
 form {
   display: flex;
   flex-direction: column;

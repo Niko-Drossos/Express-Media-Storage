@@ -10,12 +10,8 @@
   <h1>Upload routes</h1>
   <div class="container" style="margin-bottom: 30px">
     <hr>
-    <form method="POST" onsubmit="uploadFiles(event)">
+    <form method="POST" onsubmit="uploadFiles(event)" enctype="multipart/form-data">
       <h2>Upload files</h2>
-      <div class="formGroup">
-        <label for="username">Username:</label>
-        <input id="username" name="username" type="text">
-      </div>
       <div class="formGroup">
         <label for="files">Files:</label>
         <input id="files" name="files" type="file" multiple>
@@ -42,15 +38,15 @@
 
     async function uploadFiles(event) {
       event.preventDefault()
-      console.log(new FormData(event.target))
-      return 
 
       const formData = new FormData(event.target)
+
       const uploadRequest = await fetch("http://localhost:3000/file/upload", {
         method: "POST",
         headers: {
-          "Content-Type": "multipart/form-data",
-          "Authorization": JWT
+          // for some reason I have to NOT send this header... wack
+          // "Content-Type": "multipart/form-data",
+          "authorization": JWT
         },
         body: formData
       })
