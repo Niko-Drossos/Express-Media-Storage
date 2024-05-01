@@ -6,7 +6,7 @@ const Image = require("../models/schemas/Image")
 /* --------------------------------- Helpers -------------------------------- */
 const getVideoDetails = require('../helpers/getVideoDetails')
 const getFileExt = require('../helpers/getFileExt')
-const { uploadFile, retrieveFiles, streamFile } = require("../helpers/fileUploading")
+const { uploadFile, retrieveFiles, streamFile, deleteFile } = require("../helpers/gridFsMethods")
 /* -------------------------- Fetch the folder path ------------------------- */
 
 exports.findFiles = async (req, res) => {
@@ -98,6 +98,36 @@ exports.batchUpload = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to upload files",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+/* ------------------------------ Delete files ------------------------------ */
+
+exports.deleteFiles = async (req, res) => {
+  try {
+    const { deleteIds, mimetype } = req.body
+
+    const query = {
+      _id: deleteIds,
+      mimetype
+    }
+
+    const deletedFile = await deleteFile(req, res, query)
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully deleted file",
+      data: {
+        deletedFile
+      }
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete file",
       errorMessage: error.message,
       error
     })

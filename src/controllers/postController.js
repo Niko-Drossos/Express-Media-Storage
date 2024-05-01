@@ -7,7 +7,7 @@ const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
 /* --------------------------------- Helpers -------------------------------- */
-
+const { deleteFiles } = require("../helpers/gridFsMethods")
 /* ------------------------------- Get a post ------------------------------- */
 
 exports.getPost = async (req, res) => {
@@ -121,13 +121,21 @@ exports.deletePost = async (req, res) => {
       user: req.userId
     })
 
-    if (!deletedPost) throw new Error("Post not found")
+    if (!deletedPost) throw new Error("Post not found or not own by the user")
+
+    // Delete all the files associated with the post
+    const deletedImages = await deleteFiles(req, res, { fileIds: deletedPost.images.map(image => image._id), mimetype: "image" })
+    const deletedVideos = await deleteFiles(req, res, { fileIds: deletedPost.videos.map(video => video._id), mimetype: "video" })
+    const deletedAudios = await deleteFiles(req, res, { fileIds: deletedPost.audios.map(audio => audio._id), mimetype: "audio" })
 
     res.status(200).json({
       success: true,
       message: "Successfully deleted post",
       data: {
-        deletedPost
+        deletedPost,
+        deletedImages,
+        deletedVideos,
+        deletedAudios
       }
     })
   } catch (error) {

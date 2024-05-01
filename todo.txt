@@ -2,7 +2,7 @@ Docs:
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
 
 
-Currently working on: creating a ejs render for a gui 
+Currently working on: creating a delete api for posts to delete associated files, needs testing
 
 
 Add reaction routes 

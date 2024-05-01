@@ -65,25 +65,6 @@ const uploadFile = async function(req, res, file) {
   })
 }
 
-/* -------------------------------------------------------------------------- */
-
-// TODO: Incomplete
-const uploadMultipleFiles = function(req, res, next) {
-  req.files.map(file => uploadFile(req, res, next, file))
-  /* uploadFile(req, res, function(error) {
-    if (error) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Error uploading file', 
-        errorMessage: error.message,
-        error
-      })
-    }
-    next()
-  }) */
-  next()
-}
-
 /* ------------------------------ Retrieve file ----------------------------- */
 
 const retrieveFiles = async function(req, res, query) {
@@ -92,15 +73,16 @@ const retrieveFiles = async function(req, res, query) {
   const bucket = new mongodb.GridFSBucket(db)
   
   // TODO: add query to retrieve files
-  const bucketQuery = {
+  const bucketQuery = {}
 
-  }
+  const { _id } = query
 
-  const cursor = bucket.find(bucketQuery)
+  if (_id) bucketQuery._id = new mongodb.ObjectId(_id)
+
+  const fetchFiles = bucket.find(bucketQuery)
 
   const foundFiles = []
-  for await (const doc of cursor) {
-    console.log(doc)
+  for await (const doc of fetchFiles) {
     foundFiles.push(doc)
   }
 
@@ -144,4 +126,54 @@ const streamFile = async function(req, res, fileName) {
   }
 }
 
-module.exports = { upload, uploadFile, uploadMultipleFiles, retrieveFiles, streamFile }
+/* ------------------------------- Delete file ------------------------------ */
+
+const deleteFiles = async function(req, res, query) {
+  try {
+    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
+    const dbName = query.mimetype
+    const db = client.db(dbName)
+    const bucket = new mongodb.GridFSBucket(db)
+
+    // Make the list of file id's an ObjectId instance
+    const deleteIds = query.fileIds.map(id => new mongodb.ObjectId(id))
+
+    const fetchFiles = bucket.find({ _id: { $in: deleteIds } })
+
+    // Convert the fetchFiles into an array, otherwise it wont work
+    const foundFiles = []
+    for await (const doc of fetchFiles) {
+      foundFiles.push(doc)
+    }
+
+    const deletedResults = foundFiles.map(file => {
+      if (file.metadata.uploader == req.userId) {
+        bucket.delete(new mongodb.ObjectId(file._id))
+        return {
+          success: true,
+          message: "Successfully deleted file",
+          data: {
+            filename: file.filename,
+            fileId: file._id
+          }
+        }
+      } else {
+        return {
+          success: false,
+          message: "You are not authorized to delete this file",
+          data: {
+            filename: file.filename,
+            fileId: file._id
+          }
+        }
+      }
+    })
+
+    return deletedResults 
+  } catch (error) { 
+    throw error
+  }
+}
+
+
+module.exports = { upload, uploadFile, retrieveFiles, streamFile, deleteFiles }

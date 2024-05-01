@@ -1,5 +1,5 @@
 /* --------------------------------- Helpers -------------------------------- */
-const { streamFile } = require("../helpers/fileUploading")
+const { streamFile } = require("../helpers/gridFsMethods")
 /* -------------------------------------------------------------------------- */
 
 // These are all separate controllers for each type of media because i might add to them
