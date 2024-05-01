@@ -9,7 +9,7 @@ const getFileExt = require('../helpers/getFileExt')
 const { uploadFile, retrieveFiles, streamFile } = require("../helpers/fileUploading")
 /* -------------------------- Fetch the folder path ------------------------- */
 
-exports.retrieveFolder = async (req, res) => {
+exports.findFiles = async (req, res) => {
   try {
     const query = {
       mimetype: req.query.mimetype,
@@ -20,7 +20,7 @@ exports.retrieveFolder = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Retrieved folder",
+      message: "Retrieved files",
       data: {
         retrievedFiles
       }
@@ -28,7 +28,7 @@ exports.retrieveFolder = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch folder",
+      message: "Failed to fetch files",
       errorMessage: error.message,
       error
     })

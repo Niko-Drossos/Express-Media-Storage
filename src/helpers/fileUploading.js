@@ -112,7 +112,7 @@ const retrieveFiles = async function(req, res, query) {
 const streamFile = async function(req, res, fileName) {
   try {
     const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
-    // Get the mimetype from the url
+    // Get the mimetype from the url, this works because only the /view routes stream.
     const dbName = req.originalUrl.split("/")[2]
     const db = client.db(dbName)
     const bucket = new mongodb.GridFSBucket(db)

@@ -11,8 +11,7 @@ const processUploads = require("../models/middleware/processUploads")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-// router.get("/get/:username", fileController.retrieveFolder)
-router.get("/get/:username/:date", fileController.retrieveFolder)
+router.get("/get", fileController.findFiles)
 
 router.post("/upload", upload.array('files'), processUploads, fileController.batchUpload)
 

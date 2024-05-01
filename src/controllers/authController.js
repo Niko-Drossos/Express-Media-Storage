@@ -31,11 +31,8 @@ exports.registerUser = async (req, res) => {
       email
     })
 
-    const { _id, folderId } = newUser
-
     const payload = {
-      userId: _id,
-      folderId: folderId,
+      userId: newUser._id,
       username,
       email
     }
@@ -76,13 +73,12 @@ exports.loginUser = async (req, res) => {
     const passwordMatch = await compareHash(password, foundUser.password)
     if (!passwordMatch) throw new Error(`Incorrect credentials`)
 
-    const { _id, email, folderId } = foundUser
+    const { _id, email } = foundUser
 
     const payload = {
       userId: _id,
-      email: email,
-      username: username,
-      folderId: folderId
+      username,
+      email
     }
 
     const loginToken = generateJWT(payload)
@@ -92,7 +88,9 @@ exports.loginUser = async (req, res) => {
       message: "Successfully logged in",
       data: {
         user: {
-          folderId: folderId
+          userId: _id,
+          username,
+          email
         },
         JWT: loginToken
       }

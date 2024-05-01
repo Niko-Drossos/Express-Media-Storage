@@ -1,3 +1,7 @@
+Docs: 
+Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
+
+
 Currently working on: creating a ejs render for a gui 
 
 
