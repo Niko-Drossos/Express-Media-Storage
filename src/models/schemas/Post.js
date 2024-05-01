@@ -51,6 +51,7 @@ const postSchema = new Schema({
   tags: [{
     type: String // TODO: change this to an enum once tags are added
   }],
+  // TODO: Add journal entry's
   votes: {
     type: [{
       user: {
@@ -68,9 +69,6 @@ const postSchema = new Schema({
   voteCount: {
     type: Number,
     default: 0
-  },
-  postId: {
-    type: String
   }
 }, {
   timestamps: true,

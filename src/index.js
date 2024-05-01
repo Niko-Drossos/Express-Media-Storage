@@ -23,7 +23,7 @@ app.use("/search", require("./routes/search.routes"))
 app.use("/post", require("./routes/post.routes"))
 app.use("/comment", require("./routes/comment.routes"))
 app.use("/view", require("./routes/view.routes"))
-/* ------------------------------- View routes ------------------------------ */
+/* ----------------------------- Viewing routes ----------------------------- */
 app.get("/", (req, res) => {
   res.render("index.ejs")
 })
@@ -32,14 +32,13 @@ app.get("/media", (req, res) => {
   res.render("media.ejs")
 })
 
-app.get("/posts", (req, res) => {
-  res.render("posts.ejs")
+app.get("/documents", (req, res) => {
+  res.render("documents.ejs")
 })
 
 app.get("/upload", (req, res) => {
   res.render("upload.ejs")
 })
-
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, () => console.log(`server started at http://localhost:${port}`))

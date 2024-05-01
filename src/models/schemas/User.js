@@ -23,13 +23,19 @@ const userSchema = new Schema({
     required: true,
     unique: true
   },
+  tags: {
+    type: [String],
+    default: []
+  },
   comments: [{
     type: Schema.Types.ObjectId,
-    ref: 'Comment'
+    ref: 'Comment',
+    select: false
   }],
   posts: [{
     type: Schema.Types.ObjectId,
-    ref: 'Post'
+    ref: 'Post',
+    select: false
   }],
   votes: {
     type: [{
