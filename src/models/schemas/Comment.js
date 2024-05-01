@@ -87,22 +87,6 @@ commentSchema.pre('save', function(next) {
   next()
 })
 
-/* ------------------ Make deleting a comment a soft delete ----------------- */
-
-// This wont work yet, i don't know why
-/* commentSchema.pre('findOneAndDelete', { document: true, query: false }, async function(next) {
-  try {
-    console.log("DELETING COMMENT!")
-    // Update the content of the document to indicate deletion
-    this.content = `[This comment was deleted on ${new Date(Date.now()).toLocaleDateString()}]`;
-    await this.save();
-
-    next(new Error('Document deletion prevented'));
-  } catch (error) {
-    next(error);
-  }
-}); */
-
 /* --- Validate that that the originType and originId combination is valid -- */
 
 commentSchema.path('originId').validate(function(value) {

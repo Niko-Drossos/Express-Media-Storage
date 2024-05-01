@@ -43,8 +43,8 @@ exports.batchUpload = async (req, res) => {
     const acceptedImageExt = ["jpg", "jpeg", "png", "webp"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
-    const { date } = req.params
-    
+    const { date } = req.body
+
     const newUploads = req.uploads.map(async file => {
       const uploadedFileId = await uploadFile(req, res, file)
 

@@ -5,8 +5,6 @@ const Schema = mongoose.Schema
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
-// TODO: Add profile image field
-
 const userSchema = new Schema({
   username: {
     type: String,
@@ -22,6 +20,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true
+  },
+  // TODO: Not yet in use
+  profilePhoto: {
+    type: Schema.Types.ObjectId,
+    required: false
   },
   tags: {
     type: [String],
