@@ -71,7 +71,13 @@ exports.loginUser = async (req, res) => {
 
     // Check if password is a match 
     const passwordMatch = await compareHash(password, foundUser.password)
-    if (!passwordMatch) throw new Error(`Incorrect credentials`)
+    if (!passwordMatch) {
+      return res.status(403).json({
+        success: false,
+        message: "Failed to log in",
+        message: "Incorrect credentials"
+      })
+    }
 
     const { _id, email } = foundUser
 
