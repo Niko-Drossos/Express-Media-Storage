@@ -75,7 +75,7 @@ exports.loginUser = async (req, res) => {
       return res.status(403).json({
         success: false,
         message: "Failed to log in",
-        message: "Incorrect credentials"
+        errorMessage: "Incorrect credentials"
       })
     }
 
