@@ -137,7 +137,7 @@ exports.searchVideos = async (req, res) => {
     const { uploader, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (uploader) searchQuery.user = uploader
+    if (uploader) searchQuery.uploader = uploader
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 

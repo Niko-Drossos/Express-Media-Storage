@@ -58,7 +58,9 @@ exports.createPost = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Successfully created post",
-      data: createdPost
+      data: {
+        post: createdPost
+      }
     })
   } catch (error) {
     res.status(500).json({ 
@@ -124,18 +126,19 @@ exports.deletePost = async (req, res) => {
     if (!deletedPost) throw new Error("Post not found or not own by the user")
 
     // Delete all the files associated with the post
-    const deletedImages = await deleteFiles(req, res, { fileIds: deletedPost.images.map(image => image._id), mimetype: "image" })
-    const deletedVideos = await deleteFiles(req, res, { fileIds: deletedPost.videos.map(video => video._id), mimetype: "video" })
-    const deletedAudios = await deleteFiles(req, res, { fileIds: deletedPost.audios.map(audio => audio._id), mimetype: "audio" })
+    // I changed my mind and wont delete the files for now
+    // const deletedImages = await deleteFiles(req, res, { fileIds: deletedPost.images.map(image => image._id), mimetype: "image" })
+    // const deletedVideos = await deleteFiles(req, res, { fileIds: deletedPost.videos.map(video => video._id), mimetype: "video" })
+    // const deletedAudios = await deleteFiles(req, res, { fileIds: deletedPost.audios.map(audio => audio._id), mimetype: "audio" })
 
     res.status(200).json({
       success: true,
       message: "Successfully deleted post",
       data: {
         deletedPost,
-        deletedImages,
-        deletedVideos,
-        deletedAudios
+        // deletedImages,
+        // deletedVideos,
+        // deletedAudios
       }
     })
   } catch (error) {
