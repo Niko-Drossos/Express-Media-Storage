@@ -4,6 +4,7 @@ Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local
 
 Write documentation for "view" routes.
 
+Add user routes to fetch user data
 
 Currently working on: creating a delete api for posts to delete associated files, needs testing
 
