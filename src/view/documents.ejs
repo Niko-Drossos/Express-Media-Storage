@@ -45,13 +45,6 @@
   </div>
 
   <script>
-    const JWT = localStorage.getItem("JWT-Test")
-
-    if (!JWT) {
-      const newToken = prompt("Enter your JWT")
-      localStorage.setItem("JWT-Test", newToken)
-    }
-
     function fetchFiles(event, options) {
       event.preventDefault() // Prevent default form submission behavior
 
@@ -67,8 +60,7 @@
       fetch(`http://localhost:3000/search/${collection}s?${queryString}`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          "authorization": JWT
+          "Content-Type": "application/json"
         }
       })
       .then(res => res.json())

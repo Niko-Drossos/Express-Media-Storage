@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const { connectDB } = require('./models/connection')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser');
 dotenv.config()
 
 const app = express()
@@ -15,6 +16,7 @@ app.set("view engine", "ejs")
 app.set("views", "src/view")
 app.use(express.static('src/view'))
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cookieParser())
 /* ------------------------------- App router ------------------------------- */
 app.use("/auth", require("./routes/auth.routes"))
 app.use("/user", require("./routes/user.routes"))

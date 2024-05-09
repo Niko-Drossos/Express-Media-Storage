@@ -4,7 +4,7 @@ const decryptJWT = require("../../helpers/decryptJWT");
 module.exports = authenticateUserJWT = (req, res, next) => {
   try {
 
-    const token = req.cookies.storyToken;
+    const token = req.cookies.media_authentication;
     
     if (!token) {
       return res.status(401).json({

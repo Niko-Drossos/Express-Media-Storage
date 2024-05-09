@@ -28,7 +28,7 @@ This is a list of all the middlewares used in the server. <br>
 - [authenticateUserJWT](#authenticateUserJWT)
 
 ## authenticateUserJWT
-<p>This middleware is used to validate that a JWT token send the the header <code>authorization</code> is valid.</p>
+<p>This middleware is used to validate that a JWT token stored in the cookie <code>media_authentication</code> is valid.</p>
 <p>all routes besides the auth routes use the <code>authenticateUserJWT</code> to verify login status.</p>
 <p>The <code>authenticateUserJWT</code> middleware only returns error responses if there are problems with JWT, like <code>expired</code>, <code>invalid</code> or <code>not provided</code></p>
 

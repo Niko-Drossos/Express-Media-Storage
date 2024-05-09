@@ -47,13 +47,6 @@
   </div>
   
   <script>
-    const JWT = localStorage.getItem("JWT-Test")
-
-    if (!JWT) {
-      const newToken = prompt("Enter your JWT")
-      localStorage.setItem("JWT-Test", newToken)
-    }
-
     function fetchFiles(event, options) {
       event.preventDefault() // Prevent default form submission behavior
 
@@ -70,13 +63,11 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "authorization": JWT
         }
       })
       .then(res => res.json())
       .then(data => {
         // Process the response data
-        console.log(fileType)
         renderResults(data.data.searchResults, fileType)
       })
       .catch(error => {
@@ -93,7 +84,6 @@
       const tagName = fileType === 'image' ? 'img' : 'video';
       // Render new results
       data.forEach(item => {
-        console.log(item)
         const container = document.createElement('div')
         container.className = 'mediaContainer';
 
