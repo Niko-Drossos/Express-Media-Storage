@@ -7,20 +7,14 @@
   <title>Home</title>
 </head>
 <body>
-  <h1>Routes</h1>
+  <h1>Media Storage</h1>
   <div class="nav">
-    <div><a href="/media">Media</a></div>
-    <div><a href="/documents">Documents</a></div>
-    <div><a href="/upload">Upload</a></div>
+    <a href="/login">Login</a>
+    <a href="/media">Media</a>
+    <a href="/documents">Documents</a>
+    <a href="/upload">Upload</a>
   </div>
   <script>
-    function setCookie(cookieName, cookieValue, expirationDays) {
-      var d = new Date();
-      d.setTime(d.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
-      var expires = "expires=" + d.toUTCString();
-      document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
-    }
-
     function getCookie(cookieName) {
         var name = cookieName + "=";
         var decodedCookie = decodeURIComponent(document.cookie);
@@ -41,7 +35,6 @@
 
     if (!JWT) {
       const newToken = prompt("Enter your JWT")
-      setCookie("media_authentication", newToken, 1)
     }
   </script>
 </body>

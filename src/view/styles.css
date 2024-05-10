@@ -40,12 +40,16 @@ a:hover {
 }
 
 .nav {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
+  display: grid;
   height: 60vh;
   font-size: 40px;
+}
+
+.nav > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
 }
 
 h1 {

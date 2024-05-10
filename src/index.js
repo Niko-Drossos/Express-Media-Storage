@@ -41,6 +41,10 @@ app.get("/documents", (req, res) => {
 app.get("/upload", (req, res) => {
   res.render("upload.ejs")
 })
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs")
+})
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, () => console.log(`server started at http://localhost:${port}`))

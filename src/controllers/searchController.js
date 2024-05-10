@@ -24,9 +24,7 @@ exports.searchUsers = async (req, res) => {
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
-
-    // TODO: Add tags to users later
-    // if (tags) searchQuery.tags = tags.split(",")
+    if (tags) searchQuery.tags = tags.split(",")
 
     const searchResults = await User.find(searchQuery)
 
