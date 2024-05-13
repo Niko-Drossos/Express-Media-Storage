@@ -1,3 +1,4 @@
+
 # Routes
 view
 (all routes return a populated document to be rendered , all GET requests)
@@ -11,6 +12,8 @@ view
 
 user
 (Im not sure what im going to add yet)
+GET
+/:userId
 
 file
 GET
@@ -20,8 +23,6 @@ POST
 /upload/folder/:username/:date  (Uploads a group of files)
 
 vote (future plan, not yet implemented)
-
-
 
 # Middleware
 This is a list of all the middlewares used in the server. <br>
