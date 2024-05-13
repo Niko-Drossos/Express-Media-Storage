@@ -112,3 +112,9 @@ input[type="submit"]:hover {
   border: 2px solid white;
   border-radius: 5px;
 }
+
+.backButton {
+  text-align: center; 
+  font-size: xx-large;
+  margin-bottom: 30px;
+}

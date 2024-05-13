@@ -5,7 +5,7 @@ module.exports = authenticateUserJWT = (req, res, next) => {
   try {
 
     const token = req.cookies.media_authentication;
-    
+
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -15,9 +15,11 @@ module.exports = authenticateUserJWT = (req, res, next) => {
 
     const decodedToken = decryptJWT(token);
     
-    req.userId = decodedToken.payload.userId || null
-    req.username = decodedToken.payload.username || null
-    req.email = decodedToken.payload.email || null
+    const { payload } = decodedToken
+
+    req.userId = payload.userId || null
+    req.username = payload.username || null
+    req.email = payload.email || null
     
     next()
   } catch (error) {

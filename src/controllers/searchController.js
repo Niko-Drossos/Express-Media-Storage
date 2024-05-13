@@ -20,7 +20,7 @@ exports.searchUsers = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { username } = query
+    const { username, tags } = query
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
@@ -175,7 +175,7 @@ exports.searchImages = async (req, res) => {
     // Add the search query's properties to the searchQuery object
     if (uploader) searchQuery.user = uploader
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
-    if (title) searchQuery.title = new RegExp(title, 'i')
+    if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
 
     const searchResults = await Image.find(searchQuery)
     
