@@ -51,8 +51,11 @@ exports.batchUpload = async (req, res) => {
 
       const fileExtension = getFileExt(file.originalname)
       
+      // TODO: Change this to allow users to add their own titles & descriptions
+      const customTitle = ""
+
       const documentBody = {
-        title: file.originalname,
+        title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
         filename: file.originalname,
         uploader: req.userId,
         description: "",
@@ -65,9 +68,9 @@ exports.batchUpload = async (req, res) => {
         return await Image.create(documentBody)
       } else if (acceptedVideoExt.includes(fileExtension)) {
         // TODO: make function to determine media length with byte size
-        return await Video.create({ ...documentBody })
+        return await Video.create(documentBody)
       } else if (acceptedAudioExt.includes(fileExtension)) {
-        return await Audio.create({ ...documentBody })
+        return await Audio.create(documentBody)
       }
     })
 
@@ -76,11 +79,11 @@ exports.batchUpload = async (req, res) => {
     // Sort the uploads into videos, images, and audios
     let videos = [], images = [], audios = []
     finishedUploads.map(upload => {
-      const { title } = upload
+      const { filename } = upload
 
-      if (acceptedVideoExt.includes(getFileExt(title))) videos.push(upload)
-      if (acceptedImageExt.includes(getFileExt(title))) images.push(upload)
-      if (acceptedAudioExt.includes(getFileExt(title))) audios.push(upload)
+      if (acceptedVideoExt.includes(getFileExt(filename))) videos.push(upload)
+      if (acceptedImageExt.includes(getFileExt(filename))) images.push(upload)
+      if (acceptedAudioExt.includes(getFileExt(filename))) audios.push(upload)
     })
 
     res.status(201).json({

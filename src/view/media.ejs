@@ -47,6 +47,11 @@
   </div>
   
   <script>
+    // TODO: implement better search later
+    function constructQuery(searchInput, inputName) {
+      return `${inputName}=${searchInput}`
+    }
+
     function fetchFiles(event, options) {
       event.preventDefault() // Prevent default form submission behavior
 
@@ -57,7 +62,7 @@
 
       let queryString = ``
 
-      queryString += `${inputName}=${searchInput}`
+      queryString += `${inputName}=${searchInput}&`
 
       fetch(`http://localhost:3000/search/${fileType}s?${queryString}`, {
         method: "GET",
@@ -81,7 +86,19 @@
       // Clear previous results
       resultsContainer.innerHTML = '';
 
-      const tagName = fileType === 'image' ? 'img' : 'video';
+      let tagName
+      switch (fileType) {
+        case 'image':
+          tagName = 'img'
+          break;
+        case 'video':
+          tagName = 'video'
+          break;
+        case 'audio':
+          tagName = 'audio'
+          break;
+      }
+
       // Render new results
       data.forEach(item => {
         const container = document.createElement('div')
@@ -91,7 +108,7 @@
         fileName.textContent = item.filename
 
         const resultItem = document.createElement(tagName);
-        if (fileType === 'video') {
+        if (fileType === 'video' || fileType === 'audio') {
           resultItem.controls = true
         }
         resultItem.src = `/view/${fileType}/${item.filename}` // Adjust this to match the structure of your data

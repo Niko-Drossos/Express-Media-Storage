@@ -45,6 +45,16 @@
 
       const returnedJson = await uploadRequest.json()
 
+      if (!uploadRequest.ok) {
+        alert("Upload failed")
+        return
+      }
+
+      if (returnedData.success) {
+        alert("Upload successful")
+        window.location.href = "/"
+      }
+
       console.log(returnedJson)
     }
   </script>
