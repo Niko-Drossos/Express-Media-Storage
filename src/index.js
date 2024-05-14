@@ -3,14 +3,23 @@ const dotenv = require('dotenv')
 const { connectDB } = require('./models/connection')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
 dotenv.config()
 
+const { PORT, frontendUrl } = process.env
+
 const app = express()
-const port = process.env.PORT || 3000
+const port = PORT || 3000
 
 connectDB()
 
+const corsOptions = {
+  origin: frontendUrl || `http://localhost:${port}`,
+  credentials: true,
+};
+
 /* ------------------------------ App settings ------------------------------ */
+app.use(cors(corsOptions))
 app.use(express.json())
 app.set("view engine", "ejs")
 app.set("views", "src/view")
