@@ -1,6 +1,7 @@
 /* --------------------------------- Schemas -------------------------------- */
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
+const Audio = require("../models/schemas/Audio")
 /* ------------------------------ Middle wares ------------------------------ */
 
 /* --------------------------------- Helpers -------------------------------- */
