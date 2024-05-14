@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Account</title>
+</head>
+<body>
+  <h1>User Account</h1>
+  <div class="container">
+    <hr>
+    <button onclick="fetchFiles(event)">View My Files</button>
+    <hr>
+  </div>
+
+  <script>
+    function fetchFiles(event) {
+      event.preventDefault() // Prevent default form submission behavior
+
+      fetch(`http://localhost:3000/user/my-files`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Credentials": "include"
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Process the response data
+        console.log(data)
+      })
+      .catch(error => {
+        console.error("Error:", error)
+      })
+    }
+  </script>
+</body>
+</html>

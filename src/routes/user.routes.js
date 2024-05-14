@@ -6,11 +6,12 @@ const userController = require("../controllers/userController")
 /* --------------------------------- Helpers -------------------------------- */
 
 /* ------------------------------- Middlewares ------------------------------ */
-
-// TODO: Logging middleware, maybe
+const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
+router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.get("/:userId", userController.getUser)
+router.get("/my-files", userController.getMyFiles)
 
+router.get("/:userId", userController.getUser)
 
 module.exports = router

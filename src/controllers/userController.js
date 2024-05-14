@@ -1,5 +1,8 @@
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
+const Image = require("../models/schemas/Image")
+const Video = require("../models/schemas/Video")
+const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 
 /* --------------------------------- Helpers -------------------------------- */
@@ -34,4 +37,29 @@ exports.getUser = async (req, res) => {
       error
     })
   }
+}
+
+exports.getMyFiles = async (req, res) => {
+  try {
+    const fetchImages = await Image.find({ uploader: req.userId }) || []
+    const fetchVideos = await Video.find({ uploader: req.userId }) || []
+    const fetchAudios = await Audio.find({ uploader: req.userId }) || []
+
+    return res.status(200).json({
+      success: true,
+      message: "Fetched users files",
+      data: {
+        images: fetchImages,
+        videos: fetchVideos,
+        audios: fetchAudios 
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get user files",
+      errorMessage: error.message,
+      error
+    })
+  }    
 }
