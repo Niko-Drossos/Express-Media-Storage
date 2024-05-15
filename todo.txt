@@ -1,13 +1,13 @@
 Docs: 
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
 
+Make the  processUploads middleware work when the files come in bulk, file0, file1, title0, title1 ect
+
 Fix the routes to not use localhost, use current location
 
 Add favorites to routes and to user schemas
 
 Write documentation for "view" routes.
-
-Add user routes to fetch user data
 
 Currently working on: creating a delete api for posts to delete associated files, needs testing
 
@@ -16,7 +16,5 @@ Add ability to download files (low priority)
 Add reaction routes for likes
 
 slogan: ©Where your story becomes His-Story
-
-Create upload api
 
 pipe data from video compression to gridfs
