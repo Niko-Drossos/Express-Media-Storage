@@ -28,10 +28,6 @@ const audioSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Comment',
   }],
-  thumbnailImage: {
-    type: String, // TODO: This will probably be a base 64 string
-    required: false //Change later
-  },
   tags: [{
     type: String // TODO: change this to an enum once tags are added
   }],

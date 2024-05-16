@@ -49,9 +49,20 @@ const postSchema = new Schema({
     ref: 'Audio'
   }],
   tags: [{
-    type: String // TODO: change this to an enum once tags are added
+    type: String
   }],
-  // TODO: Add journal entry's
+  // TODO: test this to see if it works
+  journal: {
+    type: [{
+      date: {
+        type: Date,
+        default: Date.now
+      },
+      entry: {
+        type: String
+      }
+    }]
+  },
   votes: {
     type: [{
       user: {

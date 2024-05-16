@@ -39,6 +39,8 @@ exports.getUser = async (req, res) => {
   }
 }
 
+/* ---------------------------- Fetch user files ---------------------------- */
+
 exports.getMyFiles = async (req, res) => {
   try {
     const fetchImages = await Image.find({ uploader: req.userId }) || []
@@ -62,4 +64,40 @@ exports.getMyFiles = async (req, res) => {
       error
     })
   }    
+}
+
+/* -------------------------- Get user media titles ------------------------- */
+
+// This is used for getting data to add media to Posts
+exports.mediaTitles = async (req, res) => {
+  try {
+    const images = await Image.find({ uploader: req.userId })
+    const videos = await Video.find({ uploader: req.userId })
+    const audios = await Audio.find({ uploader: req.userId })
+
+    function separateTitles(media) {
+      return media.map(media => ({
+        title: media.title,
+        _id: media._id
+      }))
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Fetched users media titles",
+      data: {
+        images: separateTitles(images),
+        videos: separateTitles(videos),
+        audios: separateTitles(audios)
+      }
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get users media titles",
+      errorMessage: error.message,
+      error
+    })
+  }
 }

@@ -12,6 +12,9 @@ router.all("/*", authenticateUserJWT)
 
 router.get("/my-files", userController.getMyFiles)
 
+// TODO: Working on route name
+router.get("/media-titles", userController.mediaTitles)
+
 router.get("/:userId", userController.getUser)
 
 module.exports = router
