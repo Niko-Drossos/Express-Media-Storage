@@ -41,24 +41,28 @@ exports.findFiles = async (req, res) => {
 exports.batchUpload = async (req, res) => {
   try {
     const acceptedVideoExt = ["mp4"]
-    const acceptedImageExt = ["jpg", "jpeg", "png", "webp"] 
+    const acceptedImageExt = ["jpg", "jpeg", "png", "webp", "webm"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
-    const { date } = req.body
+    const { body } = req
 
     const newUploads = req.uploads.map(async file => {
+      const index = file.fieldname.split("file")[1]
+
       const uploadedFileId = await uploadFile(req, res, file)
 
       const fileExtension = getFileExt(file.originalname)
       
-      // TODO: Change this to allow users to add their own titles & descriptions
-      const customTitle = ""
+      // Add custom file information
+      const customTitle = body[`title${index}`]
+      const date = body[`date${index}`]
+      const description = body[`description${index}`]
 
       const documentBody = {
         title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
         filename: file.originalname,
         uploader: req.userId,
-        description: "",
+        description: description || "No description",
         fileId: uploadedFileId,
         date: new Date(date)
       }

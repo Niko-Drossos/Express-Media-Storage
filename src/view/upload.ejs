@@ -10,15 +10,15 @@
   <h1>Upload routes</h1>
   <div class="container" style="margin-bottom: 30px">
     <hr>
-    <form method="POST" onsubmit="uploadFiles(event)" enctype="multipart/form-data">
+    <form method="POST" onsubmit="await uploadFiles(event)" enctype="multipart/form-data">
       <h2>Upload files</h2>
       <div class="formGroup">
         <label for="files">Files:</label>
-        <input id="files" name="files" type="file" multiple>
+        <input id="file0" name="file0" type="file">
       </div>
       <div class="formGroup">
         <label for="date">Date:</label>
-        <input id="date" name="date" type="date">
+        <input id="date0" name="date0" type="date">
       </div>
       <input type="submit">
     </form>
@@ -32,7 +32,11 @@
     async function uploadFiles(event) {
       event.preventDefault()
 
-      const formData = new FormData(event.target)
+      const formData = new FormData()
+      formData.append("file0", document.getElementById("file0").files[0])
+      for (let i = 0; i < event.target.length - 1; i++) {
+        formData.append(event.target[i].name, event.target[i].value)
+      }
 
       const uploadRequest = await fetch("http://localhost:3000/file/upload", {
         method: "POST",
@@ -54,8 +58,6 @@
         alert("Upload successful")
         window.location.href = "/"
       }
-
-      console.log(returnedJson)
     }
   </script>
 </body>

@@ -5,11 +5,6 @@ const multer = require('multer')
 const dotenv = require("dotenv")
 dotenv.config()
 
-/* --------------------------------- Helpers -------------------------------- */
-// TODO: Not yet implemented
-// const videoCompressor = require('../../helpers/videoCompressor')
-/* -------------------------------------------------------------------------- */
-
 // Multer storage configuration
 const storage = multer.memoryStorage()
 
@@ -42,10 +37,9 @@ const uploadFile = async function(req, res, file) {
     // Pipe the buffer stream through the video compressor
     const uploadStream = bufferStream.pipe(bucket.openUploadStream(file.originalname, {
       metadata: {
-        // TODO: Add the ability to add your own file names besides original name
-        // filename: file.originalname,
-
-        // TODO: Add more tags like dimensions
+        // Conditionally add the duration and dimensions to the metadata
+        ...(file.duration && { duration: file.duration }),
+        ...(file.dimensions && { dimensions: file.dimensions }),
         uploader: req.userId
       }
     }))
