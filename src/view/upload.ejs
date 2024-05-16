@@ -10,7 +10,7 @@
   <h1>Upload routes</h1>
   <div class="container" style="margin-bottom: 30px">
     <hr>
-    <form method="POST" onsubmit="await uploadFiles(event)" enctype="multipart/form-data">
+    <form onsubmit="uploadFiles(event)" enctype="multipart/form-data">
       <h2>Upload files</h2>
       <div class="formGroup">
         <label for="files">Files:</label>
@@ -32,11 +32,7 @@
     async function uploadFiles(event) {
       event.preventDefault()
 
-      const formData = new FormData()
-      formData.append("file0", document.getElementById("file0").files[0])
-      for (let i = 0; i < event.target.length - 1; i++) {
-        formData.append(event.target[i].name, event.target[i].value)
-      }
+      const formData = new FormData(event.target)
 
       const uploadRequest = await fetch("http://localhost:3000/file/upload", {
         method: "POST",
@@ -54,9 +50,11 @@
         return
       }
 
-      if (returnedData.success) {
+      if (returnedData?.success) {
         alert("Upload successful")
         window.location.href = "/"
+      } else {
+        alert("Upload failed")
       }
     }
   </script>

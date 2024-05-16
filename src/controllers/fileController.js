@@ -41,7 +41,7 @@ exports.findFiles = async (req, res) => {
 exports.batchUpload = async (req, res) => {
   try {
     const acceptedVideoExt = ["mp4"]
-    const acceptedImageExt = ["jpg", "jpeg", "png", "webp", "webm"] 
+    const acceptedImageExt = ["jpg", "jpeg", "png"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
     const { body } = req
