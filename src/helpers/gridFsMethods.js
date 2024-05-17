@@ -120,6 +120,34 @@ const streamFile = async function(req, res, fileName) {
   }
 }
 
+/* 
+  ! Possible future addition, true file streaming,
+  const streamFile = async function(req, res, fileName) {
+    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
+    // Get the mimetype from the url, this works because only the /view routes stream.
+    const dbName = req.originalUrl.split("/")[2]
+    const db = client.db(dbName)
+    const bucket = new mongodb.GridFSBucket(db)
+
+    const fileStream = bucket.openDownloadStreamByName(fileName)
+
+    // Set the response headers
+    const file = await bucket.find({ filename: fileName }).toArray()[0]
+    res.setHeader('Content-Type', file.metadata.mimetype)
+    res.setHeader('Content-Length', file.length)
+    res.setHeader('Content-Disposition', `inline; filename=${file.filename}`)
+
+    // Pipe the file stream to the response, but only request the next chunk of data when the last one was fully read
+    const pipeline = fileStream.pipe(res)
+    pipeline.on('data', () => {
+      fileStream.pause()
+    })
+    pipeline.on('drain', () => {
+      fileStream.resume()
+    })
+  }
+*/
+
 /* ------------------------------- Delete file ------------------------------ */
 
 const deleteFiles = async function(req, res, query) {
