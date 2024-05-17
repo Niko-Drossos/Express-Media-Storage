@@ -38,7 +38,7 @@
       let username = document.getElementById("username").value;
       let password = document.getElementById("password").value;
 
-      const loginAttempt = await fetch("http://localhost:3000/auth/login", {
+      const loginAttempt = await fetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

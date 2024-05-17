@@ -34,7 +34,7 @@
 
       const formData = new FormData(event.target)
 
-      const uploadRequest = await fetch("http://localhost:3000/file/upload", {
+      const uploadRequest = await fetch("/file/upload", {
         method: "POST",
         headers: {
           // for some reason I have to NOT send this header... wack

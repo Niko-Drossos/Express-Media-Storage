@@ -57,7 +57,7 @@
 
       queryString += `${inputName}=${searchInput}`
 
-      fetch(`http://localhost:3000/search/${collection}s?${queryString}`, {
+      fetch(`/search/${collection}s?${queryString}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json"

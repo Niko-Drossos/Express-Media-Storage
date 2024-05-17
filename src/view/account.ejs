@@ -18,7 +18,7 @@
     function fetchFiles(event) {
       event.preventDefault() // Prevent default form submission behavior
 
-      fetch(`http://localhost:3000/user/my-files`, {
+      fetch(`/user/my-files`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

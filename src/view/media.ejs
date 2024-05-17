@@ -64,7 +64,7 @@
 
       queryString += `${inputName}=${searchInput}&`
 
-      fetch(`http://localhost:3000/search/${fileType}s?${queryString}`, {
+      fetch(`/search/${fileType}s?${queryString}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
