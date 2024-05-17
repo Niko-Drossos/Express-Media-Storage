@@ -50,6 +50,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   border-radius: 0;
+  text-decoration: none;
 }
 
 h1 {
@@ -117,4 +118,8 @@ input[type="submit"]:hover {
   text-align: center; 
   font-size: xx-large;
   margin-bottom: 30px;
+}
+
+.backButton > a {
+  text-decoration: none
 }
