@@ -56,15 +56,22 @@ exports.searchPosts = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { posterId, tags, startDate, endDate, title } = query
+    const { posterId, tags, startDate, endDate, title, description } = query
 
     // Add the search query's properties to the searchQuery object
     if (posterId) searchQuery.user = posterId
-    if (tags) searchQuery.tags = tags.split(",")
+    if (tags) searchQuery.tags = { $all: tags.split(",") }
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
+    if (description) searchQuery.description = new RegExp(description, 'i')
 
-    const searchResults = await Post.find(searchQuery).populate(['videos', 'images', 'audios'])
+    const searchResults = await Post.find({
+      ...searchQuery,
+      $or: [
+        { user: req.userId },
+        { privacy: "Public" }
+      ]
+    }).populate(['videos', 'images', 'audios'])
     
     res.status(200).json({ 
       success: true, 
