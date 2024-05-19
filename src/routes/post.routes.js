@@ -12,6 +12,8 @@ router.get("/:postId", postController.getPost)
 
 router.post("/create", postController.createPost)
 
+router.post("/journal/add/:postId", postController.addJournal)
+
 router.put("/edit/:postId", postController.editPost)
 
 router.delete("/delete/:postId", postController.deletePost)

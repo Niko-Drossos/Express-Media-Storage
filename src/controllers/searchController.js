@@ -64,7 +64,7 @@ exports.searchPosts = async (req, res) => {
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 
-    const searchResults = await Post.find(searchQuery)
+    const searchResults = await Post.find(searchQuery).populate(['videos', 'images', 'audios'])
     
     res.status(200).json({ 
       success: true, 

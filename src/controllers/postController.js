@@ -36,7 +36,7 @@ exports.getPost = async (req, res) => {
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, description, privacy, images, videos, audios, tags } = req.body
+    const { title, description, privacy, images, videos, audios, tags, journal } = req.body
 
     const createdPost = await Post.create({
       user: req.userId,
@@ -46,7 +46,8 @@ exports.createPost = async (req, res) => {
       images: images || [], 
       videos: videos || [], 
       audios: audios || [],
-      tags: tags || []
+      tags: tags || [],
+      journal: journal || [],
     })
 
     await User.findByIdAndUpdate(req.userId, {
@@ -95,6 +96,44 @@ exports.editPost = async (req, res) => {
       updatedInformation,
       { new: true }
     )
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully updated post",
+      data: {
+        newPost: updatedPost
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to update post",
+      errorMessage: error.message,
+      error 
+    })
+  }
+}
+
+/* ------------------------- Add a new journal entry ------------------------ */
+
+exports.addJournal = async (req, res) => {
+  try {
+    const date = new Date()
+    // Format the date to 24 hours and only time
+    const formattedTime = date.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit', hour12: false })
+
+    const updatedPost = await Post.findOneAndUpdate({ 
+        _id: req.params.postId, user: req.userId 
+      },{
+        $push: {
+          journal: {
+            time: formattedTime,
+            entry: req.body.journal
+          }
+        }
+      },{ 
+        new: true 
+      })
 
     res.status(200).json({
       success: true,

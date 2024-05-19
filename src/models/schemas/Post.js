@@ -13,7 +13,7 @@ const postSchema = new Schema({
   title: {
     type: String,
     required: false,
-    default: `Untitled ${Date.now()}`
+    default: new Date().toLocaleString()
   },
   description: {
     // This is stored as a markdown string
@@ -54,12 +54,13 @@ const postSchema = new Schema({
   // TODO: test this to see if it works
   journal: {
     type: [{
-      date: {
-        type: Date,
-        default: Date.now
+      time: {
+        type: String,
+        required: true
       },
       entry: {
-        type: String
+        type: String,
+        required: true
       }
     }]
   },
