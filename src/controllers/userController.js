@@ -76,9 +76,11 @@ exports.mediaTitles = async (req, res) => {
     const audios = await Audio.find({ uploader: req.userId })
 
     function separateTitles(media) {
+      media.sort((a, b) => new Date(b.date) - new Date(a.date))
       return media.map(media => ({
         title: media.title,
-        _id: media._id
+        date: media.date,
+        _id: media._id,
       }))
     }
 
