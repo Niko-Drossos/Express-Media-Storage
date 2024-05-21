@@ -14,13 +14,22 @@ user
 (Im not sure what im going to add yet)
 GET
 /:userId
+/media-titles
+/my-files
+
+POST
+/follow/:userId
+/unfollow/:userId
+
+
 
 file
 GET
-/get/:username      (Gets and returns the folder data)
-/get/:username/:date
+- /get/:username      This might be removed
+
 POST
-/upload/folder/:username/:date  (Uploads a group of files)
+/upload  (Uploads a batch of files)
+/delete
 
 vote (future plan, not yet implemented)
 
