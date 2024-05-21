@@ -43,10 +43,10 @@ exports.createPost = async (req, res) => {
       title, 
       description,
       privacy,
-      images: images || [], 
-      videos: videos || [], 
-      audios: audios || [],
-      tags: tags || [],
+      images: images ? images.split(",") : [], 
+      videos: videos ? videos.split(",") : [], 
+      audios: audios ? audios.split(",") : [],
+      tags: tags ? tags.split(",") : [],
       journal: journal || [],
     })
 

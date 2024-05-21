@@ -10,6 +10,7 @@ const getFileExt = require('../helpers/getFileExt')
 const { uploadFile, retrieveFiles, streamFile, deleteFile } = require("../helpers/gridFsMethods")
 /* -------------------------- Fetch the folder path ------------------------- */
 
+// ! I might remove this
 exports.findFiles = async (req, res) => {
   try {
     const query = {

@@ -1,5 +1,6 @@
 const { Readable } = require('stream')
 const mongodb = require("mongodb")
+const mongoose = require("mongoose")
 const multer = require('multer')
 
 const dotenv = require("dotenv")
@@ -71,7 +72,7 @@ const retrieveFiles = async function(req, res, query) {
 
   const { _id } = query
 
-  if (_id) bucketQuery._id = new mongodb.ObjectId(_id)
+  if (_id) bucketQuery._id = new mongoose.Schema.Types.ObjectId(_id)
 
   const fetchFiles = bucket.find(bucketQuery)
 
@@ -158,7 +159,7 @@ const deleteFiles = async function(req, res, query) {
     const bucket = new mongodb.GridFSBucket(db)
 
     // Make the list of file id's an ObjectId instance
-    const deleteIds = query.fileIds.map(id => new mongodb.ObjectId(id))
+    const deleteIds = query.fileIds.map(id => new mongoose.Schema.Types.ObjectId(id))
 
     const fetchFiles = bucket.find({ _id: { $in: deleteIds } })
 
