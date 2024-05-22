@@ -9,14 +9,14 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.get("/:postId", postController.getPost)
-
 router.post("/create", upload.none(), postController.createPost)
 
-router.post("/journal/add/:postId", upload.none(), postController.addJournal)
+router.post("/journal/add", upload.none(), postController.addJournal)
 
 router.put("/edit/:postId", upload.none(), postController.editPost)
 
 router.delete("/delete/:postId", postController.deletePost)
+
+router.get("/:postId", postController.getPost)
 
 module.exports = router

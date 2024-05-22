@@ -122,18 +122,31 @@ exports.addJournal = async (req, res) => {
     // Format the date to 24 hours and only time
     const formattedTime = date.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit', hour12: false })
 
+    // Find the first post for the day
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0); // Set to the beginning of the day
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999); // Set to the end of the day
+
     const updatedPost = await Post.findOneAndUpdate({ 
-        _id: req.params.postId, user: req.userId 
-      },{
-        $push: {
-          journal: {
-            time: formattedTime,
-            entry: req.body.journal
-          }
+      user: req.userId,
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      }
+    },{
+      $push: {
+        journal: {
+          time: formattedTime,
+          entry: req.body.entry
         }
-      },{ 
-        new: true 
-      })
+      }
+    },{ 
+      new: true 
+    })
+
+    if (!updatedPost) throw new Error("Post not found or not own by the user")
 
     res.status(200).json({
       success: true,
