@@ -103,3 +103,91 @@ exports.mediaTitles = async (req, res) => {
     })
   }
 }
+
+/* ------------------------------ Follow a user ----------------------------- */
+
+exports.follow = async (req, res) => {
+  try {
+    const followedUser = await User.findByIdAndUpdate(req.params.userId, {
+      $push: {
+        followers: req.userId
+      }
+    }, {
+      new: true
+    })  
+
+    const followingUser = await User.findByIdAndUpdate(req.userId, {
+      $push: {
+        following: req.params.userId
+      }
+    }, {
+      new: true
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: `${followingUser.username} followed ${followedUser.username}`,
+      data: {
+        user: {
+          username: followingUser.username,
+          id: followingUser._id
+        },
+        followed: {
+          username: followedUser.username,
+          id: followedUser._id
+        }
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to follow user",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+/* ------------------------------ Unfollow user ----------------------------- */
+
+exports.unfollow = async (req, res) => {
+  try {
+    const unfollowedUser = await User.findByIdAndUpdate(req.params.userId, {
+      $pull: {
+        followers: req.userId
+      }
+    }, {
+      new: true
+    })
+
+    const unfollowingUser = await User.findByIdAndUpdate(req.userId, {
+      $pull: {
+        following: req.params.userId
+      }
+    }, {
+      new: true
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: `${unfollowingUser.username} unfollowed ${unfollowedUser.username}`,
+      data: {
+        user: {
+          username: unfollowingUser.username,
+          id: unfollowingUser._id
+        },
+        unfollowed: {
+          username: unfollowedUser.username,
+          id: unfollowedUser._id
+        }
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to unfollow user",
+      errorMessage: error.message,
+      error
+    })
+  }
+}

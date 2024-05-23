@@ -30,6 +30,16 @@ const userSchema = new Schema({
     type: [String],
     default: []
   },
+  followers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    select: false
+  }],
+  following: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    select: false
+  }],
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment',

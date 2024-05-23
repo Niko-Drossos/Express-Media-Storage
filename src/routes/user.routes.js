@@ -15,6 +15,10 @@ router.get("/my-files", userController.getMyFiles)
 // TODO: Working on route name
 router.get("/media-titles", userController.mediaTitles)
 
+router.post("/follow/:userId", userController.follow)
+
+router.post("/unfollow/:userId", userController.unfollow)
+
 router.get("/:userId", userController.getUser)
 
 module.exports = router
