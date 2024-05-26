@@ -3,6 +3,8 @@ make the files that a user uploads keep all tags when uploaded to llama.  Specif
 Make everyone have a separate account for the chatbot but the files they can search are public.
 make the search find the userId AND the privacy flag
 
+Finish the Daat routes
+
 RAG Docs: https://medium.com/@ingridwickstevens/chat-with-your-audio-locally-a-guide-to-rag-with-whisper-ollama-and-faiss-6656b0b40a68
 https://www.assemblyai.com/blog/javascript-audio-transcript/
 

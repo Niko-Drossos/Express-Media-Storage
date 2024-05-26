@@ -40,7 +40,7 @@ exports.createPost = async (req, res) => {
 
     const createdPost = await Post.create({
       user: req.userId,
-      title, 
+      title: title || undefined, // This is so that mongoose defaults to the date it was created
       description,
       privacy,
       images: images ? images.split(",") : [], 

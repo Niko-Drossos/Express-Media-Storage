@@ -19,6 +19,16 @@ const audioSchema = new Schema({
     required: true,
     unique: true
   },
+  fileId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  transcription: {
+    type: String,
+    default: '',
+    required: false
+  },
   uploader: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -64,11 +74,6 @@ const audioSchema = new Schema({
   voteCount: {
     type: Number,
     default: 0
-  },
-  fileId: {
-    type: String,
-    required: true,
-    unique: true
   }
 }, {
   timestamps: true,

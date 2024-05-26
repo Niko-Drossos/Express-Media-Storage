@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Stream Client</title>
+</head>
+<body>
+  <h1>Daat</h1>
+  <form>
+    <label for="content">Content</label>
+    <input type="text" name="content">
+  </form>
+  <input type="button" onclick="chat(document.getElementsByName('content')[0].value)" value="Send">
+  <div id="chat"></div>
+
+  <script>
+    // Function to render a new message in the UI
+    function renderMessage(message) {
+      const chatDiv = document.getElementById('chat');
+      chatDiv.innerText += message;
+    }
+
+    function chat(message) {
+      // Make a request to the server to start streaming chat messages
+      fetch(`/daat/ask`, {
+        method: 'POST',
+        headers: {
+          // 'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content: message })
+      })
+      .then(response => {
+        // Read each chunk of data as it arrives
+        const reader = response.body.getReader();
+        return new ReadableStream({
+          start(controller) {
+            function push() {
+              reader.read().then(({ done, value }) => {
+                if (done) {
+                  controller.close();
+                  return;
+                }
+                // Render the received message
+                renderMessage(new TextDecoder().decode(value));
+                push(); // Continue reading the next chunk
+              }).catch(error => {
+                console.error('Error reading response:', error);
+                controller.error(error);
+              });
+            }
+            push(); // Start reading the response stream
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+      });
+    }
+
+  </script>
+</body>
+</html>

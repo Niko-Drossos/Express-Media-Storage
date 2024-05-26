@@ -55,7 +55,7 @@ exports.searchPosts = async (req, res) => {
 
     // Object that will be searched for in the db
     const searchQuery = {}
-    
+
     const { posterId, tags, startDate, endDate, title, description } = query
 
     // Add the search query's properties to the searchQuery object
