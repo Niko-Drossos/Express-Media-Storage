@@ -1,3 +1,12 @@
+AI File uploading: 
+make the files that a user uploads keep all tags when uploaded to llama.  Specifically the UserId 
+Make everyone have a separate account for the chatbot but the files they can search are public.
+make the search find the userId AND the privacy flag
+
+RAG Docs: https://medium.com/@ingridwickstevens/chat-with-your-audio-locally-a-guide-to-rag-with-whisper-ollama-and-faiss-6656b0b40a68
+https://www.assemblyai.com/blog/javascript-audio-transcript/
+
+
 Docs: 
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
 
@@ -17,4 +26,5 @@ Add reaction routes for likes
 
 slogan: ©Where your story becomes His-Story
 
-pipe data from video compression to gridfs
+pipe data from video compression to GridFs
+Make files store original file date before running it through middleware
