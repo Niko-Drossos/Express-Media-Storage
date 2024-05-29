@@ -2,7 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const { connectDB } = require('./models/connection')
 const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser')
 const cors = require('cors')
 dotenv.config()
 
@@ -10,13 +10,14 @@ const { PORT, frontendUrl } = process.env
 
 const app = express()
 const port = PORT || 3000
+const host = '0.0.0.0' // This makes the server listen on all available interfaces
 
 connectDB()
 
 const corsOptions = {
   origin: frontendUrl || `http://localhost:${port}`,
   credentials: true,
-};
+}
 
 /* ------------------------------ App settings ------------------------------ */
 app.use(cors(corsOptions))
@@ -65,4 +66,4 @@ app.get("/daat-chat", (req, res) => {
 })
 /* -------------------------------------------------------------------------- */
 
-app.listen(port, () => console.log(`server started at http://localhost:${port}`))
+app.listen(port, host, () => console.log(`server started at http://localhost:${port}`))
