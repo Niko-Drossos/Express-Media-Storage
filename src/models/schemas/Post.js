@@ -51,7 +51,6 @@ const postSchema = new Schema({
   tags: [{
     type: String
   }],
-  // TODO: test this to see if it works
   journal: {
     type: [{
       time: {

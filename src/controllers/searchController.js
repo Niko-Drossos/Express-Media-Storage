@@ -1,5 +1,3 @@
-const path = require("path")
-
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
 const Post = require("../models/schemas/Post")
@@ -20,21 +18,34 @@ exports.searchUsers = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { username, tags } = query
+    const { username, tags, page, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
     if (tags) searchQuery.tags = tags.split(",")
 
-    const searchResults = await User.find(searchQuery)
+    const totalDocuments = await Post.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    const searchResults = await User.find(
+      searchQuery
+    )
+    .sort({ createdAt: -1 })
+    .limit(limit ? limit : 16)
+    .skip((page - 1) * (limit ? limit : 16))
 
     res.status(200).json({
       success: true,
       message: "Successfully searched for users",
       data: {
         userCount: searchResults.length,
-        query,
-        searchResults
+        total: totalDocuments,
+        page: page, 
+        pageCount: totalPages,
+        limit: limit,
+        query: query,
+        searchResults: searchResults
       }
     })
   } catch (error) {
@@ -56,7 +67,7 @@ exports.searchPosts = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { posterId, tags, startDate, endDate, title, description } = query
+    const { posterId, tags, startDate, endDate, title, description, page, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (posterId) searchQuery.user = posterId
@@ -65,21 +76,36 @@ exports.searchPosts = async (req, res) => {
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (description) searchQuery.description = new RegExp(description, 'i')
 
-    const searchResults = await Post.find({
+    const documentQuery = {
       ...searchQuery,
       $or: [
         { user: req.userId },
         { privacy: "Public" }
       ]
-    }).populate(['videos', 'images', 'audios'])
+    }
+
+    // Get the total number of documents that match the search query
+    const totalDocuments = await Post.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    const searchResults = await Post.find(documentQuery)
+    .sort({ createdAt: -1 })
+    .limit(limit ? limit : 16)
+    .skip((page - 1) * (limit ? limit : 16))
+    .populate(['videos', 'images', 'audios'])
     
     res.status(200).json({ 
       success: true, 
       message: "Successfully searched for posts" ,
       data: {
         postCount: searchResults.length,
-        query,
-        searchResults
+        total: totalDocuments,
+        page: page,
+        pageCount: totalPages,
+        limit: limit,
+        query: query,
+        searchResults: searchResults
       }
     })
   } catch (error) {
