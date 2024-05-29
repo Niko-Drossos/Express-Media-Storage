@@ -3,20 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script defer src="app.js"></script>
   <title>Chat Stream Client</title>
 </head>
 <body>
-  <h1>Daat</h1>
+  <!-- <h1>Daat</h1>
   <form>
     <label for="content">Content</label>
     <input type="text" name="content">
   </form>
   <input type="button" onclick="chat(document.getElementsByName('content')[0].value)" value="Send">
-  <div id="chat"></div>
+  <div id="chat"></div> -->
+
+  <!-- ------------------------------- testing ------------------------------- -->
+  <button id="ws_open">Connect</button>
+  <button id="ws_close">Disconnect</button>
+  <div class="input_block">
+    <input type="text" name="input" id="ws_input">
+    <button id="ws_send">Send Message</button>
+  </div>
+  <pre id="messages"></pre>
+
 
   <script>
-    // Function to render a new message in the UI
-    function renderMessage(message) {
+    
+
+// Function to render a new message in the UI
+    /* function renderMessage(message) {
       const chatDiv = document.getElementById('chat');
       chatDiv.innerText += message;
     }
@@ -56,7 +69,7 @@
       .catch(error => {
         console.error('Fetch error:', error);
       });
-    }
+    } */
 
   </script>
 </body>
