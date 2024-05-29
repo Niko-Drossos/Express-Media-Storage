@@ -12,7 +12,7 @@ https://www.assemblyai.com/blog/javascript-audio-transcript/
 Docs: 
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
 
-Make the  processUploads middleware work when the files come in bulk, file0, file1, title0, title1 ect
+Find out how to transcribe audio and video to text to store in documents
 
 Fix the routes to not use localhost, use current location
 

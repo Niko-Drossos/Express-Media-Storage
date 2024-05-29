@@ -67,7 +67,7 @@ exports.searchPosts = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { posterId, tags, startDate, endDate, title, description, page, limit=16 } = query
+    const { posterId, tags, startDate, endDate, title, description, transcription, page, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (posterId) searchQuery.user = posterId
@@ -75,6 +75,7 @@ exports.searchPosts = async (req, res) => {
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (description) searchQuery.description = new RegExp(description, 'i')
+    if (transcription) searchQuery.transcription = new RegExp(transcription, 'i')
 
     const documentQuery = {
       ...searchQuery,

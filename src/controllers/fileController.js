@@ -59,6 +59,11 @@ exports.batchUpload = async (req, res) => {
       const date = body[`date${index}`]
       const description = body[`description${index}`]
 
+      // TODO: Create transcription function audios and videos
+      if (acceptedAudioExt.includes(fileExtension) || acceptedVideoExt.includes(fileExtension)) {
+        var completedTranscription = ''
+      }
+
       const documentBody = {
         title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
         filename: file.originalname,
@@ -73,9 +78,9 @@ exports.batchUpload = async (req, res) => {
         return await Image.create(documentBody)
       } else if (acceptedVideoExt.includes(fileExtension)) {
         // TODO: make function to determine media length with byte size
-        return await Video.create(documentBody)
+        return await Video.create({ ...documentBody, transcription: completedTranscription || "" })
       } else if (acceptedAudioExt.includes(fileExtension)) {
-        return await Audio.create(documentBody)
+        return await Audio.create({ ...documentBody, transcription: completedTranscription || ""})
       }
     })
 
