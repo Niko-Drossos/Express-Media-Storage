@@ -7,9 +7,15 @@ const calculateVoteCount = require('../../helpers/calculateVoteCount')
 
 const commentSchema = new Schema({
   user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
   },
   date: {
     type: Date,
@@ -19,12 +25,14 @@ const commentSchema = new Schema({
     type: {
       isEdited: {
         type: Boolean,
-        default: false
       },
       date: {
         type: Date,
-        default: Date.now()
       }
+    },
+    default: {
+      isEdited: false,
+      date: Date.now()
     }
   },
   deleted: {
@@ -38,6 +46,10 @@ const commentSchema = new Schema({
         default: Date.now()
       }
     },
+    default: {
+      isDeleted: false,
+      date: Date.now()
+    }
   },
   originType: {
     type: String,
@@ -60,9 +72,15 @@ const commentSchema = new Schema({
   votes: {
     type: [{
       user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        username: {
+          type: String,
+          required: true
+        },
       },
       vote: {
         type: Boolean,

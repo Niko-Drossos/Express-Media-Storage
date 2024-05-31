@@ -80,7 +80,12 @@ exports.searchPosts = async (req, res) => {
     const documentQuery = {
       ...searchQuery,
       $or: [
-        { user: req.userId },
+        // ! CURRENTLY BROKEN
+        /* { 
+          user: {
+            userId: req.userId
+          } 
+        }, */
         { privacy: "Public" }
       ]
     }
@@ -94,7 +99,8 @@ exports.searchPosts = async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(limit ? limit : 16)
     .skip((page - 1) * (limit ? limit : 16))
-    .populate(['videos', 'images', 'audios'])
+    // TODO: Leave this out for now, change the post routes to populate
+    // .populate(['videos', 'images', 'audios'])
     
     res.status(200).json({ 
       success: true, 
@@ -166,10 +172,10 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { uploader, title, startDate, endDate } = query
+    const { user, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (uploader) searchQuery.uploader = uploader
+    if (user) searchQuery.user = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 
@@ -204,10 +210,10 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { uploader, title, startDate, endDate } = query
+    const { user, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (uploader) searchQuery.user = uploader
+    if (user) searchQuery.user = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
 
@@ -241,10 +247,10 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { uploader, title, startDate, endDate } = query
+    const { user, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (uploader) searchQuery.user = uploader
+    if (user) searchQuery.user = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 

@@ -6,6 +6,17 @@ const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const audioSchema = new Schema({
+  user: {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
+  },
   date: {
     type: Date,
     default: Date.now
@@ -28,11 +39,6 @@ const audioSchema = new Schema({
     type: String,
     default: '',
     required: false
-  },
-  uploader: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
   },
   comments: [{
     type: Schema.Types.ObjectId,
@@ -60,9 +66,15 @@ const audioSchema = new Schema({
   votes: {
     type: [{
       user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        username: {
+          type: String,
+          required: true
+        },
       },
       vote: {
         type: Boolean,

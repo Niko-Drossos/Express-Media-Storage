@@ -43,9 +43,9 @@ exports.getUser = async (req, res) => {
 
 exports.getMyFiles = async (req, res) => {
   try {
-    const fetchImages = await Image.find({ uploader: req.userId }) || []
-    const fetchVideos = await Video.find({ uploader: req.userId }) || []
-    const fetchAudios = await Audio.find({ uploader: req.userId }) || []
+    const fetchImages = await Image.find({ "user.userId": req.userId }) || []
+    const fetchVideos = await Video.find({ "user.userId": req.userId }) || []
+    const fetchAudios = await Audio.find({ "user.userId": req.userId }) || []
 
     return res.status(200).json({
       success: true,
@@ -71,9 +71,9 @@ exports.getMyFiles = async (req, res) => {
 // This is used for getting data to add media to Posts
 exports.mediaTitles = async (req, res) => {
   try {
-    const images = await Image.find({ uploader: req.userId })
-    const videos = await Video.find({ uploader: req.userId })
-    const audios = await Audio.find({ uploader: req.userId })
+    const images = await Image.find({ "user.userId": req.userId })
+    const videos = await Video.find({ "user.userId": req.userId })
+    const audios = await Audio.find({ "user.userId": req.userId })
 
     function separateTitles(media) {
       media.sort((a, b) => new Date(b.date) - new Date(a.date))

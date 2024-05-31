@@ -4,6 +4,7 @@ const Post = require("../models/schemas/Post")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
+const Audio = require("../models/schemas/Audio")
 /* -------------------------------------------------------------------------- */
 
 exports.getComments = async (req, res) => {
@@ -32,7 +33,10 @@ exports.getComments = async (req, res) => {
 exports.commentOnPost = async (req, res) => {
   try {
     const postedComment = await Comment.create({
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       originType: "Post",
       originId: req.params.postId,
       content: req.body.content
@@ -67,7 +71,10 @@ exports.commentOnPost = async (req, res) => {
 exports.commentOnComment = async (req, res) => {
   try {
     const postedComment = await Comment.create({
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       originType: "Comment",
       originId: req.params.commentId,
       content: req.body.content
@@ -102,7 +109,10 @@ exports.commentOnComment = async (req, res) => {
 exports.commentOnUser = async (req, res) => {
   try {
     const postedComment = await Comment.create({
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       originType: "User",
       originId: req.params.userId,
       content: req.body.content
@@ -137,7 +147,10 @@ exports.commentOnUser = async (req, res) => {
 exports.commentOnVideo = async (req, res) => {
   try {
     const postedComment = await Comment.create({
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       originType: "Video",
       originId: req.params.videoId,
       content: req.body.content
@@ -172,7 +185,10 @@ exports.commentOnVideo = async (req, res) => {
 exports.commentOnImage = async (req, res) => {
   try {
     const postedComment = await Comment.create({
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       originType: "Image",
       originId: req.params.imageId,
       content: req.body.content
@@ -207,7 +223,10 @@ exports.commentOnImage = async (req, res) => {
 exports.commentOnAudio = async (req, res) => {
   try {
     const postedComment = await Comment.create({
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       originType: "Audio",
       originId: req.params.audioId,
       content: req.body.content
@@ -245,7 +264,10 @@ exports.deleteComment = async (req, res) => {
   try {
     const deletedComment = await Comment.findOneAndUpdate({
       _id: req.params.commentId,
-      user: req.userId,
+      user: { 
+        userId: req.userId,
+        username: req.username
+      },
       deleted: { $ne: true } // Make sure the comment is not already deleted
     }, {
       content: `[This comment was deleted on ${new Date(Date.now()).toLocaleDateString()}, ${new Date(Date.now()).toLocaleTimeString()}]`,
@@ -282,7 +304,7 @@ exports.updateComment = async (req, res) => {
   try {
     const updatedComment = await Comment.findOneAndUpdate({
       _id: req.params.commentId,
-      user: req.userId
+      "user.userId": req.userId
     }, {
       content: req.body.content,
       edited: {

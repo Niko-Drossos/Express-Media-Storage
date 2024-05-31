@@ -67,7 +67,10 @@ exports.batchUpload = async (req, res) => {
       const documentBody = {
         title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
         filename: file.originalname,
-        uploader: req.userId,
+        user: {
+          userId: req.userId,
+          username: req.username
+        },
         description: description || "No description",
         fileId: uploadedFileId,
         date: new Date(date)

@@ -53,9 +53,17 @@ const userSchema = new Schema({
   votes: {
     type: [{
       user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        type: {
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          },
+          username: {
+            type: String,
+            required: true
+          }
+        },
       },
       vote: {
         type: Boolean,

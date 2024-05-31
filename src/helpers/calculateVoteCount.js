@@ -13,7 +13,7 @@ function calculateVoteCount(votes) {
   });
 
   // Return the vote count
-  return Math.max(0, positiveVotes - negativeVotes);
+  return positiveVotes - negativeVotes
 }
 
 module.exports = calculateVoteCount;

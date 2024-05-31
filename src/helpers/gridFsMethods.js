@@ -41,7 +41,10 @@ const uploadFile = async function(req, res, file) {
         // Conditionally add the duration and dimensions to the metadata
         ...(file.duration && { duration: file.duration }),
         ...(file.dimensions && { dimensions: file.dimensions }),
-        uploader: req.userId
+        user: {
+          userId: req.userId,
+          username: req.username
+        }
       }
     }))
 
@@ -170,7 +173,7 @@ const deleteFiles = async function(req, res, query) {
     }
 
     const deletedResults = foundFiles.map(file => {
-      if (file.metadata.uploader == req.userId) {
+      if (file.metadata.user == req.userId) {
         bucket.delete(new mongodb.ObjectId(file._id))
         return {
           success: true,

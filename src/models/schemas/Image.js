@@ -19,10 +19,16 @@ const imageSchema = new Schema({
     required: true,
     unique: true
   },
-  uploader: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  user: {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
   },
   comments: [{
     type: Schema.Types.ObjectId,
@@ -31,10 +37,19 @@ const imageSchema = new Schema({
   votes: {
     type: [{
       user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+        type: {
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          },
+          username: {
+            type: String,
+            required: true
+          }
+        },
       },
-      type: {
+      vote: {
         type: Boolean,
         required: true
       }

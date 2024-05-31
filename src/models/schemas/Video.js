@@ -29,10 +29,18 @@ const videoSchema = new Schema({
     default: '',
     required: false
   },
-  uploader: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  user: {
+    type: {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      username: {
+        type: String,
+        required: true
+      }
+    }
   },
   comments: [{
     type: Schema.Types.ObjectId,
@@ -70,9 +78,17 @@ const videoSchema = new Schema({
   votes: {
     type: [{
       user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        type: {
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          },
+          username: {
+            type: String,
+            required: true
+          }
+        },
       },
       vote: {
         type: Boolean,

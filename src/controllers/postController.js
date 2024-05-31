@@ -39,7 +39,10 @@ exports.createPost = async (req, res) => {
     const { title, description, privacy, images, videos, audios, tags, journal } = req.body
 
     const createdPost = await Post.create({
-      user: req.userId,
+      user: {
+        userId: req.userId,
+        username: req.username
+      },
       title: title || undefined, // This is so that mongoose defaults to the date it was created
       description,
       privacy,
@@ -92,7 +95,7 @@ exports.editPost = async (req, res) => {
 
     // Make sure that the person updating the post is the one who created it
     const updatedPost = await Post.findOneAndUpdate(
-      { _id: req.params.postId, user: req.userId }, 
+      { _id: req.params.postId, "user.userId": req.userId }, 
       updatedInformation,
       { new: true }
     )
@@ -123,7 +126,7 @@ exports.addJournal = async (req, res) => {
     const formattedTime = date.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit', hour12: false })
 
     const updatedPost = await Post.findOneAndUpdate({ 
-      user: req.userId,
+      "user.userId": req.userId,
       _id: req.params.postId,
     },{
       $push: {
@@ -159,10 +162,17 @@ exports.addJournal = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
   try {
-    const deletedPost = await Post.findOneAndDelete({
+    const deletedPost = await Post.findOneAndUpdate({
       _id: req.params.postId,
       // This is to prevent users from deleting other users' posts
-      user: req.userId
+      "user.userId": req.userId
+    }, {
+      title: "Deleted",
+      description: `Post deleted ${new Date().toLocaleDateString}`,
+      deleted: {
+        isDeleted: true,
+        date: new Date().toISOString()
+      }
     })
 
     if (!deletedPost) throw new Error("Post not found or not own by the user")

@@ -21,9 +21,17 @@ const postSchema = new Schema({
     required: false
   },
   user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      username: {
+        type: String,
+        required: true
+      }
+    },
   },
   privacy: {
     type: String,
@@ -31,6 +39,36 @@ const postSchema = new Schema({
     enum: ['Public', 'Private', 'Unlisted'],
     default: 'Private',
     required: true
+  },
+  edited: {
+    type: {
+      isEdited: {
+        type: Boolean,
+      },
+      date: {
+        type: Date,
+      }
+    },
+    default: {
+      isEdited: false,
+      date: Date.now()
+    }
+  },
+  deleted: {
+    type: {
+      isDeleted: {
+        type: Boolean,
+        default: false
+      },
+      date: { 
+        type: Date,
+        default: Date.now()
+      }
+    },
+    default: {
+      isDeleted: false,
+      date: Date.now()
+    }
   },
   comments: [{
     type: Schema.Types.ObjectId,
@@ -66,9 +104,17 @@ const postSchema = new Schema({
   votes: {
     type: [{
       user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        type: {
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          },
+          username: {
+            type: String,
+            required: true
+          }
+        },
       },
       vote: {
         type: Boolean,
@@ -79,7 +125,6 @@ const postSchema = new Schema({
   },
   voteCount: {
     type: Number,
-    default: 0
   }
 }, {
   timestamps: true,
@@ -89,7 +134,7 @@ const postSchema = new Schema({
 // Middleware to update voteCount when likes array is modified
 postSchema.pre('save', function(next) {
   this.voteCount = calculateVoteCount(this.votes)
-
+  console.log(this.votes)
   next()
 })
 
