@@ -31,7 +31,10 @@ POST
 /upload  (Uploads a batch of files)
 /delete
 
-vote (future plan, not yet implemented)
+vote
+POST
+/:postId
+/:commentId
 
 # Middleware
 This is a list of all the middlewares used in the server. <br>
@@ -528,7 +531,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 <p>This route searches the list of videos in the <code>Videos</code> collection, not the <code>GridFs</code> bucket.</p>  
 
 ## Query's
-- uploader: Doc id of the uploader,
+- user: Doc id of the user,
 - title: String (uses regex expression), 
 - startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
 - endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
@@ -561,7 +564,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 <p>This route searches the list of images in the <code>Images</code> collection, not the <code>GridFs</code> bucket.</p> 
 
 ## Query's
-- uploader: Doc id of the uploader,
+- user: Doc id of the user,
 - title: String (uses regex expression), 
 - startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
 - endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
@@ -594,7 +597,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 <p>This route searches the list of audios in the <code>Audios</code> collection, not the <code>GridFs</code> bucket.</p> 
 
 ## Query's
-- uploader: Doc id of the uploader,
+- user: Doc id of the user,
 - title: String (uses regex expression), 
 - startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
 - endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
