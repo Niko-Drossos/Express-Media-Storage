@@ -75,6 +75,21 @@ const userSchema = new Schema({
   voteCount: {
     type: Number,
     default: 0
+  },
+  settings: {
+    type: {
+      theme: {
+        type: String,
+        enum: ["Dark", "Light"],
+        default: "Dark"
+      }, 
+      privacy: {
+        type: String,
+        enum: ["Private", "Public", "Unlisted"],
+        default: "Private"
+      },
+      // TODO: Add more settings
+    }
   }
 }, {
   timestamps: true,

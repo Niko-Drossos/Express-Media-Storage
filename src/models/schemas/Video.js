@@ -47,7 +47,7 @@ const videoSchema = new Schema({
     ref: 'Comment',
   }],
   tags: [{
-    type: String // TODO: change this to an enum once tags are added
+    type: String 
   }],
   privacy: {
     type: String,

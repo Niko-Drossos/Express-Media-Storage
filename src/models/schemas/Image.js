@@ -61,7 +61,7 @@ const imageSchema = new Schema({
     default: 0
   },
   tags: [{
-    type: String // TODO: change this to an enum once tags are added
+    type: String 
   }],
   privacy: {
     type: String,

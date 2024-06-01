@@ -12,7 +12,6 @@ router.all("/*", authenticateUserJWT)
 
 router.get("/my-files", userController.getMyFiles)
 
-// TODO: Working on route name
 router.get("/media-titles", userController.mediaTitles)
 
 router.post("/follow/:userId", userController.follow)
