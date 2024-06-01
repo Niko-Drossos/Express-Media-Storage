@@ -67,10 +67,10 @@ exports.searchPosts = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { posterId, tags, startDate, endDate, title, description, transcription, page, limit=16 } = query
+    const { user, tags, startDate, endDate, title, description, transcription, page, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
-    if (posterId) searchQuery.user = posterId
+    if (user) searchQuery["user.userId"] = user
     if (tags) searchQuery.tags = { $all: tags.split(",") }
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
@@ -80,12 +80,7 @@ exports.searchPosts = async (req, res) => {
     const documentQuery = {
       ...searchQuery,
       $or: [
-        // ! CURRENTLY BROKEN
-        /* { 
-          user: {
-            userId: req.userId
-          } 
-        }, */
+        { "user.userId": req.userId },
         { privacy: "Public" }
       ]
     }
@@ -99,8 +94,6 @@ exports.searchPosts = async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(limit ? limit : 16)
     .skip((page - 1) * (limit ? limit : 16))
-    // TODO: Leave this out for now, change the post routes to populate
-    // .populate(['videos', 'images', 'audios'])
     
     res.status(200).json({ 
       success: true, 
@@ -134,10 +127,10 @@ exports.searchComments = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { posterId, originId, startDate, endDate, content } = query
+    const { user, originId, startDate, endDate, content } = query
 
     // Add the search query's properties to the searchQuery object
-    if (posterId) searchQuery.user = posterId
+    if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (content) searchQuery.content = new RegExp(content, 'i')
     if (originId) searchQuery.originId = originId
@@ -175,7 +168,7 @@ exports.searchVideos = async (req, res) => {
     const { user, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery.user = user
+    if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 
@@ -213,7 +206,7 @@ exports.searchImages = async (req, res) => {
     const { user, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery.user = user
+    if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
 
@@ -250,7 +243,7 @@ exports.searchAudios = async (req, res) => {
     const { user, title, startDate, endDate } = query
 
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery.user = user
+    if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 

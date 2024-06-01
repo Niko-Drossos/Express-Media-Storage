@@ -10,7 +10,8 @@ const Audio = require("../models/schemas/Audio")
 exports.voteOnPost = async (req, res) => {
   try {
     // Update the post with the new vote
-    const postedVote = await Post.findByIdAndUpdate(req.params.postId, {
+    const { postId } = req.params
+    /* const postedVote = await Post.findByIdAndUpdate(req.params.postId, {
       // ! TODO: Make this a set
       $push: {
         votes: {
@@ -23,12 +24,43 @@ exports.voteOnPost = async (req, res) => {
       }
     }, {
       new: true
-    })
+    }) */
+
+    const newVote = {
+      user: {
+        userId: req.userId,
+        username: req.username
+      },
+      vote: req.body.vote
+    }
+
+    console.log(newVote)
+
+    let postedVote = await Post.findById(postId)
+
+    if (postedVote.votes) {
+      console.log("SET")
+      await Post.updateOne({
+        _id: postId
+      }, {
+        $set: { '$.votes': newVote }
+      })
+    } else {
+      console.log("PUSH")
+      postedVote = await Post.updateOne({
+        _id: postId
+      }, {
+        $push: { 
+          votes: newVote
+        }
+      })
+    }
 
     res.status(200).json({
       success: true,
       message: "voted on post",
       data: {
+        vote: req.body.vote,
         post: postedVote
       }
     })
@@ -66,6 +98,7 @@ exports.voteOnComment = async (req, res) => {
       success: true,
       message: "Voted on comment",
       data: {
+        vote: req.body.vote,
         comment: votedComment
       }
     })
@@ -103,6 +136,7 @@ exports.voteOnUser = async (req, res) => {
       success: true,
       message: "Commented on user",
       data: {
+        vote: req.body.vote,
         user: votedUser
       }
     })
@@ -140,6 +174,7 @@ exports.voteOnVideo = async (req, res) => {
       success: true,
       message: "voted on video",
       data: {
+        vote: req.body.vote,
         video: votedVideo
       }
     })
@@ -177,6 +212,7 @@ exports.voteOnImage = async (req, res) => {
       success: true,
       message: "Voted on image",
       data: {
+        vote: req.body.vote,
         image: votedImage
       }
     })
@@ -214,6 +250,7 @@ exports.voteOnAudio = async (req, res) => {
       success: true,
       message: "Voted on audio",
       data: {
+        vote: req.body.vote,
         audio: votedAudio
       }
     })

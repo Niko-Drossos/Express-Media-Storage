@@ -463,7 +463,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 
 ## Query's
 - title: String (uses regex expression),
-- posterId: Doc id of poster, 
+- user: Doc id of poster, 
 - tags: String with "," to separate tags, 
 - startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
 - endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
@@ -498,7 +498,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 
 ## Query's
 - content: String (uses regex expression),
-- posterId: Doc id of poster, 
+- user: Doc id of poster, 
 - originId: Doc id document that the comment was attached to, 
 - startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
 - endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 

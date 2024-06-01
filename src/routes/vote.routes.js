@@ -10,7 +10,7 @@ router.all("/*", authenticateUserJWT)
 
 router.post("/post/:postId", voteController.voteOnPost)
 
-router.post("/create/vote/:voteId", voteController.voteOnComment)
+router.post("/comment/:commentId", voteController.voteOnComment)
 
 router.post("/user/:userId", voteController.voteOnUser)
 
