@@ -1,21 +1,27 @@
-// Uses start and end date to add a condition for the query
+// Uses start and end date to add a condition for the query object for Mongoose
 module.exports = searchDateRange = (query, startDate, endDate) => {
   const setMidnight = (dateString) => {
-    const [month, day, year] = dateString.split('-').map(Number) // Split the string and convert to numbers
+    const [year, month, day] = dateString.split('-').map(Number) // Split the string and convert to numbers
     const dateObject = new Date(year, month - 1, day)
 
-    dateObject.setUTCHours(0, 0, 0, 0) // Set hours, minutes, seconds, and milliseconds to zero
+    dateObject.setUTCHours(23, 59, 59, 999) // Set hours, minutes, seconds, and milliseconds to zero
     return dateObject
   }
 
   if (startDate) var midnightStartDate = setMidnight(startDate)
 
   // Sets the end date to midnight of the next day so that it includes the entire day
-  if (endDate) var endDay = setMidnight(endDate)
-  if (endDay) var midnightEndDate = endDay.setDate(new Date(endDay).getDate() + 1)
-    console.log(endDate)
+  if (endDate) {
+    var endDay = new Date(endDate).getDate() + 1
+    console.log(endDay)
+    var midnightEndDate = new Date(new Date(endDate).setDate(endDay))
+  }
+  // if (endDay) var midnightEndDate = setMidnight()
+/*   if (endDate) var endDay = setMidnight(endDate)
+  if (endDay) var midnightEndDate = endDay.setDate(new Date(endDay).getDate() + 1) */
+    console.log(startDate, endDate)
+    console.log(midnightStartDate, midnightEndDate)
   if (startDate && endDate) {
-
     query.date = {
       $gte: midnightStartDate,
       $lte: midnightEndDate
