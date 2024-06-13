@@ -123,3 +123,33 @@ input[type="submit"]:hover {
 .backButton > a {
   text-decoration: none
 }
+
+/* --------------------------------- Account -------------------------------- */
+
+.media_header {
+  text-align: start;
+}
+
+.media_container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: auto;
+  gap: 5px; 
+}
+
+.media_summary {
+  display: flex;
+  border-bottom: 2px solid white;
+}
+
+.media_wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px;
+  border: 2px solid white;
+  border-radius: 5px;
+}
+
+.media_wrapper > img, video, audio {
+  width: 100%
+}

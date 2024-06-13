@@ -9,15 +9,41 @@
 <body>
   <h1>User Account</h1>
   <div class="container">
-    <hr>
-    <button onclick="fetchFiles(event)">View My Files</button>
-    <hr>
+    <div>
+      <details>
+        <summary class="media_summary">
+          <h2 class="media_header">
+            <li>Images</li>
+          </h2>
+        </summary>
+        <div id="imageContainer" class="media_container"></div>
+      </details>
+
+      <details>
+        <summary class="media_summary">
+          <h2 class="media_header">
+            <li>Videos</li>
+          </h2>
+        </summary>
+        <div id="videoContainer" class="media_container"></div>
+      </details>
+
+      <details>
+        <summary class="media_summary">
+          <h2 class="media_header">
+            <li>Audios</li>
+          </h2>
+        </summary>
+        <div id="audioContainer" class="media_container"></div>
+      </details>
+    </div>
   </div>
 
   <script>
-    function fetchFiles(event) {
-      event.preventDefault() // Prevent default form submission behavior
+    let userData = {}
+    fetchFiles()
 
+    function fetchFiles() {
       fetch(`/user/my-files`, {
         method: "GET",
         headers: {
@@ -26,13 +52,67 @@
         }
       })
       .then(res => res.json())
-      .then(data => {
-        // Process the response data
-        console.log(data)
+      .then(json => {
+        // Process the response json
+        console.log(json)
+        userData.files = json.data
+        populateMedia(json.data.images, "image")
       })
       .catch(error => {
         console.error("Error:", error)
       })
+    }
+
+    // Add the media to a mediaContainer
+    function populateMedia(data, type) {
+      const mediaContainer = document.getElementById(`${type}Container`)
+
+      for (let i = 0; i < data.length; i++) {
+        console.log(data[i])
+        const newContainer = document.createElement("div")
+        
+        let mediaTag
+        switch (type) {
+          case "image":
+            mediaTag = "img"
+            break
+          
+          case "audio":
+            mediaTag = "audio"
+            break
+
+          case "video": 
+            mediaTag = "video"
+            break
+
+          default: 
+            console.log("Broke")
+        }
+
+        const mediaElement = document.createElement(mediaTag)
+        const mediaSource = document.createElement("source")
+
+        // Add the "source" tag only if the media is not an image
+        if (type === "image") {
+          mediaElement.setAttribute("src", `${location.origin}/view/${type}/${data[i].filename}`)
+        } else {
+          mediaSource.setAttribute("src", `${location.origin}/view/${type}/${data[i].filename}`) 
+          mediaSource.setAttribute("controls", true)
+          mediaElement.appendChild(mediaSource)
+        }
+
+        // Add the filename as a title to the container
+        const mediaWrapper = document.createElement("div")
+        const titleText = document.createTextNode(data[i].filename)
+        const titleElement = document.createElement("p")
+        titleElement.appendChild(titleText)
+        mediaWrapper.appendChild(titleElement)
+
+        // <!-- ------------ Add the media element to the main container ------------ -->
+        mediaWrapper.className = "media_wrapper"
+        mediaWrapper.appendChild(mediaElement)
+        mediaContainer.appendChild(mediaWrapper)
+      }
     }
   </script>
 </body>

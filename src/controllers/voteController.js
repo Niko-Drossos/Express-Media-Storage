@@ -5,63 +5,33 @@ const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
+/* --------------------------------- Helpers -------------------------------- */
+const castVote = require("../helpers/castVote")
 /* -------------------------------------------------------------------------- */
 
 exports.voteOnPost = async (req, res) => {
   try {
     // Update the post with the new vote
     const { postId } = req.params
-    /* const postedVote = await Post.findByIdAndUpdate(req.params.postId, {
-      // ! TODO: Make this a set
-      $push: {
-        votes: {
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          vote: req.body.vote
-        }
-      }
-    }, {
-      new: true
-    }) */
+    const { userId, username } = req
 
     const newVote = {
       user: {
-        userId: req.userId,
-        username: req.username
+        userId,
+        username
       },
       vote: req.body.vote
     }
-
-    console.log(newVote)
-
-    let postedVote = await Post.findById(postId)
-
-    if (postedVote.votes) {
-      console.log("SET")
-      await Post.updateOne({
-        _id: postId
-      }, {
-        $set: { '$.votes': newVote }
-      })
-    } else {
-      console.log("PUSH")
-      postedVote = await Post.updateOne({
-        _id: postId
-      }, {
-        $push: { 
-          votes: newVote
-        }
-      })
-    }
+    
+    const post = await Post.findById(postId).select('votes');
+    
+    await castVote(post, newVote)
 
     res.status(200).json({
       success: true,
       message: "voted on post",
       data: {
-        vote: req.body.vote,
-        post: postedVote
+        vote: req.body.vote
       }
     })
   } catch (error) {
@@ -79,27 +49,26 @@ exports.voteOnPost = async (req, res) => {
 exports.voteOnComment = async (req, res) => {
   try {
     // Update the comment with the new vote
-    const votedComment = await Comment.findByIdAndUpdate(req.params.commentId, {
-      // ! TODO: Make this a set
-      $push: {
-        votes: {
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          vote: req.body.vote
-        }
-      }
-    }, {
-      new: true
-    })
+    const { commentId } = req.params
+    const { userId, username } = req
+
+    const newVote = {
+      user: {
+        userId,
+        username
+      },
+      vote: req.body.vote
+    }
+    
+    const comment = await Comment.findById(commentId).select('votes');
+    
+    await castVote(comment, newVote)
 
     res.status(200).json({
       success: true,
       message: "Voted on comment",
       data: {
-        vote: req.body.vote,
-        comment: votedComment
+        vote: req.body.vote
       }
     })
   } catch (error) {
@@ -117,33 +86,32 @@ exports.voteOnComment = async (req, res) => {
 exports.voteOnUser = async (req, res) => {
   try {
     // Update the user with the new comment
-    const votedUser = await User.findByIdAndUpdate(req.params.userId, {
-      // ! TODO: Make this a set
-      $push: {
-        votes: {
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          vote: req.body.vote
-        }
-      }
-    }, {
-      new: true
-    })
+    const paramUserId = req.params.userId
+    const { userId, username } = req
+
+    const newVote = {
+      user: {
+        userId,
+        username
+      },
+      vote: req.body.vote
+    }
+    
+    const user = await User.findById(paramUserId).select('votes');
+    
+    await castVote(user, newVote)
 
     res.status(200).json({
       success: true,
-      message: "Commented on user",
+      message: "Voted on user",
       data: {
-        vote: req.body.vote,
-        user: votedUser
+        vote: req.body.vote
       }
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to comment on user",
+      message: "Failed to vote on user",
       errorMessage: error.message,
       error
     })
@@ -155,27 +123,26 @@ exports.voteOnUser = async (req, res) => {
 exports.voteOnVideo = async (req, res) => {
   try {
     // Update the video with the new vote
-    const votedVideo = await Video.findByIdAndUpdate(req.params.videoId, {
-      // ! TODO: Make this a set
-      $push: {
-        votes: {
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          vote: req.body.vote
-        }
-      }
-    }, {
-      new: true
-    })
+    const { videoId } = req.params
+    const { userId, username } = req
+
+    const newVote = {
+      user: {
+        userId,
+        username
+      },
+      vote: req.body.vote
+    }
+    
+    const video = await Video.findById(videoId).select('votes');
+    
+    await castVote(video, newVote)
 
     res.status(200).json({
       success: true,
       message: "voted on video",
       data: {
-        vote: req.body.vote,
-        video: votedVideo
+        vote: req.body.vote
       }
     })
   } catch (error) {
@@ -193,27 +160,26 @@ exports.voteOnVideo = async (req, res) => {
 exports.voteOnImage = async (req, res) => {
   try {
     // Update the user with the new comment
-    const votedImage = await Image.findByIdAndUpdate(req.params.imageId, {
-      // ! TODO: Make this a set
-      $push: {
-        votes: {
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          vote: req.body.vote
-        }
-      }
-    }, {
-      new: true
-    })
+    const { imageId } = req.params
+    const { userId, username } = req
+
+    const newVote = {
+      user: {
+        userId,
+        username
+      },
+      vote: req.body.vote
+    }
+    
+    const image = await Image.findById(imageId).select('votes');
+    
+    await castVote(image, newVote)
 
     res.status(200).json({
       success: true,
       message: "Voted on image",
       data: {
-        vote: req.body.vote,
-        image: votedImage
+        vote: req.body.vote
       }
     })
   } catch (error) {
@@ -231,20 +197,20 @@ exports.voteOnImage = async (req, res) => {
 exports.voteOnAudio = async (req, res) => {
   try {
     // Update the user with the new comment
-    const votedAudio = await Audio.findByIdAndUpdate(req.params.audioId, {
-      // ! TODO: Make this a set
-      $push: {
-        votes: {
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          vote: req.body.vote
-        }
-      }
-    }, {
-      new: true
-    })
+    const { audioId } = req.params
+    const { userId, username } = req
+
+    const newVote = {
+      user: {
+        userId,
+        username
+      },
+      vote: req.body.vote
+    }
+    
+    const audio = await Audio.findById(audioId).select('votes');
+    
+    await castVote(audio, newVote)
 
     res.status(200).json({
       success: true,

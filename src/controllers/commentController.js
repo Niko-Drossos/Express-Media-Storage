@@ -9,7 +9,7 @@ const Audio = require("../models/schemas/Audio")
 
 exports.getComments = async (req, res) => {
   try {
-    const comments = await Comment.findById(req.params.commentId).populate("comments")
+    const comments = await Comment.find({ originId: req.params.commentId }).populate("comments")
 
     res.status(200).json({
       success: true,
