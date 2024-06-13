@@ -125,6 +125,7 @@ const postSchema = new Schema({
   },
   voteCount: {
     type: Number,
+    default: 0
   }
 }, {
   timestamps: true,

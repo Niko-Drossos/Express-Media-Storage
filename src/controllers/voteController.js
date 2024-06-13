@@ -25,13 +25,14 @@ exports.voteOnPost = async (req, res) => {
     
     const post = await Post.findById(postId).select('votes');
     
-    await castVote(post, newVote)
+    const updated = await castVote(post, newVote)
 
     res.status(200).json({
       success: true,
       message: "voted on post",
       data: {
-        vote: req.body.vote
+        vote: req.body.vote,
+        voteCount: updated.voteCount
       }
     })
   } catch (error) {
@@ -62,13 +63,14 @@ exports.voteOnComment = async (req, res) => {
     
     const comment = await Comment.findById(commentId).select('votes');
     
-    await castVote(comment, newVote)
+    const updated = await castVote(comment, newVote)
 
     res.status(200).json({
       success: true,
       message: "Voted on comment",
       data: {
-        vote: req.body.vote
+        vote: req.body.vote,
+        voteCount: updated.voteCount
       }
     })
   } catch (error) {
@@ -99,13 +101,14 @@ exports.voteOnUser = async (req, res) => {
     
     const user = await User.findById(paramUserId).select('votes');
     
-    await castVote(user, newVote)
+    const updated = await castVote(user, newVote)
 
     res.status(200).json({
       success: true,
       message: "Voted on user",
       data: {
-        vote: req.body.vote
+        vote: req.body.vote,
+        voteCount: updated.voteCount
       }
     })
   } catch (error) {
@@ -136,13 +139,14 @@ exports.voteOnVideo = async (req, res) => {
     
     const video = await Video.findById(videoId).select('votes');
     
-    await castVote(video, newVote)
+    const updated = await castVote(video, newVote)
 
     res.status(200).json({
       success: true,
       message: "voted on video",
       data: {
-        vote: req.body.vote
+        vote: req.body.vote,
+        voteCount: updated.voteCount
       }
     })
   } catch (error) {
@@ -173,13 +177,14 @@ exports.voteOnImage = async (req, res) => {
     
     const image = await Image.findById(imageId).select('votes');
     
-    await castVote(image, newVote)
+    const updated = await castVote(image, newVote)
 
     res.status(200).json({
       success: true,
       message: "Voted on image",
       data: {
-        vote: req.body.vote
+        vote: req.body.vote,
+        voteCount: updated.voteCount
       }
     })
   } catch (error) {
@@ -210,14 +215,14 @@ exports.voteOnAudio = async (req, res) => {
     
     const audio = await Audio.findById(audioId).select('votes');
     
-    await castVote(audio, newVote)
+    const updated = await castVote(audio, newVote)
 
     res.status(200).json({
       success: true,
       message: "Voted on audio",
       data: {
         vote: req.body.vote,
-        audio: votedAudio
+        voteCount: updated.voteCount
       }
     })
   } catch (error) {
