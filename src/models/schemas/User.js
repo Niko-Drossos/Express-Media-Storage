@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const Vote = require('./sub-documents/Vote')
+
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
@@ -50,28 +52,7 @@ const userSchema = new Schema({
     ref: 'Post',
     select: false
   }],
-  votes: {
-    type: [{
-      user: {
-        type: {
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-          },
-          username: {
-            type: String,
-            required: true
-          }
-        },
-      },
-      vote: {
-        type: Boolean,
-        required: true
-      }
-    }],
-    select: false
-  },
+  votes: [Vote],
   voteCount: {
     type: Number,
     default: 0

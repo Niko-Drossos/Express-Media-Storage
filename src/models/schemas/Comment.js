@@ -1,22 +1,15 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const Vote = require('./sub-documents/Vote')
+const SubUser = require('./sub-documents/SubUser')
+
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const commentSchema = new Schema({
-  user: {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    username: {
-      type: String,
-      required: true
-    },
-  },
+  user: SubUser,
   date: {
     type: Date,
     default: Date.now
@@ -69,26 +62,7 @@ const commentSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Comment'
   }],
-  votes: {
-    type: [{
-      user: {
-        userId: {
-          type: Schema.Types.ObjectId,
-          ref: 'User',
-          required: true
-        },
-        username: {
-          type: String,
-          required: true
-        },
-      },
-      vote: {
-        type: Boolean,
-        required: true
-      }
-    }],
-    select: false
-  },
+  votes: [Vote],
   voteCount: {
     type: Number,
     default: 0

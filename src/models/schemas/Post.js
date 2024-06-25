@@ -1,11 +1,16 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const Vote = require('./sub-documents/Vote')
+const SubUser = require('./sub-documents/SubUser')
+const Privacy = require('./sub-documents/Privacy')
+
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const postSchema = new Schema({
+  user: SubUser,
   date: {
     type: Date,
     default: Date.now
@@ -20,26 +25,7 @@ const postSchema = new Schema({
     type: String,
     required: false
   },
-  user: {
-    type: {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-      },
-      username: {
-        type: String,
-        required: true
-      }
-    },
-  },
-  privacy: {
-    type: String,
-    // TODO: This will later change to allow levels of friends to see
-    enum: ['Public', 'Private', 'Unlisted'],
-    default: 'Private',
-    required: true
-  },
+  privacy: Privacy,
   edited: {
     type: {
       isEdited: {
@@ -55,19 +41,13 @@ const postSchema = new Schema({
     }
   },
   deleted: {
-    type: {
-      isDeleted: {
-        type: Boolean,
-        default: false
-      },
-      date: { 
-        type: Date,
-        default: Date.now()
-      }
+    isDeleted: {
+      type: Boolean,
+      default: false
     },
-    default: {
-      isDeleted: false,
-      date: Date.now()
+    date: { 
+      type: Date || null,
+      default: null
     }
   },
   comments: [{
@@ -101,28 +81,7 @@ const postSchema = new Schema({
       }
     }]
   },
-  votes: {
-    type: [{
-      user: {
-        type: {
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-          },
-          username: {
-            type: String,
-            required: true
-          }
-        },
-      },
-      vote: {
-        type: Boolean,
-        required: true
-      }
-    }],
-    select: false
-  },
+  votes: [Vote],
   voteCount: {
     type: Number,
     default: 0

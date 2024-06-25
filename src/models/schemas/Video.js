@@ -1,11 +1,17 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const Votes = require('./sub-documents/Vote')
+const SubUser = require('./sub-documents/SubUser')
+const Privacy = require('./sub-documents/Privacy')
+const Transcription = require('./sub-documents/Transcription')
+
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const videoSchema = new Schema({
+  user: SubUser,
   date: {
     type: Date,
     default: Date.now
@@ -24,24 +30,7 @@ const videoSchema = new Schema({
     required: true,
     unique: true
   },
-  transcription: {
-    type: String,
-    default: '',
-    required: false
-  },
-  user: {
-    type: {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-      },
-      username: {
-        type: String,
-        required: true
-      }
-    }
-  },
+  transcription: Transcription,
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment',
@@ -49,13 +38,7 @@ const videoSchema = new Schema({
   tags: [{
     type: String 
   }],
-  privacy: {
-    type: String,
-    // This will later change to allow levels of friends to see
-    enum: ['Public', 'Private', 'Unlisted'],
-    default: 'Private',
-    required: true
-  },
+  privacy: Privacy,
   dimensions: {
     width: {
       type: Number,
@@ -75,28 +58,7 @@ const videoSchema = new Schema({
     type: String,
     required: false
   },
-  votes: {
-    type: [{
-      user: {
-        type: {
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-          },
-          username: {
-            type: String,
-            required: true
-          }
-        },
-      },
-      vote: {
-        type: Boolean,
-        required: true
-      }
-    }],
-    select: false
-  },
+  votes: [Votes],
   voteCount: {
     type: Number,
     default: 0

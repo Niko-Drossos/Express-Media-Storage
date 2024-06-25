@@ -1,22 +1,17 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const Vote = require('./sub-documents/Vote')
+const SubUser = require('./sub-documents/SubUser')
+const Privacy = require('./sub-documents/Privacy')
+const Transcription = require('./sub-documents/Transcription')
+
 /* --------------------------------- Helpers -------------------------------- */
 const calculateVoteCount = require('../../helpers/calculateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const audioSchema = new Schema({
-  user: {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    username: {
-      type: String,
-      required: true
-    },
-  },
+  user: SubUser,
   date: {
     type: Date,
     default: Date.now
@@ -35,11 +30,7 @@ const audioSchema = new Schema({
     required: true,
     unique: true
   },
-  transcription: {
-    type: String,
-    default: '',
-    required: false
-  },
+  transcription: Transcription,
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment',
@@ -47,13 +38,7 @@ const audioSchema = new Schema({
   tags: [{
     type: String 
   }],
-  privacy: {
-    type: String,
-    // This will later change to allow levels of friends to see
-    enum: ['Public', 'Private', 'Unlisted'],
-    default: 'Private',
-    required: true
-  },
+  privacy: Privacy,
   length: {
     type: Number,
     // TODO: uncomment these after testing
@@ -63,26 +48,7 @@ const audioSchema = new Schema({
     type: String,
     required: false
   },
-  votes: {
-    type: [{
-      user: {
-        userId: {
-          type: Schema.Types.ObjectId,
-          ref: 'User',
-          required: true
-        },
-        username: {
-          type: String,
-          required: true
-        },
-      },
-      vote: {
-        type: Boolean,
-        required: true
-      }
-    }],
-    select: false
-  },
+  votes: [Vote],
   voteCount: {
     type: Number,
     default: 0
@@ -105,6 +71,6 @@ audioSchema.pre('save', function(next) {
   next()
 })
 
-const Video = mongoose.model('Audio', audioSchema)
+const Audio = mongoose.model('Audio', audioSchema)
 
-module.exports = Video
+module.exports = Audio
