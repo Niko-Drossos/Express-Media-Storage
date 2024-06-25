@@ -37,6 +37,7 @@ app.use("/comment", require("./routes/comment.routes"))
 app.use("/view", require("./routes/view.routes"))
 app.use("/vote", require("./routes/vote.routes"))
 app.use("/daat", require("./routes/daat.routes"))
+app.use("/transcription", require("./routes/transcription.routes"))
 /* ----------------------------- Viewing routes ----------------------------- */
 app.get("/", (req, res) => {
   res.render("index.ejs")

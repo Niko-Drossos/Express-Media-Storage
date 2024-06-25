@@ -16,11 +16,7 @@ module.exports = searchDateRange = (query, startDate, endDate) => {
     console.log(endDay)
     var midnightEndDate = new Date(new Date(endDate).setDate(endDay))
   }
-  // if (endDay) var midnightEndDate = setMidnight()
-/*   if (endDate) var endDay = setMidnight(endDate)
-  if (endDay) var midnightEndDate = endDay.setDate(new Date(endDay).getDate() + 1) */
-    console.log(startDate, endDate)
-    console.log(midnightStartDate, midnightEndDate)
+  
   if (startDate && endDate) {
     query.date = {
       $gte: midnightStartDate,

@@ -8,11 +8,13 @@ Finish the Daat routes
 RAG Docs: https://medium.com/@ingridwickstevens/chat-with-your-audio-locally-a-guide-to-rag-with-whisper-ollama-and-faiss-6656b0b40a68
 https://www.assemblyai.com/blog/javascript-audio-transcript/
 
-
-FIX VOTE MIDDLEWARE.  the pre('save') doesn't even run on document update
-Update all the routes in the voteController to be a $set instead of $push
-
 FIX the search routes to work with the new user: { userId, username } schema
+
+CURRENTLY WORKING ON
+Make transcription have a state of "none", "queued", or "finished" 
+make a route to accept a transcription, once the transcription in written then update the state
+lifecycle: upload file, make transcription request, set transcription state to "queued", on transcription server run through the redis DB,
+once transcription is complete call the webhook, update the state of the file to "finished" and add the text.
 
 Docs: 
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu

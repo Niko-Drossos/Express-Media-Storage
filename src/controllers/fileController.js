@@ -58,10 +58,14 @@ exports.batchUpload = async (req, res) => {
       const customTitle = body[`title${index}`]
       const date = body[`date${index}`]
       const description = body[`description${index}`]
+      const transcribe = body[`transcribe${index}`]
 
       // TODO: Create transcription function audios and videos
       if (acceptedAudioExt.includes(fileExtension) || acceptedVideoExt.includes(fileExtension)) {
-        var completedTranscription = ''
+        var completedTranscription = {
+          status: transcribe ? 'queued' : 'none',
+          text: ''
+        }
       }
 
       const documentBody = {
