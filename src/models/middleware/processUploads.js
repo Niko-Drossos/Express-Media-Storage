@@ -1,5 +1,5 @@
 const getVideoDetails = require("../../helpers/getVideoDetails")
-// const mediaCompressor = require('../../helpers/mediaCompressor')
+const mediaCompressor = require('../../helpers/mediaCompressor')
 
 
 const processUploads = async (req, res, next) => {
@@ -23,7 +23,8 @@ const processUploads = async (req, res, next) => {
 
       // ! Replace when media compressor works
       // const compressedFile = await mediaCompressor(req.files[`file${i}`][0], )
-
+      // console.log(`Compressed file`)
+      // console.log(compressedFile)
       req.uploads.push({
         // ! Replace when media compressor works
         // ...compressedFile,

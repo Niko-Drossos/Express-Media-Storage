@@ -16,7 +16,8 @@ for (let i = 0; i < 10; i++) {
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.get("/get", fileController.findFiles)
+// TODO: I might remove this, i don't see a point to it
+// router.get("/get", fileController.findFiles)
 
 router.post("/upload", upload.fields(uploadFields), processUploads, fileController.batchUpload)
 

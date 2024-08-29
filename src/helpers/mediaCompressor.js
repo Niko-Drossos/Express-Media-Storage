@@ -1,51 +1,71 @@
-const ffmpeg = require('fluent-ffmpeg')
-const { PassThrough } = require('stream')
+const ffmpeg = require('fluent-ffmpeg');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
-// ! Not yet functionally implemented
-// Function to compress a media file (video or audio)
 async function mediaCompressor(file) {
-  console.log(file.buffer)
   return new Promise((resolve, reject) => {
-    // Create FFmpeg command
-    const command = ffmpeg()
-      .input(new PassThrough().end(file.buffer)) // Input from buffer
-      .outputOptions('-preset veryfast') // Set encoding preset for faster compression
+    // Determine output file extension based on mimetype
+    let outputFileExt;
+    let command = ffmpeg();
 
     if (file.mimetype.startsWith('video/')) {
-      command.videoCodec('libx264').audioCodec('aac') // Set codecs for video
+      outputFileExt = '.mp4';
+      command = command.videoCodec('libx264').audioCodec('aac');
 
     } else if (file.mimetype.startsWith('image/')) {
-      command.size('?x720').outputOptions('-vf scale=-1:720').videoCodec('libx264') // For images, we resize and compress
+      outputFileExt = '.png';
+      command = command.size('?x720').outputOptions('-vf scale=-1:720');
 
     } else if (file.mimetype.startsWith('audio/')) {
-      command.audioCodec('aac') // Set codec for audio only
+      outputFileExt = '.mp3';
+      command = command.audioCodec('libmp3lame');
 
     } else {
-      reject(new Error('Unsupported file type'))
+      return reject(new Error('Unsupported file type'));
     }
 
-    // Prepare output stream to collect the compressed data
-    const outputStream = new PassThrough()
-    const chunks = []
+    const illegalCharsRegex = /[<>:"\/\\|?*\x00-\x1F]/g; 
+    // Remove spaces and illegal characters from filename
+    const sanitizedPath = file.originalname.replace(/ /g, '_').replace(illegalCharsRegex, '_'); 
 
-    outputStream.on('data', (chunk) => chunks.push(chunk))
-    outputStream.on('end', () => {
-      const compressedBuffer = Buffer.concat(chunks);
-      resolve({
-        ...file,
-        buffer: compressedBuffer,
-        size: compressedBuffer.length,
-      });
-    })
+    // Temporary file path to store uploaded file
+    const tempFilePath = path.join(os.tmpdir(), `tempfile_${sanitizedPath}`);
+    
+    // Write uploaded file buffer to temporary file
+    fs.writeFile(tempFilePath, file.buffer, async (err) => {
+      if (err) {
+        console.error('Error writing file to temp:', err);
+        return reject(err);
+      }
 
-    command.on('error', (err) => {
-      console.error('FFmpeg Error:', err);
-      reject(err)
-    })
-
-    command.pipe(outputStream, { end: true })
-    command.run()
-  })
+      // Run ffmpeg command
+      command.input(tempFilePath)
+        .outputOptions('-preset veryfast') // Example option for faster encoding
+        .on('error', (err) => {
+          console.error('FFmpeg Error:', err);
+          reject(err);
+        })
+        .on('end', () => {
+          console.log('Compression finished');
+          // Read compressed file back into buffer
+          fs.readFile(`${tempFilePath}.compressed`, (err, data) => {
+            if (err) {
+              console.error('Error reading compressed file:', err);
+              return reject(err);
+            }
+            resolve({
+              ...file,
+              buffer: data,
+              size: data.length,
+            });
+            // Optionally, delete temporary files
+            fs.unlinkSync(`${tempFilePath}.compressed`);
+          });
+        })
+        .save(`${tempFilePath}.compressed`); // Save compressed file with a temporary extension
+    });
+  });
 }
 
-module.exports = mediaCompressor
+module.exports = mediaCompressor;
