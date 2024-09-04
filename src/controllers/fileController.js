@@ -47,51 +47,62 @@ exports.batchUpload = async (req, res) => {
 
     const { body } = req
 
+    const successfulUploads = []
+    const failedUploads = []
+
     const newUploads = req.uploads.map(async file => {
-      const index = file.fieldname.split("file")[1]
+      try {
+        const index = file.fieldname.split("file")[1]
 
-      const uploadedFileId = await uploadFile(req, res, file)
+        const uploadedFileId = await uploadFile(req, res, file)
 
-      const fileExtension = getFileExt(file.originalname)
-      
-      // Add custom file information
-      const customTitle = body[`title${index}`]
-      const date = body[`date${index}`]
-      const description = body[`description${index}`]
+        const fileExtension = getFileExt(file.originalname)
+        
+        // Add custom file information
+        const customTitle = body[`title${index}`]
+        const date = body[`date${index}`]
+        const description = body[`description${index}`]
 
-      // TODO: Create transcription function audios and videos
-      if (acceptedAudioExt.includes(fileExtension) || acceptedVideoExt.includes(fileExtension)) {
-        var completedTranscription = ''
-      }
+        // TODO: Create transcription function audios and videos
+        if (acceptedAudioExt.includes(fileExtension) || acceptedVideoExt.includes(fileExtension)) {
+          var completedTranscription = ''
+        }
 
-      const documentBody = {
-        title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
-        filename: file.originalname,
-        user: {
-          userId: req.userId,
-          username: req.username
-        },
-        description: description || "No description",
-        fileId: uploadedFileId,
-        date: new Date(date)
-      }
+        const documentBody = {
+          title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
+          filename: file.originalname,
+          user: {
+            userId: req.userId,
+            username: req.username
+          },
+          description: description || "No description",
+          fileId: uploadedFileId,
+          date: new Date(date)
+        }
 
-      // Create exactly one document per upload
-      if (acceptedImageExt.includes(fileExtension)) {
-        return await Image.create(documentBody)
-      } else if (acceptedVideoExt.includes(fileExtension)) {
-        // TODO: make function to determine media length with byte size
-        return await Video.create({ ...documentBody, transcription: completedTranscription || "" })
-      } else if (acceptedAudioExt.includes(fileExtension)) {
-        return await Audio.create({ ...documentBody, transcription: completedTranscription || ""})
+        // Create exactly one document per upload
+        if (acceptedImageExt.includes(fileExtension)) {
+          return await Image.create(documentBody)
+        } else if (acceptedVideoExt.includes(fileExtension)) {
+          // TODO: make function to determine media length with byte size
+          return await Video.create({ ...documentBody, transcription: completedTranscription || "" })
+        } else if (acceptedAudioExt.includes(fileExtension)) {
+          return await Audio.create({ ...documentBody, transcription: completedTranscription || ""})
+        }
+
+        successfulUploads.push({ file: file.originalname })
+      } catch (error) {
+        // If an upload fails then add it to the failed uploads
+        failedUploads.push({ file: file.originalname, error: error.message })
       }
     })
-
-    const finishedUploads = await Promise.all(newUploads)
+    
+    // Attempt to upload all files
+    await Promise.all(newUploads)
 
     // Sort the uploads into videos, images, and audios
     let videos = [], images = [], audios = []
-    finishedUploads.map(upload => {
+    successfulUploads.map(upload => {
       const { filename } = upload
 
       if (acceptedVideoExt.includes(getFileExt(filename))) videos.push(upload)
@@ -100,7 +111,7 @@ exports.batchUpload = async (req, res) => {
     })
 
     res.status(201).json({
-      success: true,
+      success: failedUploads.length ? false : true,
       message: "Uploaded files to account",
       data: {
         uploadedFiles: {
@@ -109,6 +120,7 @@ exports.batchUpload = async (req, res) => {
           videos,
           audios
         },
+        failedUploads
       }
     })
   } catch (error) {
