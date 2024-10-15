@@ -15,11 +15,13 @@ const host = '0.0.0.0' // This makes the server listen on all available interfac
 connectDB()
 
 const corsOptions = {
-  origin: frontendUrl || `http://localhost:${port}`,
+  origin: frontendUrl,
+  methods: 'POST, GET, OPTIONS',
   credentials: true,
 }
 
 /* ------------------------------ App settings ------------------------------ */
+
 app.use(cors(corsOptions))
 app.use(express.json())
 app.set("view engine", "ejs")
@@ -27,7 +29,9 @@ app.set("views", "src/view")
 app.use(express.static('src/view'))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser())
+
 /* ------------------------------- App router ------------------------------- */
+
 app.use("/auth", require("./routes/auth.routes"))
 app.use("/user", require("./routes/user.routes"))
 app.use("/file", require("./routes/file.routes"))
@@ -37,7 +41,9 @@ app.use("/comment", require("./routes/comment.routes"))
 app.use("/view", require("./routes/view.routes"))
 app.use("/vote", require("./routes/vote.routes"))
 app.use("/daat", require("./routes/daat.routes"))
+
 /* ----------------------------- Viewing routes ----------------------------- */
+
 app.get("/", (req, res) => {
   res.render("index.ejs")
 })
