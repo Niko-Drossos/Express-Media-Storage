@@ -81,7 +81,10 @@ const postSchema = new Schema({
       }
     }]
   },
-  votes: [Vote],
+  votes: [{
+    type: Vote,
+    select: false
+  }],
   voteCount: {
     type: Number,
     default: 0

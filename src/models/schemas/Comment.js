@@ -62,7 +62,10 @@ const commentSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Comment'
   }],
-  votes: [Vote],
+  votes: [{
+    type: Vote,
+    select: false
+  }],
   voteCount: {
     type: Number,
     default: 0

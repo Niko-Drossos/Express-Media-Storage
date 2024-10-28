@@ -37,7 +37,10 @@ const imageSchema = new Schema({
     required: true,
     unique: true
   },
-  votes: [Vote],
+  votes: [{
+    type: Vote,
+    select: false
+  }],
   voteCount: {
     type: Number,
     default: 0

@@ -48,7 +48,10 @@ const audioSchema = new Schema({
     type: String,
     required: false
   },
-  votes: [Vote],
+  votes: [{
+    type: Vote,
+    select: false
+  }],
   voteCount: {
     type: Number,
     default: 0

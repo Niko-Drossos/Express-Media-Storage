@@ -13,7 +13,7 @@ const voteSchema = new Schema({
     select: false
   }
 }, {
-  _id: false
+  timestamps: true
 })
 
 module.exports = voteSchema
