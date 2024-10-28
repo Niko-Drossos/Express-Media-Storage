@@ -1,0 +1,72 @@
+<div class="flex flex-col items-center justify-center">
+    <% if (register) { %> 
+        <h1>Register</h1>
+        <form>
+            <div class="">
+                <label for="username">Username: </label>
+                <input type="text" name="username" id="username">
+            </div>
+            <div class="">
+                <label for="email">Email: </label>
+                <input type="email" name="email" id="email">
+            </div>
+            <div class="">
+                <label for="password">Password: </label>
+                <input type="password" name="password" id="password">
+            </div>
+            <div class="">
+                <label for="confirm-password">Confirm Password: </label>
+                <input type="password" name="confirm-password" id="confirm-password">
+            </div>
+            <input type="submit" value="Register">
+        </form>
+    <% } else { %>
+        <h1 class="mb-2">Login</h1>
+        <form onsubmit="login(event)">
+            <div class="formGroup">
+                <label for="username">Username: </label>
+                <input type="text" name="username" id="username">
+            </div>
+            <div class="formGroup">
+                <label for="password">Password: </label>
+                <input type="password" name="password" id="password">
+            </div>
+            <input type="submit" value="Login">
+        </form>
+    <% } %>
+</div>
+
+<script>
+    function setCookie(cookieName, cookieValue, expirationDays) {
+      let d = new Date();
+      d.setTime(d.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+      let expires = "expires=" + d.toUTCString();
+      document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
+    }
+    
+    async function login(event) {
+      event.preventDefault();
+      let username = document.getElementById("username").value;
+      let password = document.getElementById("password").value;
+
+      const loginAttempt = await fetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      })
+     
+      if (!loginAttempt.ok) {
+        alert("Login failed")
+        return
+      }
+
+      let returnedData = await loginAttempt.json()
+
+      setCookie("media_authentication", returnedData.data.JWT, 7)
+      alert("Login successful")
+      
+      document.location = "/";
+    }
+</script>
