@@ -52,7 +52,10 @@ const userSchema = new Schema({
     ref: 'Post',
     select: false
   }],
-  votes: [Vote],
+  votes: [{
+    type: Vote,
+    select: false
+  }],
   voteCount: {
     type: Number,
     default: 0

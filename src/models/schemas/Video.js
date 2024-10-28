@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const Votes = require('./sub-documents/Vote')
+const Vote = require('./sub-documents/Vote')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 const Transcription = require('./sub-documents/Transcription')
@@ -58,7 +58,10 @@ const videoSchema = new Schema({
     type: String,
     required: false
   },
-  votes: [Votes],
+  votes: [{
+    type: Vote,
+    select: false
+  }],
   voteCount: {
     type: Number,
     default: 0
