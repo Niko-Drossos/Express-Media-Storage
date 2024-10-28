@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src",
-    "start": "node src"
+    "start": "node src",
+    "tw": "npx tailwindcss -i ./src/view/styles/main.css -o ./src/view/styles/output.css --watch"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +21,8 @@
     "deepgram": "^1.0.1",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
+    "express-ejs-layouts": "^2.5.1",
     "fluent-ffmpeg": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
@@ -29,6 +31,7 @@
     "stream": "^0.0.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "tailwindcss": "^3.4.14"
   }
 }
