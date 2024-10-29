@@ -22,7 +22,7 @@ const upload = multer({
 
 // Middleware function to handle video compression upon upload
 
-const uploadFile = async function(req, res, file) {
+const uploadFile = async function(req, file) {
   const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
 
   // Either video, image, or audio
@@ -35,8 +35,10 @@ const uploadFile = async function(req, res, file) {
     // Create a readable stream from the buffer
     const bufferStream = Readable.from(file.buffer)
 
+    const newFileName = `${req.username}-${file.originalname}`
+
     // Pipe the buffer stream through the video compressor
-    const uploadStream = bufferStream.pipe(bucket.openUploadStream(file.originalname, {
+    const uploadStream = bufferStream.pipe(bucket.openUploadStream(newFileName, {
       metadata: {
         // Conditionally add the duration and dimensions to the metadata
         ...(file.duration && { duration: file.duration }),

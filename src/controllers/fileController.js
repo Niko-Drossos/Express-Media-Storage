@@ -39,22 +39,26 @@ exports.findFiles = async (req, res) => {
  */
 /* ---------------------------- Upload file batch --------------------------- */
 
+// ! Fix response not showing successfully uploaded files. something to do with promises.
 exports.batchUpload = async (req, res) => {
   try {
+    // File extensions that can be uploaded
     const acceptedVideoExt = ["mp4"]
     const acceptedImageExt = ["jpg", "jpeg", "png"] 
     const acceptedAudioExt = ["mp3", "m4a", "wav"]
 
     const { body } = req
 
-    const successfulUploads = []
-    const failedUploads = []
+    // Arrays for response to user about results
+    const successfulUploads = [], failedUploads = []
 
-    const newUploads = req.uploads.map(async file => {
+    const newUploads = await req.uploads.map(async file => {
       try {
+        // Get the index of the file from the fieldname that uploaded it (returns 0 - 9)
         const index = file.fieldname.split("file")[1]
 
-        const uploadedFileId = await uploadFile(req, res, file)
+        // Upload the file and return the file ID
+        const uploadedFileId = await uploadFile(req, file)
 
         const fileExtension = getFileExt(file.originalname)
         
@@ -73,7 +77,7 @@ exports.batchUpload = async (req, res) => {
 
         const documentBody = {
           title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
-          filename: file.originalname,
+          filename: `${req.username}-${file.originalname}`,
           user: {
             userId: req.userId,
             username: req.username
@@ -101,24 +105,24 @@ exports.batchUpload = async (req, res) => {
     })
     
     // Attempt to upload all files
-    await Promise.all(newUploads)
+    await Promise.allSettled(newUploads)
 
     // Sort the uploads into videos, images, and audios
     let videos = [], images = [], audios = []
-    successfulUploads.map(upload => {
-      const { filename } = upload
+    successfulUploads.forEach(upload => {
+      const fileExt = getFileExt(upload.filename)
 
-      if (acceptedVideoExt.includes(getFileExt(filename))) videos.push(upload)
-      if (acceptedImageExt.includes(getFileExt(filename))) images.push(upload)
-      if (acceptedAudioExt.includes(getFileExt(filename))) audios.push(upload)
+      if (acceptedVideoExt.includes(fileExt)) videos.push(upload)
+      else if (acceptedImageExt.includes(fileExt)) images.push(upload)
+      else if (acceptedAudioExt.includes(fileExt)) audios.push(upload)
     })
 
     res.status(201).json({
       success: failedUploads.length ? false : true,
       message: "Uploaded files to account",
       data: {
+        // separate the images and videos
         uploadedFiles: {
-          // separate the images and videos
           images,
           videos,
           audios

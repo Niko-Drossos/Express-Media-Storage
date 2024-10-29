@@ -1,6 +1,14 @@
 <h1 class="flex justify-center">Search</h1> 
 <%- include('./partials/searchForm.ejs', { searchType: searchType }) %>
-
+<div>
+    <!-- Finish file display -->
+    <% if (response.length) { %>
+        <% response.map(v => { %>
+            <div><%= v.filename %></div>
+            <br>
+        <% }) %>
+    <% } %>
+    </div>
 <!-- <div class='max-w-md mx-auto'>
     <div class="relative flex items-center w-full h-12 rounded-lg focus-within:shadow-lg bg-white overflow-hidden">
         <input
