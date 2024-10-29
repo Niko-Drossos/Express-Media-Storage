@@ -81,34 +81,46 @@ app.get("/upload", (req, res) => {
 
 app.get("/search-media", async (req, res) => {
   const query = req.query
-  console.log(query)
 
-  /* const request = await fetch(`${API_URL}/search`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    body: JSON.stringify(query),
-    credentials: "include"
-  })
+  if (query.mediaType) {   
+    // Construct the search URL
+    const searchURL = `${API_URL}/search/${query.mediaType}?${new URLSearchParams(query)}`
 
-  const response = await request.json()
+    const request = await fetch(searchURL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
 
-  if (response.error) {
+    const response = await request.json()
+    
+    if (response.error) {
+      res.render("search.ejs", {
+        searchType: "media",
+        query,
+        response: [],
+        error: response.error
+      })
+      return
+    }
+
+    console.log(response.data.searchResults)
+    
     res.render("search.ejs", {
       searchType: "media",
       query,
-      error: response.error
+      response: response.data.searchResults || []
     })
-    return
-  } */
-
-  res.render("search.ejs", {
-    searchType: "media",
-    query,
-    // response
-  })
+  } else { 
+    res.render("search.ejs", {
+      searchType: "media",
+      query,
+      response: []
+    })
+  }
 })
 
 app.get("/search-users", (req, res) => {
