@@ -1,47 +1,61 @@
 <div class="container mx-auto bg-slate-300">
-    <div class="flex items-center justify-between py-6 lg:py-10">
-      <a href="/" class="flex items-center">
-        <span href="/" class="mr-2">
-          <img src="/assets/img/logo.svg" alt="add logo">
-        </span>
-        <p class="hidden font-body text-2xl font-bold text-primary dark:text-white lg:block">
-          Story
-        </p>
-      </a>
-      <div class="flex items-center lg:hidden">
-        <i class="bx mr-8 cursor-pointer text-3xl text-primary dark:text-white bxs-sun" @click="themeSwitch()" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
-  
-        <svg width="24" height="15" xmlns="http://www.w3.org/2000/svg" @click="isMobileMenuOpen = true" class="fill-current text-primary dark:text-white">
-          <g fill-rule="evenodd">
-            <rect width="24" height="3" rx="1.5"></rect>
-            <rect x="8" y="6" width="16" height="3" rx="1.5"></rect>
-            <rect x="4" y="12" width="20" height="3" rx="1.5"></rect>
-          </g>
-        </svg>
-      </div>
-      <div class="hidden lg:block">
-        <ul class="flex items-center">
-          
-          <li class="group relative mr-6 mb-1">
-            <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-            <a href="/" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Home</a>
-          </li>
-          
-          <li class="group relative mr-6 mb-1">
-            <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-            <a href="/feed" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Feed</a>
-          </li>
-          
-          <li class="group relative mr-6 mb-1">
-            <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-            <a href="/users" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Users</a>
-          </li>
-          
-          <li class="group relative mr-6 mb-1">
-            <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-            <a href="/profile" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Profile</a>
-          </li>
-        </ul>
-      </div>
+  <div class="flex items-center justify-between py-6 lg:py-10">
+    <a href="/" class="flex items-center">
+      <span href="/" class="mr-2">
+        <img src="/assets/img/logo.svg" alt="add logo">
+      </span>
+      <p class="hidden font-body text-2xl font-bold text-primary dark:text-white lg:block">
+        Story
+      </p>
+    </a>
+    <div class="flex items-center lg:hidden">
+      <svg width="24" height="15" xmlns="http://www.w3.org/2000/svg" onclick="toggleMobileMenu()" class="fill-current text-primary dark:text-white">
+        <g fill-rule="evenodd">
+          <rect width="24" height="3" rx="1.5"></rect>
+          <rect x="8" y="6" width="16" height="3" rx="1.5"></rect>
+          <rect x="4" y="12" width="20" height="3" rx="1.5"></rect>
+        </g>
+      </svg>
+    </div>
+    <div class="hidden lg:block" id="mobile-menu">
+      <ul class="flex items-center" id="item-list">
+        
+        <li class="group relative mr-6 mb-1">
+          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+          <a href="/" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Home</a>
+        </li>
+        
+        <li class="group relative mr-6 mb-1">
+          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+          <a href="/feed" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Feed</a>
+        </li>
+        
+        <li class="group relative mr-6 mb-1">
+          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+          <a href="/users" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Users</a>
+        </li>
+        
+        <li class="group relative mr-6 mb-1">
+          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+          <a href="/profile" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Profile</a>
+        </li>
+      </ul>
     </div>
   </div>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const mobileMenu = document.getElementById("mobile-menu");
+    const itemList = document.getElementById("item-list");
+    if (mobileMenu.classList.contains("hidden")) {
+      mobileMenu.classList.remove("hidden");
+      mobileMenu.classList.add("block");
+      // itemList.classList.add("absolute");
+      // itemList.classList.add("flex-col");
+    } else {
+      mobileMenu.classList.remove("block");
+      mobileMenu.classList.add("hidden");
+    }
+  }
+</script>

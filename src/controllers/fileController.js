@@ -65,7 +65,10 @@ exports.batchUpload = async (req, res) => {
 
         // TODO: Create transcription function audios and videos
         if (acceptedAudioExt.includes(fileExtension) || acceptedVideoExt.includes(fileExtension)) {
-          var completedTranscription = ''
+          var completedTranscription = {
+            status: "none",
+            text: ""
+          }
         }
 
         const documentBody = {

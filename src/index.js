@@ -77,10 +77,50 @@ app.get("/upload", (req, res) => {
   res.render("upload.ejs")
 })
 
-/* ------------------ Navigate to the search page for media ----------------- */
+/* ----------------------- Navigate to the search page ---------------------- */
 
-app.get("/search-media", (req, res) => {
-  res.render("search.ejs")
+app.get("/search-media", async (req, res) => {
+  const query = req.query
+  console.log(query)
+
+  /* const request = await fetch(`${API_URL}/search`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": getCookies(req, "media_authentication")
+    },
+    body: JSON.stringify(query),
+    credentials: "include"
+  })
+
+  const response = await request.json()
+
+  if (response.error) {
+    res.render("search.ejs", {
+      searchType: "media",
+      query,
+      error: response.error
+    })
+    return
+  } */
+
+  res.render("search.ejs", {
+    searchType: "media",
+    query,
+    // response
+  })
+})
+
+app.get("/search-users", (req, res) => {
+  res.render("search.ejs", {
+    searchType: "users"
+  })
+})
+
+app.get("/search-pools", (req, res) => {
+  res.render("search.ejs", {
+    searchType: "pools"
+  })
 })
 
 app.get("/media", (req, res) => {
@@ -89,7 +129,7 @@ app.get("/media", (req, res) => {
 
 /* ------------------------ Get the users own profile ----------------------- */
 
-app.get("/profile", authenticateUserJWT, async (req, res) => {
+app.get("/profile", async (req, res) => {
   const request = await fetch(`${API_URL}/user/${req.userId}`, {
     method: "GET",
     headers: {
@@ -100,6 +140,11 @@ app.get("/profile", authenticateUserJWT, async (req, res) => {
   })
 
   const response = await request.json()
+
+  if (response.error) {
+    res.redirect(301, "/auth/login")
+    return
+  }
 
   res.render("profile.ejs", response.data.user)
 })
@@ -118,6 +163,12 @@ app.get("/profile/:id", async (req, res) => {
   })
 
   const response = await request.json()
+
+  if (response.error) {
+    res.redirect(301, req.headers.referer)
+    alert(response.error)
+    return
+  }
 
   res.render("profile.ejs", response.data.user)
 })

@@ -6,3 +6,12 @@
 h1 {
     @apply text-4xl;
 }
+
+.input-with-plus-icon {
+    padding-right: 2.5rem; /* Extra padding on the right to fit the icon */
+    background-image: url('./icons/plus-symbol.svg'); /* Adjust to the path of your SVG file */
+    background-repeat: no-repeat;
+    background-size: 1.25rem; /* Adjust the size of the icon here */
+    background-position: calc(100% - 1rem) center; /* Position the icon within the input */
+    cursor: pointer;
+}
