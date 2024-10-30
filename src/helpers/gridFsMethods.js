@@ -67,6 +67,7 @@ const uploadFile = async function(req, file) {
 
 /* ------------------------------ Retrieve file ----------------------------- */
 
+// Maybe remove, I don't know what I would need this for
 const retrieveFiles = async function(req, res, query) {
   const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
   const db = client.db(query.mimetype)
@@ -91,19 +92,22 @@ const retrieveFiles = async function(req, res, query) {
 
 /* ------------------------------- Stream file ------------------------------ */
 
-const streamFile = async function(req, res, fileName) {
+const streamFile = async function(req, res, fileId) {
   try {
     const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
     // Get the mimetype from the url, this works because only the /view routes stream.
     const dbName = req.originalUrl.split("/")[2]
     const db = client.db(dbName)
     const bucket = new mongodb.GridFSBucket(db)
+
+    // Convert the fileId string to an ObjectId
+    const searchId = new mongodb.ObjectId(fileId)
     
-    const fileStream = bucket.openDownloadStreamByName(fileName)
+    const fileStream = bucket.openDownloadStream(searchId)
       .on('error', (error) => {
         return res.status(404).json({
           success: false,
-          message: `File: ${fileName} not found`,
+          message: `File: ${fileId} not found in container: ${dbName}`,
           errorMessage: error.message,
           error
         })

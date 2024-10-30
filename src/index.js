@@ -135,8 +135,21 @@ app.get("/search-pools", (req, res) => {
   })
 })
 
-app.get("/media", (req, res) => {
-  res.render("media.ejs")
+/* ---------------------- View a file with document id ---------------------- */
+
+app.get("/view/:mediaType", async (req, res) => {
+  const { mediaType } = req.params
+  const { id } = req.query
+  console.log(id)
+  if (mediaType !== ("image" || "video" || "audio")) {
+    const redirectUrl = req.headers.referer || `http://${req.headers.host}`
+    res.redirect(301, redirectUrl)
+    return
+  }
+
+  res.render("view.ejs", {
+    id
+  })
 })
 
 /* ------------------------ Get the users own profile ----------------------- */
@@ -185,31 +198,6 @@ app.get("/profile/:id", async (req, res) => {
   res.render("profile.ejs", response.data.user)
 })
 
-// Get all the users
-/* app.get("/users", (req, res) => {
-  res.render("users.ejs", {})
-})
- */
-/*
-app.get("/documents", (req, res) => {
-  res.render("documents.ejs")
-})
-
-app.get("/upload", (req, res) => {
-  res.render("upload.ejs")
-})
-
-app.get("/login", (req, res) => {
-  res.render("login.ejs")
-})
-
-app.get("/account", (req, res) => {
-  res.render("account.ejs")
-})
-
-app.get("/daat-chat", (req, res) => {
-  res.render("chat.ejs")
-}) */
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, host, () => console.log(`server started at http://localhost:${port}`))
