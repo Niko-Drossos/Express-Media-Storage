@@ -7,10 +7,16 @@ module.exports = async function castVote(doc, newVote) {
 
     // Check if the vote already exists
     if (existingVoteIndex !== -1) {
-      // Update the existing vote
-      doc.votes[existingVoteIndex] = newVote;
+      // Check if the existing vote has the same value as the new vote
+      if (doc.votes[existingVoteIndex].vote === newVote.vote) {
+        // Remove the existing vote
+        doc.votes.splice(existingVoteIndex, 1);
+      } else {
+        // Update the existing vote with the new one
+        doc.votes[existingVoteIndex] = newVote;
+      }
     } else {
-      // Push a new vote
+      // Push a new vote if no existing vote was found
       doc.votes.push(newVote);
     }
 
