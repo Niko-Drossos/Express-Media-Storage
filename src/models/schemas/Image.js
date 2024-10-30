@@ -18,6 +18,11 @@ const imageSchema = new Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String,
+    default: 'No Description',
+    required: false
+  },
   filename: {
     type: String,
     required: true,
