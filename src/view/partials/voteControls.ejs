@@ -1,0 +1,36 @@
+<button onclick="vote(true, { id: '<%= id %>', mediaType: '<%= mediaType %>' })" class="inline-flex items-center cursor-pointer">
+    <img class="inline-block h-8 w-8" src="../icons/upvote.svg" alt="upvote button">
+</button>
+
+<!-- Vote counter -->
+<span class="text-gray-600 text-sm font-bold text-center px-2"><%= voteCount %></span>
+
+<button onclick="vote(false, { id: '<%= id %>', mediaType: '<%= mediaType %>' })" class="mr-3 inline-flex items-center cursor-pointer">
+    <img class="inline-block h-8 w-8" src="../icons/downvote.svg" alt="upvote button">
+</button>
+
+<script>
+    async function vote(vote, { id, mediaType }) {
+        // Vote on a document
+        console.log(vote, id, mediaType)
+        const request = await fetch(`/vote/${mediaType}/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                vote
+            })
+        })
+
+        const response = await request.json()
+
+        if (response.error) {
+            alert(response.error)
+            return
+        }   
+
+        window.location.reload()
+    }
+</script>
