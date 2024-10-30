@@ -20,6 +20,11 @@ const audioSchema = new Schema({
     type: String,
     required: false
   },
+  description: {
+    type: String,
+    default: 'No Description',
+    required: false
+  },
   filename: {
     type: String,
     required: true,
