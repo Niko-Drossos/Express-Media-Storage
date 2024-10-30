@@ -18,29 +18,27 @@ exports.searchUsers = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { username, tags, page, limit=16 } = query
+    const { username, tags, page=1, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
     if (tags) searchQuery.tags = tags.split(",")
 
-    const totalDocuments = await Post.countDocuments(searchQuery);
+    const totalDocuments = await User.countDocuments(searchQuery);
 
     const totalPages = Math.ceil(totalDocuments / limit);
 
-    const searchResults = await User.find(
-      searchQuery
-    )
-    .sort({ createdAt: -1 })
-    .limit(limit ? limit : 16)
-    .skip((page - 1) * (limit ? limit : 16))
+    const searchResults = await User.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .limit(limit ? limit : 16)
+      .skip((page - 1) * (limit ? limit : 16))
 
     res.status(200).json({
       success: true,
       message: "Successfully searched for users",
       data: {
-        userCount: searchResults.length,
-        total: totalDocuments,
+        resultCount: searchResults.length,
+        totalDocuments: totalDocuments,
         page: page, 
         pageCount: totalPages,
         limit: limit,
@@ -91,16 +89,16 @@ exports.searchPosts = async (req, res) => {
     const totalPages = Math.ceil(totalDocuments / limit);
 
     const searchResults = await Post.find(documentQuery)
-    .sort({ createdAt: -1 })
-    .limit(limit ? limit : 16)
-    .skip((page - 1) * (limit ? limit : 16))
+      .sort({ createdAt: -1 })
+      .limit(limit ? limit : 16)
+      .skip((page - 1) * (limit ? limit : 16))
     
     res.status(200).json({ 
       success: true, 
       message: "Successfully searched for posts" ,
       data: {
-        postCount: searchResults.length,
-        total: totalDocuments,
+        resultCount: searchResults.length,
+        totalDocuments: totalDocuments,
         page: page,
         pageCount: totalPages,
         limit: limit,
@@ -127,7 +125,7 @@ exports.searchComments = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, originId, startDate, endDate, content } = query
+    const { user, originId, startDate, endDate, content, page=1, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (user) searchQuery["user.userId"] = user
@@ -135,15 +133,27 @@ exports.searchComments = async (req, res) => {
     if (content) searchQuery.content = new RegExp(content, 'i')
     if (originId) searchQuery.originId = originId
 
+    // Get the total number of documents that match the search query
+    const totalDocuments = await Comment.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
     const searchResults = await Comment.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * (limit ? limit : 16))
     
     res.status(200).json({
       success: true, 
       message: "Successfully searched for comments" ,
       data: {
-        commentCount: searchResults.length,
-        query,
-        searchResults
+        resultCount: searchResults.length,
+        totalDocuments: totalDocuments,
+        page: page,
+        pageCount: totalPages,
+        limit: limit,
+        query: query,
+        searchResults: searchResults
       }
     })
   } catch (error) {
@@ -165,22 +175,34 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, title, startDate, endDate } = query
+    const { user, title, startDate, endDate, page=1, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 
+    // Get the total number of documents that match the search query
+    const totalDocuments = await Video.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
     const searchResults = await Video.find(searchQuery)
-    
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * (limit ? limit : 16))
+      
     res.status(200).json({
       success: true, 
       message: "Successfully searched for videos" ,
       data: {
-        imageCount: searchResults.length,
-        query,
-        searchResults
+        resultCount: searchResults.length,
+        totalDocuments: totalDocuments,
+        page: page,
+        pageCount: totalPages,
+        limit: limit,
+        query: query,
+        searchResults: searchResults
       }
     })
   } catch (error) {
@@ -203,22 +225,34 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, title, startDate, endDate } = query
+    const { user, title, startDate, endDate, page=1, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
 
+    // Get the total number of documents that match the search query
+    const totalDocuments = await Image.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
     const searchResults = await Image.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * (limit ? limit : 16))
     
     res.status(200).json({
       success: true, 
       message: "Successfully searched for images" ,
       data: {
-        imageCount: searchResults.length,
-        query,
-        searchResults
+        resultCount: searchResults.length,
+        totalDocuments: totalDocuments,
+        page: page,
+        pageCount: totalPages,
+        limit: limit,
+        query: query,
+        searchResults: searchResults
       }
     })
   } catch (error) {
@@ -240,22 +274,34 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, title, startDate, endDate } = query
+    const { user, title, startDate, endDate, page=1, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (user) searchQuery["user.userId"] = user
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
 
+    // Get the total number of documents that match the search query
+    const totalDocuments = await Audio.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
     const searchResults = await Audio.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * (limit ? limit : 16))
     
     res.status(200).json({
       success: true, 
       message: "Successfully searched for audios" ,
       data: {
-        imageCount: searchResults.length,
-        query,
-        searchResults
+        resultCount: searchResults.length,
+        totalDocuments: totalDocuments,
+        page: page,
+        pageCount: totalPages,
+        limit: limit,
+        query: query,
+        searchResults: searchResults
       }
     })
   } catch (error) {
