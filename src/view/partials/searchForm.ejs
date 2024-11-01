@@ -5,7 +5,7 @@
                 <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="title">
                     Title
                 </label>
-                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="title" type="text" name="title" placeholder="Xodus festival">
+                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="title" type="text" value="<%= query.title %>" name="title" placeholder="Xodus festival">
             </div>
             <div class="md:w-1/2 px-3 mb-3">
                 <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="mediaType">
@@ -13,15 +13,16 @@
                 </label>
                 <div class="relative">
                     <select class="block appearance-none w-full bg-grey-lighter border border-grey-lighter text-grey-darker py-3 px-4 pr-8 rounded" id="mediaType" name="mediaType">
-                        <!-- TODO: Maybe add support for multiple media types at a time  -->
+                        <!-- TODO: Maybe add support for multiple media type search at a time  -->
                         <!-- <option>Any</option> -->
                         <option value="images">Image</option>
                         <option value="videos">Video</option>
                         <option value="audios">Audio</option>
-                        <option value="users">User</option>
-                        <option value="comments">Comment</option>
+                        <!-- TODO: create new search pages for these options -->
+                        <!-- <option value="users">User</option> -->
+                        <!-- <option value="comments">Comment</option> -->
                         <!-- TODO: change the name of posts to pools -->
-                        <option value="posts">Pool</option>
+                        <!-- <option value="posts">Pool</option> -->
                     </select>
                 </div>
             </div>
@@ -37,7 +38,7 @@
                 <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="content">
                     Text Content
                 </label>
-                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 mb-3" id="content" type="text" value="" name="content" placeholder="hello my name is...">
+                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 mb-3" id="content" type="text" value="<%= query.content %>" name="content" placeholder="hello my name is...">
             </div>
         </div>
         <div class="-mx-3 md:flex mb-6">
@@ -45,40 +46,18 @@
                 <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="startDate">
                     Start Date
                 </label>
-                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-red rounded py-3 px-4 mb-3" id="startDate" type="date" name="startDate" placeholder="YYYY-MM-DD">
+                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-red rounded py-3 px-4 mb-3" id="startDate" type="date" value="<%= query.startDate %>" name="startDate" placeholder="YYYY-MM-DD">
             </div>
             <div class="md:w-1/2 px-3">
                 <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="endDate">
                     End Date
                 </label>
-                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="endDate" type="date" name="endDate" placeholder="YYYY-MM-DD">
+                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="endDate" type="date" value="<%= query.endDate %>" name="endDate" placeholder="YYYY-MM-DD">
             </div>
         </div>
         <div class="flex-row flex justify-between">
-            <div class="md:w-1/2 -mx-3 flex mb-2 flex-col">
-                <div class="px-3 mb-3 md:mb-0 relative">
-                    <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="add-user">
-                        Users
-                    </label>
-                    <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10" id="add-user" type="text" placeholder="JohnDoe123">
-                    <img class="absolute right-4 top-9 transform -translate-y-0.5 cursor-pointer size-8" onclick="addUser(event)" src='./icons/plus-symbol.svg' alt="Add tag icon">
-                </div>
-                <div class="md:w-1/2 px-3 mb-3 md:mb-0 flex items-center flex-wrap h-auto flex-row mt-2" id="display-user">
-                    <input id="user" name="user" type="hidden"/> <!--! Make multiple user searching possible in the future -->
-                </div>
-            </div>
-            <div class="md:w-1/2 -mx-3 flex mb-2 flex-col">
-                <div class="px-3 mb-3 md:mb-0 relative">
-                    <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="add-tag">
-                        Tags
-                    </label>
-                    <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10" id="add-tag" type="text" placeholder="Festival">
-                    <img class="absolute right-4 top-9 transform -translate-y-0.5 cursor-pointer size-8" onclick="addTag(event)" src='./icons/plus-symbol.svg' alt="Add tag icon">
-                </div>
-                <div class="md:w-1/2 px-3 mb-3 md:mb-0 flex items-center flex-wrap h-auto flex-row mt-2" id="display-tags">
-                    <input id="tags" name="tags" type="hidden"/>
-                </div>
-            </div>
+            <%- include('./form/usernameSelector.ejs', query) %>
+            <%- include('./form/tagSelector.ejs', query) %>
         </div>
         
         <button class="bg-blue hover:bg-blue-dark text-white font-bold py-2 px-4 rounded" type="submit">Search</button>
@@ -86,33 +65,12 @@
 </form>
 
 <script>
-    // Search media that contains certain tags
-    const tagArray = []
-    function addTag(event) {
-        const inputTag = document.getElementById('add-tag')
-        const tag = inputTag.value
-        const displayTags = document.getElementById('display-tags')
-        if (!tagArray.includes(tag) && tag != '') {
-            displayTags.innerHTML += `<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">${tag}</span>`
-            tagArray.push(tag)
-        }
-        // inputTag.value = ''
-    }
+    const mediaType = "<%= query.mediaType %>" || "images";
+    
+    // Set the selected option based on query media type
+    const mediaTypeSelect = document.getElementById("mediaType");
+    mediaTypeSelect.value = mediaType;
 
-    // Make the search find the media with a user
-    const userArray = []
-    function addUser(event) {
-        const inputUser = document.getElementById('add-user')
-        const user = inputUser.value
-        const displayUsers = document.getElementById('display-user')
-        const hiddenUser = document.getElementById('user')
-        if (!userArray.includes(user) && user != '' && userArray.length < 1) { /* ! Make multiple user searching possible in the future */
-            displayUsers.innerHTML += `<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">${user}</span>`
-            userArray.push(user)
-            hiddenUser.value = userArray
-        }
-        // inputUser.value = ''
-    }
 
     function search(event) {
         event.preventDefault()
@@ -125,21 +83,19 @@
         
         // Create a new set of query params
         const formFields = Array.from(form.elements)
-        
+
         const mediaType = document.getElementsByName('media-type').value
 
         const params = formFields
             .map((field) => {
-                // Don't add the media type to the URL or the tags and users input boxes
-                if (field.name === "") return
-                // If the field is empty, don't add it to the URL
-                if (field.value === "") return
+                // Don't add the media type to the URL or the tags and users input boxes or if its empty
+                if (field.name === "" || field.value === "") return
 
                 return `${field.name}=${field.value}`
             })
             // Remove undefined values from the array
             .filter((param) => param !== undefined)
-        
+
         // Redirect to the same page with the new query parameters
         document.location = `${urlPath}?${params.join('&')}`
     }

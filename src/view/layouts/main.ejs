@@ -7,12 +7,11 @@
     <title>Story</title>
 </head>
 <body>
-    <div>
-        <%- include('../partials/header.ejs') %>
-        <main class="container mx-auto bg-slate-200 p-2 border-x-2">
-            <%- body %>
-        </main>
-        <%- include('../partials/footer.ejs') %>
-    </div>
+    <!-- TODO: Change this to actually tell if user is loggedIn -->
+    <%- include('../partials/header.ejs', { loggedIn: true }) %>
+    <main class="container mx-auto bg-slate-200 border-x-2 border-slate-300 min-h-[calc(100vh-128px)] max-h-fit">
+        <%- body %>
+    </main>
+    <%- include('../partials/footer.ejs') %>
 </body>
 </html>

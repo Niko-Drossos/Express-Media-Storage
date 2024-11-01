@@ -1,0 +1,35 @@
+<div class="md:w-1/2 -mx-3 flex mb-2 flex-col">
+    <div class="pr-3 mb-3 md:mb-0 relative">
+        <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="add-tag">
+            Tags
+        </label>
+        <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10" id="add-tag" type="text" placeholder="Festival">
+        <img class="absolute right-4 top-9 transform -translate-y-0.5 cursor-pointer size-8" onclick="addTag(event)" src='./icons/plus-symbol.svg' alt="Add tag icon">
+    </div>
+    <div class="md:w-1/2 pr-3 mb-3 md:mb-0 flex items-center flex-wrap h-auto flex-row mt-2" id="display-tags">
+        <input id="tags" name="tags" value="<%= query.tags %>" type="hidden"/>
+    </div>
+</div>
+
+<script>
+    // Display media tags from query
+    const displayTags = document.getElementById('display-tags')
+    const queryTags = "<%= query.tags %>"
+    if (queryTags) {   
+        const tagArray = queryTags.split(',')
+        tagArray.forEach(tag => displayTags.innerHTML += `<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">${tag}</span>`)
+    }
+
+    function addTag(event) {
+        const inputTag = document.getElementById('add-tag')
+        const tag = inputTag.value
+        const hiddenTags = document.getElementById('tags')
+
+        if (!tagArray.includes(tag) && tag != '') {
+            displayTags.innerHTML += `<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">${tag}</span>`
+            tagArray.push(tag)
+            hiddenTags.value = tagArray.join(',')
+            inputTag.value = ''
+        }
+    }
+</script>

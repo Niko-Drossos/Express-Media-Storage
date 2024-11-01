@@ -1,1 +1,98 @@
-<img src="/view/image/<%= id %>" alt="">
+<div class="bg-white shadow-none flex flex-1 h-[calc(100vh-128px)]">
+    <div class="lg:grid lg:grid-cols-3 min-w-full max-h-min">
+
+        <div class="col-span-2 w-full h-full flex justify-center items center">
+            <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/<%= mediaType %>/<%= media.fileId %>" alt="<%= media.title %>">
+        </div>
+
+        <div class="col-span-1 relative pl-4 flex flex-col max-h-[calc(100vh-8rem)]">
+            <header class="border-b border-grey-400 flex-none">
+                <!-- TODO: Add border to top of user when in mobile view -->
+                <div class="flex justify-between items-center sm:border-white">
+                    <a href="/profile/<%= uploader.userId %>" class="cursor-pointer py-2 flex items-center text-sm outline-none focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
+                        <img class="h-12 w-12 rounded-full object-cover" src="<%= uploader.profilePhoto || '../icons/defaultUser.svg'%>" alt="user photo" />
+                        <p class="block ml-2 font-bold"><%= uploader.username %></p>
+                    </a>
+                    <p class="text-sm mr-4">
+                        <% const date = new Date(media.createdAt) %>
+                        <%= date.toLocaleTimeString() %>
+                        <%= date.toLocaleDateString() %>
+                    </p>
+                </div>
+                <b class="text-xl"><%= media.title %></b>
+                <p class="pb-4 max-h-36 overflow-y-auto"><%= media.description %></p>
+            </header>
+
+            <div class="flex-grow content-end overflow-y-auto max-h-full">
+                <!-- Comment section -->
+                <hr>
+
+                <% media.comments.forEach(comment => { %>
+                    <%- include('./partials/comment.ejs', { comment, uploader }) %>
+                    <hr>
+                <% }) %>
+            </div>
+
+            <div class="bottom-0 left-0 right-0">
+                <div class="pt-4 pb-2">
+                    <div class="mb-2">
+                        <div class="flex items-center">
+                            <%- include('./partials/voteControls.ejs', { id: media._id, voteCount: media.voteCount, mediaType }) %>
+                            <!-- Comment bubble, i likely wont use this -->
+                            <!-- <span class="mr-3 inline-flex items-center cursor-pointer">
+                                <svg class="text-gray-700 inline-block h-7 w-7 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            </span> -->
+                        </div>
+                    </div>
+                    <!-- TODO: I don't know what this is supposed to be for but I might use it -->
+                    <!-- <span class="block ml-2 text-xs text-gray-600">5 minutes</span> -->
+                </div>
+
+                <div class="pb-4">
+                    <div class="flex items-center">
+                        <textarea class="w-full resize-none outline-none appearance-none rounded-lg p-2 leading-tight focus:outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
+                        <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="postComment(event)">
+                            <img src="../icons/right-arrow.svg" alt="Send">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>    
+    async function postComment(event) {
+        event.preventDefault();
+        
+        // Get the routing information from the URL
+        const mediaType = window.location.pathname.split("/")[2]
+        const params = new URLSearchParams(window.location.search)
+
+        // Create a new comment
+        const request = await fetch(`/comment/create/${mediaType}/${params.get("id")}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                content: document.getElementById("comment").value
+            })
+        })
+
+        const response = await request.json()
+
+        if (response.error) {
+            alert(response.error)
+            return
+        }
+
+        // Clear comment field
+        document.getElementById("comment").value = ""
+
+        window.location.reload()
+    }
+</script>

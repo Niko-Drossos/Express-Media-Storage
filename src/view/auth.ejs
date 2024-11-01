@@ -90,36 +90,37 @@
       setCookie("media_authentication", returnedData.data.JWT, 7)
       alert("Login successful")
       
-      document.location = "/";
+      document.location = `<%= redirectURL %>` || "/";
     }
 
     async function register(event) {
-		event.preventDefault();
-		let username = document.getElementById("username").value;
-		let email = document.getElementById("email").value;
-		let password = document.getElementById("password").value;
-		let confirmPassword = document.getElementById("confirm-password").value;
+      event.preventDefault();
+      let username = document.getElementById("username").value;
+      let email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+      let confirmPassword = document.getElementById("confirm-password").value;
 
-		if (password !== confirmPassword) {
-			alert("Passwords do not match")
-			return
-		}
+      if (password !== confirmPassword) {
+        alert("Passwords do not match")
+        return
+      }
 
-		const registerAttempt = await fetch("/auth/register", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({ username, email, password })
-		})
-		
-		if (!registerAttempt.ok) {
-			alert(`Registration failed: ${registerAttempt.status}`)
-			return  
-		}
+      const registerAttempt = await fetch("/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, email, password })
+      })
+      
+      if (!registerAttempt.ok) {
+        alert(`Registration failed: ${registerAttempt.status}`)
+        return  
+      }
 
-		let returnedData = await registerAttempt.json()
-		console.log(returnedData)
-		alert("Registration successful")
+      let returnedData = await registerAttempt.json()
+      console.log(returnedData)
+      alert("Registration successful")
+      window.location = "/auth/login"
     }
 </script>
