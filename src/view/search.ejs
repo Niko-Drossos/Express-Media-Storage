@@ -1,14 +1,20 @@
 <h1 class="flex justify-center">Search</h1> 
-<%- include('./partials/searchForm.ejs', { searchType: searchType }) %>
+
+<%- include('./partials/searchForm.ejs') %>
 <div>
-    <!-- Finish file display -->
-    <% if (response.length) { %>
-        <% response.map(v => { %>
-            <div><%= v.filename %></div>
-            <br>
-        <% }) %>
-    <% } %>
+    <div class="grid grid-cols-3 gap-4 p-8">
+        <!-- Finish file display -->
+        <% if (response.length) { %>
+            <% response.map(data => { %>
+                <div class="mb-8">
+                    <%- include('./partials/mediaCard.ejs', { ...data, query }) %>
+                </div>
+            <% }) %>
+        <% } %>
     </div>
+</div>
+
+    <!-- I might use this for something else at some point -->
 <!-- <div class='max-w-md mx-auto'>
     <div class="relative flex items-center w-full h-12 rounded-lg focus-within:shadow-lg bg-white overflow-hidden">
         <input
