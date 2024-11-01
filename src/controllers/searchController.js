@@ -18,11 +18,12 @@ exports.searchUsers = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { username, tags, page=1, limit=16 } = query
+    const { username, tags, id, comments=false, page=1, limit=12 } = query
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
     if (tags) searchQuery.tags = tags.split(",")
+    if (id) searchQuery._id = id
 
     const totalDocuments = await User.countDocuments(searchQuery);
 
@@ -32,6 +33,7 @@ exports.searchUsers = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit ? limit : 16)
       .skip((page - 1) * (limit ? limit : 16))
+      .populate(comments ? 'comments' : '')
 
     res.status(200).json({
       success: true,
@@ -65,33 +67,39 @@ exports.searchPosts = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { user, tags, startDate, endDate, title, description, transcription, page, limit=16 } = query
+    const { userId, usernames, tags, startDate, endDate, title, description, transcription, id, comments=false, page=1, limit=12 } = query
 
+    // Search a list of usernames
+    if (usernames) {
+      const usernamesArray = usernames.split(",")
+      searchQuery["user.username"] = { $in: usernamesArray }
+    }
+    
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery["user.userId"] = user
+    if (userId) searchQuery["user.userId"] = userId
     if (tags) searchQuery.tags = { $all: tags.split(",") }
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (description) searchQuery.description = new RegExp(description, 'i')
     if (transcription) searchQuery.transcription = new RegExp(transcription, 'i')
+    if (id) searchQuery._id = id
 
-    const documentQuery = {
-      ...searchQuery,
-      $or: [
-        { "user.userId": req.userId },
-        { privacy: "Public" }
-      ]
-    }
+    // Only allow for searching of a users own documents or those made public
+    searchQuery.$or = [
+      { "user.userId": req.userId },
+      { privacy: "Public" }
+    ]
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Post.countDocuments(searchQuery);
 
     const totalPages = Math.ceil(totalDocuments / limit);
 
-    const searchResults = await Post.find(documentQuery)
+    const searchResults = await Post.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit ? limit : 16)
       .skip((page - 1) * (limit ? limit : 16))
+      .populate(comments ? 'comments' : '')
     
     res.status(200).json({ 
       success: true, 
@@ -125,13 +133,20 @@ exports.searchComments = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, originId, startDate, endDate, content, page=1, limit=16 } = query
+    const { userId, usernames, originId, startDate, endDate, content, id, comments=false, page=1, limit=12 } = query
+
+    // Search a list of usernames
+    if (usernames) {
+      const usernamesArray = usernames.split(",")
+      searchQuery["user.username"] = { $in: usernamesArray }
+    }
 
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery["user.userId"] = user
+    if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (content) searchQuery.content = new RegExp(content, 'i')
     if (originId) searchQuery.originId = originId
+    if (id) searchQuery._id = id
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Comment.countDocuments(searchQuery);
@@ -142,6 +157,7 @@ exports.searchComments = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
+      .populate(comments ? 'comments' : '')
     
     res.status(200).json({
       success: true, 
@@ -175,12 +191,26 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, title, startDate, endDate, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, content, id, comments=false,page=1, limit=12 } = query
+
+    // Search a list of usernames
+    if (usernames) {
+      const usernamesArray = usernames.split(",")
+      searchQuery["user.username"] = { $in: usernamesArray }
+    }
 
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery["user.userId"] = user
+    if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
+    if (content) searchQuery.transcription.text = new RegExp(content, 'i')
+    if (id) searchQuery._id = id
+
+    // Only allow for searching of a users own documents or those made public
+    searchQuery.$or = [
+      { "user.userId": req.userId },
+      { privacy: "Public" }
+    ]
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Video.countDocuments(searchQuery);
@@ -191,7 +221,8 @@ exports.searchVideos = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
-      
+      .populate(comments ? 'comments' : '')
+
     res.status(200).json({
       success: true, 
       message: "Successfully searched for videos" ,
@@ -225,12 +256,25 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, title, startDate, endDate, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, id, comments=false, page=1, limit=12 } = query
 
+    // Search a list of usernames
+    if (usernames) {
+      const usernamesArray = usernames.split(",")
+      searchQuery["user.username"] = { $in: usernamesArray }
+    }
+    
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery["user.userId"] = user
+    if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
+    if (id) searchQuery._id = id
+
+    // Only allow for searching of a users own documents or those made public
+    searchQuery.$or = [
+      { "user.userId": req.userId },
+      { privacy: "Public" }
+    ]
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Image.countDocuments(searchQuery);
@@ -241,6 +285,7 @@ exports.searchImages = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
+      .populate(comments ? 'comments' : '')
     
     res.status(200).json({
       success: true, 
@@ -274,12 +319,26 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { user, title, startDate, endDate, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, id, comments=false, page=1, limit=12 } = query
+
+    // Search a list of usernames
+    if (usernames) {
+      const usernamesArray = usernames.split(",")
+      searchQuery["user.username"] = { $in: usernamesArray }
+    }
 
     // Add the search query's properties to the searchQuery object
-    if (user) searchQuery["user.userId"] = user
+    // TODO: Maybe make userId a list? 
+    if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
+    if (id) searchQuery._id = id
+
+    // Only allow for searching of a users own documents or those made public
+    searchQuery.$or = [
+      { "user.userId": req.userId },
+      { privacy: "Public" }
+    ]
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Audio.countDocuments(searchQuery);
@@ -290,6 +349,7 @@ exports.searchAudios = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
+      .populate(comments ? 'comments' : '')
     
     res.status(200).json({
       success: true, 

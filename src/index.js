@@ -58,8 +58,12 @@ app.get("/", (req, res) => {
 /* ---------------------------- Login to an account ------------------------- */
 
 app.get("/auth/login", (req, res) => {
+  // Allow for a redirect url after login
+  const redirectURL = req.query.redirect || req.headers.referer
+
   res.render("auth.ejs", {
-    register: false
+    register: false,
+    redirectURL
   })
 })
 
@@ -107,14 +111,13 @@ app.get("/search-media", async (req, res) => {
       return
     }
 
-    console.log(response.data.searchResults)
-    
     res.render("search.ejs", {
       searchType: "media",
       query,
       response: response.data.searchResults || []
     })
   } else { 
+    // Render the page without searching for anything
     res.render("search.ejs", {
       searchType: "media",
       query,
@@ -123,8 +126,9 @@ app.get("/search-media", async (req, res) => {
   }
 })
 
-app.get("/search-users", (req, res) => {
-  res.render("search.ejs", {
+// TODO: Add support for these routes later
+/* app.get("/search-users", (req, res) => {
+  res.render("404.ejs", {
     searchType: "users"
   })
 })
@@ -133,29 +137,21 @@ app.get("/search-pools", (req, res) => {
   res.render("search.ejs", {
     searchType: "pools"
   })
-})
+}) */
 
 /* ---------------------- View a file with document id ---------------------- */
 
 app.get("/view/:mediaType", async (req, res) => {
   const { mediaType } = req.params
   const { id } = req.query
-  console.log(id)
+
   if (mediaType !== ("image" || "video" || "audio")) {
     const redirectUrl = req.headers.referer || `http://${req.headers.host}`
     res.redirect(301, redirectUrl)
     return
   }
 
-  res.render("view.ejs", {
-    id
-  })
-})
-
-/* ------------------------ Get the users own profile ----------------------- */
-
-app.get("/profile", async (req, res) => {
-  const request = await fetch(`${API_URL}/user/${req.userId}`, {
+  const request = await fetch(`${API_URL}/search/${mediaType}s?id=${id}&comments=true`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -166,8 +162,32 @@ app.get("/profile", async (req, res) => {
 
   const response = await request.json()
 
+  res.render("view.ejs", {
+    // Send information for the file request on the client side
+    mediaType,
+    media: response.data.searchResults[0],
+    uploader: response.data.searchResults[0].user
+  })
+})
+
+/* ------------------------ Get the users own profile ----------------------- */
+
+app.get("/profile", async (req, res) => {
+  console.log(req)
+  const request = await fetch(`${API_URL}/user/${req.userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": getCookies(req, "media_authentication")
+    },
+    credentials: "include"
+  })
+
+  const response = await request.json()
+  console.log(response)
   if (response.error) {
-    res.redirect(301, "/auth/login")
+    res.redirect(301, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
+    console.log(response.error)
     return
   }
 
@@ -189,11 +209,10 @@ app.get("/profile/:id", async (req, res) => {
 
   const response = await request.json()
 
-  if (response.error) {
+  /* if (response.error) {
     res.redirect(301, req.headers.referer)
-    alert(response.error)
     return
-  }
+  } */
 
   res.render("profile.ejs", response.data.user)
 })
