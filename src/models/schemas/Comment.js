@@ -26,7 +26,8 @@ const commentSchema = new Schema({
     default: {
       isEdited: false,
       date: Date.now()
-    }
+    },
+    _id: false
   },
   deleted: {
     type: {
@@ -42,7 +43,8 @@ const commentSchema = new Schema({
     default: {
       isDeleted: false,
       date: Date.now()
-    }
+    },
+    _id: false
   },
   originType: {
     type: String,

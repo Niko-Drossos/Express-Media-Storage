@@ -22,7 +22,7 @@ const videoSchema = new Schema({
   },
   description: {
     type: String,
-    default: 'No Description',
+    default: '(No Description)',
     required: false
   },
   filename: {

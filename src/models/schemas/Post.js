@@ -38,7 +38,8 @@ const postSchema = new Schema({
     default: {
       isEdited: false,
       date: Date.now()
-    }
+    },
+    _id: false
   },
   deleted: {
     isDeleted: {
@@ -48,7 +49,8 @@ const postSchema = new Schema({
     date: { 
       type: Date || null,
       default: null
-    }
+    },
+    _id: false
   },
   comments: [{
     type: Schema.Types.ObjectId,
