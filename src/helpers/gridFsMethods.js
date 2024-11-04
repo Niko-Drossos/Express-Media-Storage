@@ -2,7 +2,7 @@ const { Readable } = require('stream')
 const mongodb = require("mongodb")
 const mongoose = require("mongoose")
 const multer = require('multer')
-
+const mongoURI = process.env.Mongo_Connection_Uri
 const dotenv = require("dotenv")
 dotenv.config()
 
@@ -22,7 +22,7 @@ const upload = multer({
 
 // Middleware function to handle video compression upon upload
 
-const uploadFile = async function(req, file) {
+/* const uploadFile = async function(req, file) {
   const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
 
   // Either video, image, or audio
@@ -63,8 +63,52 @@ const uploadFile = async function(req, file) {
       reject(error)
     })
   })
-}
+} */
 
+  const uploadFile = async function(req, fileStream, file) {
+    const client = new mongodb.MongoClient(mongoURI);
+    
+    // Connect to the MongoDB client
+    // await client.connect();
+  
+    // Determine database name based on file type (video, image, audio)
+    const dbName = file.mimetype.split("/")[0];
+    const db = client.db(dbName);
+    const bucket = new mongodb.GridFSBucket(db);
+  
+    // Return a promise that wraps the streaming process
+    return new Promise((resolve, reject) => {
+      const newFileName = `${req.username}-${file.originalname}`;
+  
+      // Create an upload stream for GridFS
+      const uploadStream = bucket.openUploadStream(newFileName, {
+        metadata: {
+          ...(file.duration && { duration: file.duration }),
+          ...(file.dimensions && { dimensions: file.dimensions }),
+          user: {
+            userId: req.userId,
+            username: req.username,
+          },
+        },
+      });
+  
+      // Pipe the incoming file stream directly to GridFS
+      fileStream.pipe(uploadStream);
+  
+      // Listen for 'finish' event when upload is complete
+      uploadStream.on('finish', () => {
+        const fileId = uploadStream.id; // Use uploadStream.id to get the file ID
+        resolve(fileId); // Resolve with the file ID
+      });
+  
+      // Listen for errors during upload
+      uploadStream.on('error', (error) => {
+        console.error("Error uploading to GridFS:", error);
+        reject(error);
+      });
+    });
+  };
+  
 /* ------------------------------ Retrieve file ----------------------------- */
 
 // Maybe remove, I don't know what I would need this for
