@@ -153,10 +153,11 @@
 
     async function uploadFileForm(event) {
         event.preventDefault()
-        
+
         const file = event.target['file'].files[0];
+
         const upload = new tus.Upload(file, {
-            endpoint: `http://localhost:3333/testing/upload/${file.originalname}`,
+            endpoint: `${window.location.origin}/testing/upload/${file.name}`,
             retryDelays: [0, 1000, 3000, 5000],
             metadata: {
                 filename: file.name,
