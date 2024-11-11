@@ -153,8 +153,7 @@
     }
 
 
-    // ! TESTING
-/*     async function uploadFile(file) {
+async function uploadFile(file) {
   const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
   const fileId = `${file.name}-${file.size}-${file.lastModified}`;
@@ -183,53 +182,6 @@
       // Optionally, implement retry logic here
     }
   }
-} */
-
-async function uploadFile(file) {
-  let chunkSize = 1024 * 1024; // Start with 1MB
-  let success = false;
-
-  while (!success && chunkSize <= 50 * 1024 * 1024) { // Test up to 50MB
-    try {
-      await tryUploadWithChunkSize(file, chunkSize);
-      console.log(`Success with chunk size: ${chunkSize}`);
-      success = true;
-    } catch (error) {
-      console.error(`Failed with chunk size: ${chunkSize}. Trying larger size.`);
-      chunkSize += 1024 * 1024; // Increase by 1MB
-    }
-  }
-
-  if (!success) {
-    console.error("No suitable chunk size found within limits.");
-  }
 }
-
-async function tryUploadWithChunkSize(file, chunkSize) {
-  const totalChunks = Math.ceil(file.size / chunkSize);
-  const fileId = `${file.name}-${file.size}-${file.lastModified}`;
-
-  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-    const start = chunkIndex * chunkSize;
-    const end = Math.min(start + chunkSize, file.size);
-    const chunk = file.slice(start, end);
-
-    const formData = new FormData();
-    formData.append('chunk', chunk, file.name);
-    formData.append('chunkIndex', chunkIndex);
-    formData.append('totalChunks', totalChunks);
-    formData.append('fileId', fileId);
-
-    const response = await fetch('/file/chunked-upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Upload failed");
-    }
-  }
-}
-
 
 </script>
