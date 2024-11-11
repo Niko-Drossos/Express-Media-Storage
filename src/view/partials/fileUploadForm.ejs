@@ -126,12 +126,16 @@
     async function uploadFileForm(event) {
         event.preventDefault()
 
+        const file = event.target['file'].files[0]
+
         if (!event.target['file'].files[0]) {
             alert('Please select a file')
             return
         }
+
+        await uploadFile(file)
         
-        const formData = new FormData()
+        /* const formData = new FormData()
         // They need to end in a zero because of the way that I tried to implement multiple file uploading
         formData.append('file0', event.target['file'].files[0])
         formData.append('title0', event.target['title'].value)
@@ -145,6 +149,40 @@
             body: formData
         })
         const uploadResponse = await uploadRequest.json()
-        console.log(uploadResponse)
+        console.log(uploadResponse) */
     }
+
+
+    // ! TESTING
+    async function uploadFile(file) {
+  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+  const fileId = `${file.name}-${file.size}-${file.lastModified}`;
+
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const start = chunkIndex * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const chunk = file.slice(start, end);
+
+    const formData = new FormData();
+    formData.append('chunk', chunk, file.name);
+    formData.append('chunkIndex', chunkIndex);
+    formData.append('totalChunks', totalChunks);
+    formData.append('fileId', fileId);
+
+    try {
+      const response = await fetch('http://localhost:3333/file/chunked-upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log(result.message);
+    } catch (error) {
+      console.error('Error uploading chunk:', error);
+      // Optionally, implement retry logic here
+    }
+  }
+}
+
 </script>

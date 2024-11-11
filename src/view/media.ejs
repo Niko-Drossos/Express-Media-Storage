@@ -2,7 +2,17 @@
     <div class="lg:grid lg:grid-cols-3 min-w-full max-h-min">
 
         <div class="col-span-2 w-full h-full flex justify-center items center">
-            <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/<%= mediaType %>/<%= media.fileId %>" alt="<%= media.title %>">
+            <% if (mediaType === 'image') { %>
+                <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/image/<%= media.fileId %>" alt="<%= media.title %>">
+            <% } else if (mediaType === 'video') { %>
+                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" poster="<%= media.thumbnail %>" controls>
+                    <source src="/view/video/<%= media.fileId %>" type="video/mp4">
+                </video>
+            <% } else if (mediaType === 'audio') { %>
+                <audio class="w-full max-h-[calc(100vh-8rem)] object-contain" controls>
+                    <source src="/view/audio/<%= media.fileId %>" type="audio/mpeg">
+                </audio>
+            <% } %>
         </div>
 
         <div class="col-span-1 relative pl-4 flex flex-col max-h-[calc(100vh-8rem)]">

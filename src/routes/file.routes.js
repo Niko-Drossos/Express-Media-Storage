@@ -21,6 +21,9 @@ router.all("/*", authenticateUserJWT)
 
 router.post("/upload", upload.fields(uploadFields), processUploads, fileController.batchUpload)
 
+// Chunked uploads
+router.post("/chunked-upload", upload.single("chunk"), fileController.chunkedUpload)
+
 router.post("/delete", fileController.deleteFiles)
 
 module.exports = router

@@ -44,3 +44,7 @@ Add "manage" routes for editing file data
 
 Fix the username and tag fields to update with user input.  I don't know why they won't
 Fix the spacing on the usernameSelector plus icon
+
+Fix video streaming
+
+Add thumbnail support

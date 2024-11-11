@@ -1,3 +1,5 @@
+const path = require("path")
+const fs = require("fs-extra")
 /* --------------------------------- Schemas -------------------------------- */
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
@@ -137,6 +139,48 @@ exports.batchUpload = async (req, res) => {
       errorMessage: error.message,
       error
     })
+  }
+}
+
+/* ------------------------- Chunked file uploading ------------------------- */
+
+exports.chunkedUpload = async (req, res) => {
+  const { originalname, buffer } = req.file;
+  const { chunkIndex, totalChunks, fileId } = req.body;
+
+  const UPLOAD_DIR = path.join(__dirname, '..', '..', 'chunked-uploads');
+  const tempDir = path.join(UPLOAD_DIR, fileId);
+  const chunkPath = path.join(tempDir, `chunk-${chunkIndex}`);
+
+  try {
+    // Ensure the temporary directory exists
+    await fs.ensureDir(tempDir);
+
+    // Save the chunk to the temporary directory
+    await fs.writeFile(chunkPath, buffer);
+
+    // If all chunks are uploaded, merge them
+    if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
+      const finalPath = path.join(UPLOAD_DIR, originalname);
+      const writeStream = fs.createWriteStream(finalPath);
+
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = await fs.readFile(path.join(tempDir, `chunk-${i}`));
+        writeStream.write(chunk);
+      }
+
+      writeStream.end();
+
+      // Clean up temporary files
+      await fs.remove(tempDir);
+
+      res.status(200).json({ message: 'File uploaded successfully.' });
+    } else {
+      res.status(200).json({ message: `Chunk ${chunkIndex} uploaded successfully.` });
+    }
+  } catch (error) {
+    console.error('Error processing chunk:', error);
+    res.status(500).json({ error: 'An error occurred while processing the upload.' });
   }
 }
 

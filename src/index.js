@@ -141,15 +141,15 @@ app.get("/search-pools", (req, res) => {
 
 /* ---------------------- View a file with document id ---------------------- */
 
-app.get("/view/:mediaType", async (req, res) => {
+app.get("/media/:mediaType", async (req, res) => {
   const { mediaType } = req.params
   const { id } = req.query
 
-  if (mediaType !== ("image" || "video" || "audio")) {
+  /* if (mediaType !== ("image" || "video" || "audio")) {
     const redirectUrl = req.headers.referer || `http://${req.headers.host}`
     res.redirect(301, redirectUrl)
     return
-  }
+  } */
 
   const request = await fetch(`${API_URL}/search/${mediaType}s?id=${id}&comments=true`, {
     method: "GET",
@@ -162,7 +162,7 @@ app.get("/view/:mediaType", async (req, res) => {
 
   const response = await request.json()
 
-  res.render("view.ejs", {
+  res.render("media.ejs", {
     // Send information for the file request on the client side
     mediaType,
     media: response.data.searchResults[0],
@@ -174,6 +174,7 @@ app.get("/view/:mediaType", async (req, res) => {
 
 app.get("/profile", async (req, res) => {
   console.log(req)
+  //! FIX THIS TO NOT USE req.UserId AS IT IS UNDEFINED
   const request = await fetch(`${API_URL}/user/${req.userId}`, {
     method: "GET",
     headers: {

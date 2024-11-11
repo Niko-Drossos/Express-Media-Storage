@@ -92,7 +92,7 @@ const retrieveFiles = async function(req, res, query) {
 
 /* ------------------------------- Stream file ------------------------------ */
 
-const streamFile = async function(req, res, fileId) {
+/* const streamFile = async function(req, res, fileId) {
   try {
     const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
     // Get the mimetype from the url, this works because only the /view routes stream.
@@ -128,35 +128,90 @@ const streamFile = async function(req, res, fileId) {
       error
     })
   }
-}
+} */
 
-/* 
-  ! Possible future addition, true file streaming,
-  const streamFile = async function(req, res, fileName) {
-    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
-    // Get the mimetype from the url, this works because only the /view routes stream.
-    const dbName = req.originalUrl.split("/")[2]
-    const db = client.db(dbName)
-    const bucket = new mongodb.GridFSBucket(db)
+const streamFile = async function (req, res, fileId) {
+  try {
+    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri);
+    const dbName = req.originalUrl.split("/")[2];
+    const db = client.db(dbName);
+    const bucket = new mongodb.GridFSBucket(db, { bucketName: "fs" });
 
-    const fileStream = bucket.openDownloadStreamByName(fileName)
+    // Convert the fileId string to an ObjectId
+    const searchId = new mongodb.ObjectId(fileId);
 
-    // Set the response headers
-    const file = await bucket.find({ filename: fileName }).toArray()[0]
-    res.setHeader('Content-Type', file.metadata.mimetype)
-    res.setHeader('Content-Length', file.length)
-    res.setHeader('Content-Disposition', `inline; filename=${file.filename}`)
+    // Check for the Range header
+    const range = req.headers.range;
+    if (!range) {
+      // If no range header, return the whole file as usual
+      const fileStream = bucket.openDownloadStream(searchId);
+      res.setHeader("Content-Type", "video/mp4");
+      fileStream.pipe(res);
 
-    // Pipe the file stream to the response, but only request the next chunk of data when the last one was fully read
-    const pipeline = fileStream.pipe(res)
-    pipeline.on('data', () => {
-      fileStream.pause()
-    })
-    pipeline.on('drain', () => {
-      fileStream.resume()
-    })
+      // Close MongoDB connection when done
+      res.on("finish", () => {
+        client.close();
+      });
+      return;
+    }
+
+    // Parse the range, assuming it looks like "bytes=start-end"
+    const [start, end] = range.replace(/bytes=/, "").split("-").map(Number);
+    
+    // Get file metadata (optional but useful for Content-Length)
+    const fileInfo = await bucket.find({ _id: searchId }).toArray();
+    // console.log(fileInfo)
+    if (!fileInfo.length) {
+      return res.status(404).json({ success: false, message: "File not found" });
+    }
+    const fileSize = fileInfo[0].length;
+    const chunkEnd = end ? end : fileSize - 1;
+
+    // Set Cache-Control and Last-Modified headers for caching
+    res.setHeader("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
+    res.setHeader("Last-Modified", fileInfo[0].uploadDate.toUTCString());
+    res.setHeader("ETag", fileInfo[0]._id.toString());
+
+
+    // Set response headers for partial content
+    res.writeHead(206, {
+      "Content-Range": `bytes ${start}-${chunkEnd}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunkEnd - start + 1,
+      "Content-Type": "video/mp4" // Adjust MIME type as needed
+    });
+
+    // Stream the requested byte range
+    const fileStream = bucket.openDownloadStream(searchId, { start, end: chunkEnd });
+    
+    // Pipe stream to response and handle errors
+    fileStream.pipe(res)
+      .on('error', (error) => {
+        console.error('Stream error:', error);
+        res.status(500).end();
+        client.close();
+      });
+
+    // Ensure connection stays open until the streaming completes
+    /* res.on("close", () => {
+      console.log("Connection closed by client");
+      fileStream.destroy();
+    }); */
+
+    // If playback is finished naturally, close Mongo connection
+    /* res.on("finish", () => {
+      client.close();
+    }); */
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch file",
+      errorMessage: error.message,
+      error
+    });
   }
-*/
+};
+  
 
 /* ------------------------------- Delete file ------------------------------ */
 

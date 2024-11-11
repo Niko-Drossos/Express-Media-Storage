@@ -1,5 +1,57 @@
-const getVideoDetails = require("../../helpers/getVideoDetails")
 const mediaCompressor = require('../../helpers/mediaCompressor')
+const getVideoDetails = require('../../helpers/getVideoDetails')
+const fs = require('fs').promises;
+const path = require('path');
+const ffmpeg = require('fluent-ffmpeg');
+const { PassThrough } = require('stream');
+
+const generateThumbnail = async (fileBuffer) => {
+  const tempDir = path.join(__dirname, 'temp');
+  const tempFilePath = path.join(tempDir, `${Date.now()}-temp-thumbnail.mp4`);
+  
+  // Ensure the temp directory exists
+  await fs.mkdir(tempDir, { recursive: true });
+
+  // Write the buffer to a temporary file
+  await fs.writeFile(tempFilePath, fileBuffer);
+
+  return new Promise((resolve, reject) => {
+    const buffer = [];
+    const passThroughStream = new PassThrough();
+
+    ffmpeg(tempFilePath)
+      .inputFormat('mp4') // Ensure format is correctly specified
+      .on('end', async () => {
+        try {
+          const thumbnailBuffer = Buffer.concat(buffer);
+          const base64Thumbnail = thumbnailBuffer.toString('base64');
+          await fs.unlink(tempFilePath); // Clean up the temp file if it exists
+          resolve(base64Thumbnail);
+        } catch (err) {
+          console.error('Error during cleanup:', err);
+          reject(err);
+        }
+      })
+      .on('error', async (err) => {
+        console.error('ffmpeg error:', err);
+        try {
+          // Try to delete the temp file if it exists
+          await fs.unlink(tempFilePath);
+        } catch (unlinkErr) {
+          console.error('Error during file deletion:', unlinkErr);
+        }
+        reject(err);
+      })
+      .screenshots({
+        timestamps: [1], // Capture a frame at 1 second
+        size: '320x240', // Thumbnail dimensions
+      })
+      .pipe(passThroughStream);
+
+    passThroughStream.on('data', (chunk) => buffer.push(chunk));
+  });
+};
+
 
 
 const processUploads = async (req, res, next) => {
@@ -11,7 +63,8 @@ const processUploads = async (req, res, next) => {
   req.uploads = []
   for (let i = 0; i < 10; i++) {
     if (typeof req.files[`file${i}`] == "object") {
-      const metadata = await getVideoDetails(req.files[`file${i}`][0])
+      const file = req.files[`file${i}`][0];
+      const metadata = await getVideoDetails(file)
 
       const { duration, coded_width, coded_height, codec_type } = metadata.streams[0]
 
@@ -21,18 +74,30 @@ const processUploads = async (req, res, next) => {
         dimensions = { width: coded_width, height: coded_height }
       }
 
+      //! FIX THUMBNAILS 
+      // Generate thumbnail
+      let thumbnail = null;
+      /* if (codec_type === 'video') {
+        try {
+          thumbnail = await generateThumbnail(file.buffer);
+        } catch (err) {
+          console.error(`Error generating thumbnail for video ${file.originalname}:`, err);
+        }
+      } */
+
       // ! Replace when media compressor works
-      // const compressedFile = await mediaCompressor(req.files[`file${i}`][0], )
+      // const compressedFile = await mediaCompressor(file, )
       // console.log(`Compressed file`)
       // console.log(compressedFile)
       req.uploads.push({
         // ! Replace when media compressor works
         // ...compressedFile,
-        ...req.files[`file${i}`][0],
+        ...file,
 
         // Naw what da hell goofy ahh script 💀
         ...(dimensions !== undefined && { dimensions: dimensions }),
         ...(duration !== "N/A" && { duration: duration }),
+        ...(thumbnail && { thumbnail })
       })
     }
   }

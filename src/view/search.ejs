@@ -6,8 +6,8 @@
         <!-- Finish file display -->
         <% if (response.length) { %>
             <% response.map(data => { %>
-                <div class="mb-8">
-                    <%- include('./partials/mediaCard.ejs', { ...data, query }) %>
+                <div class="mb-8">                                                    <!--! Finish thumbnail display -->
+                    <%- include('./partials/mediaCard.ejs', { ...data, query, thumbnail: null }) %>
                 </div>
             <% }) %>
         <% } %>
