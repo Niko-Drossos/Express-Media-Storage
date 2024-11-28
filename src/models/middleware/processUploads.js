@@ -1,5 +1,5 @@
 const mediaCompressor = require('../../helpers/mediaCompressor')
-const getVideoDetails = require('../../helpers/getVideoDetails')
+const getFileDetails = require('../../helpers/getFileDetails')
 const fs = require('fs').promises;
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
@@ -64,7 +64,7 @@ const processUploads = async (req, res, next) => {
   for (let i = 0; i < 10; i++) {
     if (typeof req.files[`file${i}`] == "object") {
       const file = req.files[`file${i}`][0];
-      const metadata = await getVideoDetails(file)
+      const metadata = await getFileDetails(file)
 
       const { duration, coded_width, coded_height, codec_type } = metadata.streams[0]
 

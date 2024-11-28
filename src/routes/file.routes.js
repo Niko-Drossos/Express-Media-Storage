@@ -19,9 +19,11 @@ router.all("/*", authenticateUserJWT)
 // TODO: I might remove this, i don't see a point to it
 // router.get("/get", fileController.findFiles)
 
-router.post("/upload", upload.fields(uploadFields), processUploads, fileController.batchUpload)
+// Might get deprecated in the future
+router.post("/upload", /* upload.fields(uploadFields), processUploads, */ fileController.batchUpload)
 
-// Chunked uploads
+// Chunked file uploading
+router.post("/start-chunk-upload", fileController.startChunkUpload)
 router.post("/chunked-upload", upload.single("chunk"), fileController.chunkedUpload)
 
 router.post("/delete", fileController.deleteFiles)

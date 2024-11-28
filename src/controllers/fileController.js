@@ -1,4 +1,3 @@
-const path = require("path")
 const fs = require("fs-extra")
 /* --------------------------------- Schemas -------------------------------- */
 const Video = require("../models/schemas/Video")
@@ -7,10 +6,11 @@ const Audio = require("../models/schemas/Audio")
 /* ------------------------------ Middle wares ------------------------------ */
 
 /* --------------------------------- Helpers -------------------------------- */
-const getVideoDetails = require('../helpers/getVideoDetails')
+const getFileDetails = require('../helpers/getFileDetails')
 const getFileExt = require('../helpers/getFileExt')
-const { uploadFile, retrieveFiles, streamFile, deleteFile } = require("../helpers/gridFsMethods")
+const { uploadFile, retrieveFiles, streamFile, deleteFile, uploadChunk, startChunkedUpload } = require("../helpers/gridFsMethods")
 /* -------------------------- Fetch the folder path ------------------------- */
+
 
 /* // ! I might remove this
 exports.findFiles = async (req, res) => {
@@ -141,49 +141,222 @@ exports.batchUpload = async (req, res) => {
     })
   }
 }
-
-/* ------------------------- Chunked file uploading ------------------------- */
-
-exports.chunkedUpload = async (req, res) => {
-  const { originalname, buffer } = req.file;
-  const { chunkIndex, totalChunks, fileId } = req.body;
-
-  const UPLOAD_DIR = path.join(__dirname, '..', '..', 'chunked-uploads');
-  const tempDir = path.join(UPLOAD_DIR, fileId);
-  const chunkPath = path.join(tempDir, `chunk-${chunkIndex}`);
-
+/* exports.batchUpload = async (req, res) => {
   try {
-    // Ensure the temporary directory exists
-    await fs.ensureDir(tempDir);
 
-    // Save the chunk to the temporary directory
-    await fs.writeFile(chunkPath, buffer);
 
-    // If all chunks are uploaded, merge them
-    if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
-      const finalPath = path.join(UPLOAD_DIR, originalname);
-      const writeStream = fs.createWriteStream(finalPath);
-
-      for (let i = 0; i < totalChunks; i++) {
-        const chunk = await fs.readFile(path.join(tempDir, `chunk-${i}`));
-        writeStream.write(chunk);
-      }
-
-      writeStream.end();
-
-      // Clean up temporary files
-      await fs.remove(tempDir);
-
-      res.status(200).json({ message: 'File uploaded successfully.' });
-    } else {
-      res.status(200).json({ message: `Chunk ${chunkIndex} uploaded successfully.` });
-    }
+    res.status(201).json({
+      success: true,
+      message: "Uploaded files to account"
+    })
   } catch (error) {
-    console.error('Error processing chunk:', error);
-    res.status(500).json({ error: 'An error occurred while processing the upload.' });
+    
+    
+    res.status(500).json({
+      success: false,
+      message: "Failed to uploaded files to account"
+    })
+  }
+}
+ */
+/* ------------------------- Start a chunked upload ------------------------- */
+
+/* exports.startChunkUpload = async (req, res) => {
+  try {
+    const UPLOAD_DIR = path.join(__dirname, '..', '..', 'chunked-uploads')
+    await fs.ensureDir(UPLOAD_DIR)
+
+    const { fileName } = req.body
+
+    // Generate a unique file ID to send back to the client for uploading
+    const fileId = `${Date.now()}-${fileName}`
+
+    const fileMetaDataPath = path.join(UPLOAD_DIR, `${fileId}.json`)
+
+    // await fs.writeJson(fileMetaDataPath, JSON.stringify(req.body))
+
+    res.status(200).json({
+      success: true,
+      message: "Initialized chunked upload",
+      fileId: fileId
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to start chunked upload",
+      errorMessage: error.message,
+      error
+    })
+  }
+} */
+
+
+exports.startChunkUpload = async (req, res) => {
+  try {
+    const { metadata } = req.body
+
+    // Generate a unique file name to send back to the client for uploading
+    req.generatedFileName = `${Date.now()}-${metadata.fileName}`
+
+    const { uploadStream, fileId } = await startChunkedUpload(req, res)
+
+    res.status(200).json({
+      success: true,
+      message: "Initialized chunked upload",
+      fileId: fileId
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to start chunked upload",
+      errorMessage: error.message,
+      error
+    })
   }
 }
 
+/* ------------------------- Chunked file uploading ------------------------- */
+
+/* exports.chunkedUpload = async (req, res, uploadStreams) => {
+  const { originalname, buffer } = req.file
+  const { chunkIndex, totalChunks, fileId } = req.body
+
+  const tempDir = path.join(UPLOAD_DIR, fileId)
+  const chunkPath = path.join(tempDir, `chunk-${chunkIndex}`)
+  const finalPath = path.join(UPLOAD_DIR, originalname)
+
+  try {
+    // Ensure the temporary directory exists
+    await fs.ensureDir(tempDir)
+
+    // Save the chunk to the temporary directory
+    await fs.writeFile(chunkPath, buffer)
+
+    console.log(`Chunk ${chunkIndex} saved to ${chunkPath}: totalChunks: ${totalChunks}}`)
+
+    // Check if all chunks are uploaded
+    if (parseInt(chunkIndex, 10) + 1 === parseInt(totalChunks, 10)) {
+      const writeStream = fs.createWriteStream(finalPath)
+
+      console.log('Merging chunks...')
+
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = await fs.readFile(path.join(tempDir, `chunk-${i}`))
+        writeStream.write(chunk)
+      }
+
+      // Ensure write stream is closed properly
+      await new Promise((resolve, reject) => {
+        writeStream.end(() => {
+          resolve()
+        })
+        writeStream.on('error', reject)
+      })
+
+      // Clean up temporary files
+      await fs.remove(tempDir)
+
+      console.log('File merged and temporary files removed.')
+
+      res.status(200).json({
+        success: true,
+        message: 'File uploaded and merged successfully.',
+      })
+    } else {
+      res.status(200).json({
+        success: true,
+        message: `Chunk ${chunkIndex} uploaded successfully.`,
+      })
+    }
+  } catch (error) {
+    console.error('Error handling chunk upload:', error)
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload chunk.',
+      errorMessage: error.message,
+      error
+    })
+  }
+} */
+
+/* exports.chunkedUpload = async (req, res, uploadStreams) => {
+  const { originalname, buffer } = req.file
+  const { chunkIndex, totalChunks, fileId } = req.body
+
+  const tempDir = path.join(UPLOAD_DIR, fileId)
+  const chunkPath = path.join(tempDir, `chunk-${chunkIndex}`)
+  const finalPath = path.join(UPLOAD_DIR, originalname)
+
+  try {
+    // Ensure the temporary directory exists
+    await fs.ensureDir(tempDir)
+
+    // Save the chunk to the temporary directory
+    await fs.writeFile(chunkPath, buffer)
+
+    console.log(`Chunk ${chunkIndex} saved to ${chunkPath}: totalChunks: ${totalChunks}}`)
+
+    // Check if all chunks are uploaded
+    if (parseInt(chunkIndex, 10) + 1 === parseInt(totalChunks, 10)) {
+      const writeStream = fs.createWriteStream(finalPath)
+
+      console.log('Merging chunks...')
+
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = await fs.readFile(path.join(tempDir, `chunk-${i}`))
+        writeStream.write(chunk)
+      }
+
+      // Ensure write stream is closed properly
+      await new Promise((resolve, reject) => {
+        writeStream.end(() => {
+          resolve()
+        })
+        writeStream.on('error', reject)
+      })
+
+      // Clean up temporary files
+      await fs.remove(tempDir)
+
+      console.log('File merged and temporary files removed.')
+
+      res.status(200).json({
+        success: true,
+        message: 'File uploaded and merged successfully.',
+      })
+    } else {
+      res.status(200).json({
+        success: true,
+        message: `Chunk ${chunkIndex} uploaded successfully.`,
+      })
+    }
+  } catch (error) {
+    console.error('Error handling chunk upload:', error)
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload chunk.',
+      errorMessage: error.message,
+      error
+    })
+  }
+} */
+
+exports.chunkedUpload = async (req, res) => {
+  try {
+    const message = await uploadChunk(req, res)
+    return message
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to chunked upload",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+  
 /* ------------------------------ Delete files ------------------------------ */
 
 exports.deleteFiles = async (req, res) => {

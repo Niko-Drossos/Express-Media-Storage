@@ -48,3 +48,6 @@ Fix the spacing on the usernameSelector plus icon
 Fix video streaming
 
 Add thumbnail support
+
+Add a condition that will only use file chunking if the file is more then 5mb
+Upload to gridfs in 4mb chunks

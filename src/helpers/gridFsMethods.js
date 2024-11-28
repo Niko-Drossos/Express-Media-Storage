@@ -1,5 +1,5 @@
 const { Readable } = require('stream')
-const mongodb = require("mongodb")
+const { MongoClient, GridFSBucket } = require("mongodb")
 const mongoose = require("mongoose")
 const multer = require('multer')
 
@@ -18,12 +18,36 @@ const upload = multer({
   }
 })
 
+// Create a connection to MongoDB and store it for all future requests
+const mongoUri = process.env.Mongo_Connection_Uri
+const dbName = 'files'
+let db, videoBucket, audioBucket, imageBucket
+
+// Start up a client for GridFSfile uploads
+async function initializeGridFS() {
+  const client = await MongoClient.connect(mongoUri)
+  db = client.db(dbName)
+
+  // Initialize multiple buckets for different media types
+  videoBucket = new GridFSBucket(db, { bucketName: 'video' })
+  audioBucket = new GridFSBucket(db, { bucketName: 'audio' })
+  imageBucket = new GridFSBucket(db, { bucketName: 'image' })
+}
+
+
+(async () => {
+  // Wait for GridFS to initialize before running the rest of the app
+  await initializeGridFS()
+})()
+
+// Keeps track of all ongoing uploads
+const uploadStreams = new Map()
+
 /* -------------------------------------------------------------------------- */
 
 // Middleware function to handle video compression upon upload
 
 const uploadFile = async function(req, file) {
-  const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
 
   // Either video, image, or audio
   const dbName = file.mimetype.split("/")[0]
@@ -132,45 +156,45 @@ const retrieveFiles = async function(req, res, query) {
 
 const streamFile = async function (req, res, fileId) {
   try {
-    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri);
-    const dbName = req.originalUrl.split("/")[2];
-    const db = client.db(dbName);
-    const bucket = new mongodb.GridFSBucket(db, { bucketName: "fs" });
+    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
+    const dbName = req.originalUrl.split("/")[2]
+    const db = client.db(dbName)
+    const bucket = new mongodb.GridFSBucket(db, { bucketName: "fs" })
 
     // Convert the fileId string to an ObjectId
-    const searchId = new mongodb.ObjectId(fileId);
+    const searchId = new mongodb.ObjectId(fileId)
 
     // Check for the Range header
-    const range = req.headers.range;
+    const range = req.headers.range
     if (!range) {
       // If no range header, return the whole file as usual
-      const fileStream = bucket.openDownloadStream(searchId);
-      res.setHeader("Content-Type", "video/mp4");
-      fileStream.pipe(res);
+      const fileStream = bucket.openDownloadStream(searchId)
+      res.setHeader("Content-Type", "video/mp4")
+      fileStream.pipe(res)
 
       // Close MongoDB connection when done
       res.on("finish", () => {
-        client.close();
-      });
-      return;
+        client.close()
+      })
+      return
     }
 
     // Parse the range, assuming it looks like "bytes=start-end"
-    const [start, end] = range.replace(/bytes=/, "").split("-").map(Number);
+    const [start, end] = range.replace(/bytes=/, "").split("-").map(Number)
     
     // Get file metadata (optional but useful for Content-Length)
-    const fileInfo = await bucket.find({ _id: searchId }).toArray();
+    const fileInfo = await bucket.find({ _id: searchId }).toArray()
     // console.log(fileInfo)
     if (!fileInfo.length) {
-      return res.status(404).json({ success: false, message: "File not found" });
+      return res.status(404).json({ success: false, message: "File not found" })
     }
-    const fileSize = fileInfo[0].length;
-    const chunkEnd = end ? end : fileSize - 1;
+    const fileSize = fileInfo[0].length
+    const chunkEnd = end ? end : fileSize - 1
 
     // Set Cache-Control and Last-Modified headers for caching
-    res.setHeader("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
-    res.setHeader("Last-Modified", fileInfo[0].uploadDate.toUTCString());
-    res.setHeader("ETag", fileInfo[0]._id.toString());
+    res.setHeader("Cache-Control", "public, max-age=3600") // Cache for 1 hour
+    res.setHeader("Last-Modified", fileInfo[0].uploadDate.toUTCString())
+    res.setHeader("ETag", fileInfo[0]._id.toString())
 
 
     // Set response headers for partial content
@@ -179,38 +203,38 @@ const streamFile = async function (req, res, fileId) {
       "Accept-Ranges": "bytes",
       "Content-Length": chunkEnd - start + 1,
       "Content-Type": "video/mp4" // Adjust MIME type as needed
-    });
+    })
 
     // Stream the requested byte range
-    const fileStream = bucket.openDownloadStream(searchId, { start, end: chunkEnd });
+    const fileStream = bucket.openDownloadStream(searchId, { start, end: chunkEnd })
     
     // Pipe stream to response and handle errors
     fileStream.pipe(res)
       .on('error', (error) => {
-        console.error('Stream error:', error);
-        res.status(500).end();
-        client.close();
-      });
+        console.error('Stream error:', error)
+        res.status(500).end()
+        client.close()
+      })
 
     // Ensure connection stays open until the streaming completes
     /* res.on("close", () => {
-      console.log("Connection closed by client");
-      fileStream.destroy();
-    }); */
+      console.log("Connection closed by client")
+      fileStream.destroy()
+    }) */
 
     // If playback is finished naturally, close Mongo connection
     /* res.on("finish", () => {
-      client.close();
-    }); */
+      client.close()
+    }) */
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Failed to fetch file",
       errorMessage: error.message,
       error
-    });
+    })
   }
-};
+}
   
 
 /* ------------------------------- Delete file ------------------------------ */
@@ -262,5 +286,125 @@ const deleteFiles = async function(req, res, query) {
   }
 }
 
+/* ------------------------ Start gridFS chunk upload ----------------------- */
 
-module.exports = { upload, uploadFile, retrieveFiles, streamFile, deleteFiles }
+const startChunkedUpload = async (req, res) => {
+  const { mimeType, metadata } = req.body
+  const generatedFileName = req.generatedFileName
+
+  let uploadStream
+
+  // Open up a new upload stream for the file to be written to and save the metadata with it.
+  // Use a different bucket depending on the mimeType of the file
+  switch(mimeType) {
+    case "video":
+      uploadStream = videoBucket.openUploadStream(generatedFileName)
+      break
+    case "image":
+      uploadStream = imageBucket.openUploadStream(generatedFileName)
+      break
+    case "audio":
+      uploadStream = audioBucket.openUploadStream(generatedFileName)
+      break
+  }
+
+  if (!uploadStream) {
+    throw new Error(`Failed to open upload stream with mime type: ${mimeType}`)
+  }
+
+  const fileId = uploadStream.id
+
+  uploadStreams.set(fileId.toString(), { uploadStream, metadata })
+  
+  return  { uploadStream, metadata, fileId }
+}
+
+/* ---------------------- Upload a file chunk to GridFS --------------------- */
+
+const uploadChunk = async (req, res) => {
+  const { chunkIndex, totalChunks, fileId } = req.body
+
+  // Ensure the file was uploaded by multer
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).json({
+      success: false,
+      message: 'No file chunk uploaded',
+      data: { chunkIndex, totalChunks, fileId }
+    })
+  }
+
+  const chunkBuffer = req.file.buffer
+  const { uploadStream, metadata } = uploadStreams.get(fileId)
+
+  // Check if the upload stream exists
+  if (!uploadStream) {
+    return res.status(404).json({
+      success: false,
+      message: 'No upload stream found',
+      data: { chunkIndex, totalChunks, fileId }
+    })
+  }
+
+  try {
+    // Write the chunk to the upload stream
+    await new Promise((resolve, reject) => {
+      const writeResult = uploadStream.write(chunkBuffer, (err) => {
+        if (err) reject(err) // Handle write errors
+        resolve()
+      })
+
+      if (writeResult === false) {
+        // Handle backpressure if needed
+        uploadStream.once('drain', resolve)
+      }
+    })
+
+    // If this is the last chunk, finalize the upload stream
+    if (parseInt(chunkIndex, 10) === parseInt(totalChunks, 10) - 1) {
+      await new Promise((resolve, reject) => {
+        uploadStream.end(() => {
+          console.log(`File ${fileId} uploaded successfully.`)
+          uploadStreams.delete(fileId) // Clean up the stream
+
+          // Create the document for the file
+          // TODO: Use the 'metadata' object from the request.
+          // TODO: also use, if possible
+          /*
+            ...(file.duration && { duration: file.duration }),
+            ...(file.dimensions && { dimensions: file.dimensions }),
+            user: {
+              userId: req.userId,
+              username: req.username
+            } 
+          */
+
+          resolve()
+        })
+        uploadStream.on('error', reject) // Handle errors during end
+      })
+    }
+
+    // Send success response after processing the chunk
+    return res.json({
+      success: true,
+      message: 'Chunk uploaded',
+      data: {
+        chunkIndex,
+        totalChunks,
+        fileId,
+        uploadPercentage: ((chunkIndex + 1) / totalChunks) * 100
+      }
+    })
+  } catch (err) {
+    console.error('Error during chunk upload:', err)
+
+    // Send error response
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to upload chunk',
+      data: { chunkIndex, totalChunks, fileId, error: err.message }
+    })
+  }
+}
+
+module.exports = { upload, uploadFile, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload }

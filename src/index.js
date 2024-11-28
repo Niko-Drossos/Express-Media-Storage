@@ -77,7 +77,9 @@ app.get("/auth/register", (req, res) => {
 
 /* -------------------------- Form to upload files -------------------------- */
 
-app.get("/upload", (req, res) => {
+app.get("/upload", authenticateUserJWT, async (req, res) => {
+  // await uploadFolder(req, res)
+
   res.render("upload.ejs")
 })
 
@@ -172,9 +174,7 @@ app.get("/media/:mediaType", async (req, res) => {
 
 /* ------------------------ Get the users own profile ----------------------- */
 
-app.get("/profile", async (req, res) => {
-  console.log(req)
-  //! FIX THIS TO NOT USE req.UserId AS IT IS UNDEFINED
+app.get("/profile", authenticateUserJWT, async (req, res) => {
   const request = await fetch(`${API_URL}/user/${req.userId}`, {
     method: "GET",
     headers: {
@@ -196,7 +196,7 @@ app.get("/profile", async (req, res) => {
 })
 
 /* -------------------- Get a profile with a specific id -------------------- */
-app.get("/profile/:id", async (req, res) => {
+app.get("/profile/:id", authenticateUserJWT, async (req, res) => {
   const id = req.params.id
 
   const request = await fetch(`${API_URL}/user/${id}`, {
@@ -210,10 +210,10 @@ app.get("/profile/:id", async (req, res) => {
 
   const response = await request.json()
 
-  /* if (response.error) {
+  if (response.error) {
     res.redirect(301, req.headers.referer)
     return
-  } */
+  }
 
   res.render("profile.ejs", response.data.user)
 })

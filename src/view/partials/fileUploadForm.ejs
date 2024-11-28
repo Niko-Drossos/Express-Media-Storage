@@ -1,7 +1,7 @@
 <!-- TODO: Change this to let users upload multiple files at a time -->
 <div class="">
     <div class="header h-12 flex items-center justify-center">
-        <h1 class="font-medium text-2xl">Upload Files</h1>
+        <h1 class="font-medium text-3xl">Upload Files</h1>
     </div>
     <div class="flex flex-col mx-3 lg:flex-row justify-center">
         <div class="w-1/2 m-1">
@@ -55,6 +55,14 @@
                         </label>
                     </div>
 
+                    <!-- Progress bar -->
+                    <div class="hidden w-full m-3 bg-gray-200 rounded-full dark:bg-gray-700" id="progress-bar">
+                        <div class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: 0%" id="progress-bar-fill"></div>
+                    </div>
+  
+  
+
+                    <!-- Display the selected file name -->
                     <span class="hidden text-green-500 font-bold mb-4 px-3" id="display-file-name"></span>
                     
                     <div class="w-full md:w-full px-3">
@@ -127,61 +135,97 @@
         event.preventDefault()
 
         const file = event.target['file'].files[0]
-
+        
         if (!event.target['file'].files[0]) {
             alert('Please select a file')
             return
         }
 
-        await uploadFile(file)
-        
-        /* const formData = new FormData()
-        // They need to end in a zero because of the way that I tried to implement multiple file uploading
-        formData.append('file0', event.target['file'].files[0])
-        formData.append('title0', event.target['title'].value)
-        formData.append('description0', event.target['description'].value)
-        formData.append('date0', event.target['date'].value)
-        formData.append('privacy0', event.target['privacy'].value)
-
-        const uploadRequest = await fetch('/file/upload', {
+        const uploadRequest = await fetch('/file/start-chunk-upload', {
             method: 'POST',
             credentials: 'include',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                mimeType: file.type.split('/')[0],  // Returns video, image, or audio
+                metadata: {
+                    title: event.target['title'].value,
+                    description: event.target['description'].value,
+                    date: event.target['date'].value,
+                    privacy: event.target['privacy'].value,
+                    fileName: file.name
+                }
+            })
         })
+
         const uploadResponse = await uploadRequest.json()
-        console.log(uploadResponse) */
+
+        if (uploadResponse.success) {
+            // Wait half a second to allow the server to process the request
+            setTimeout(async () => {
+                await uploadFile(file, uploadResponse.fileId)
+            }, 500)
+        }
     }
 
 
-async function uploadFile(file) {
-  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
-  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-  const fileId = `${file.name}-${file.size}-${file.lastModified}`;
+    const progressBar = document.getElementById('progress-bar')
+    const progressBarFill = document.getElementById('progress-bar-fill')
 
-  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-    const start = chunkIndex * CHUNK_SIZE;
-    const end = Math.min(start + CHUNK_SIZE, file.size);
-    const chunk = file.slice(start, end);
 
-    const formData = new FormData();
-    formData.append('chunk', chunk, file.name);
-    formData.append('chunkIndex', chunkIndex);
-    formData.append('totalChunks', totalChunks);
-    formData.append('fileId', fileId);
+    function updateProgressBar(uploadPercentage) {
+        stringUploadPercentage = `${uploadPercentage}%`
+        progressBarFill.style.width = stringUploadPercentage
 
-    try {
-      const response = await fetch('/file/chunked-upload', {
-        method: 'POST',
-        body: formData,
-      });
+        if (stringUploadPercentage === '100%') {
+            // When the upload completes, change the text but not the width
+            stringUploadPercentage = 'Complete'
+        }
 
-      const result = await response.json();
-      console.log(result.message);
-    } catch (error) {
-      console.error('Error uploading chunk:', error);
-      // Optionally, implement retry logic here
+        progressBarFill.textContent = stringUploadPercentage
     }
-  }
-}
+
+    async function uploadFile(file, fileId) {
+        const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+        // Display the progress bar
+        progressBar.classList.remove('hidden')
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
+
+            const formData = new FormData();
+            formData.append('chunk', chunk);
+            formData.append('chunkIndex', chunkIndex);
+            formData.append('totalChunks', totalChunks);
+            formData.append('fileId', fileId);
+
+            try {
+                const response = await fetch('/file/chunked-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log(result.message);
+
+                if (result.success) {
+                    // TODO: Change to use the response from the server
+                    updateProgressBar(result.data.uploadPercentage);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error uploading chunk:', error);
+                // Retry the last failed chunk
+                // failedChunks.push(chunkIndex);
+                chunkIndex--
+            }
+        }
+    }
 
 </script>
