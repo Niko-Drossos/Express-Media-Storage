@@ -214,7 +214,6 @@
                 console.log(result.message);
 
                 if (result.success) {
-                    // TODO: Change to use the response from the server
                     updateProgressBar(result.data.uploadPercentage);
                 } else {
                     throw new Error(result.message);
@@ -222,7 +221,6 @@
             } catch (error) {
                 console.error('Error uploading chunk:', error);
                 // Retry the last failed chunk
-                // failedChunks.push(chunkIndex);
                 chunkIndex--
             }
         }

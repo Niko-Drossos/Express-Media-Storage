@@ -193,17 +193,45 @@ exports.batchUpload = async (req, res) => {
 
 exports.startChunkUpload = async (req, res) => {
   try {
-    const { metadata } = req.body
+    const { mimeType, metadata } = req.body
 
     // Generate a unique file name to send back to the client for uploading
     req.generatedFileName = `${Date.now()}-${metadata.fileName}`
 
     const { uploadStream, fileId } = await startChunkedUpload(req, res)
 
+    // Create a document for the file
+    let document
+    let documentBody = {
+      title: metadata.title || metadata.fileName.split(".").slice(0, -1).join("."),
+      filename: metadata.fileName,
+      description: metadata.description || "No description",
+      fileId: fileId,
+      date: new Date(metadata.date),
+      user: {
+        userId: req.userId,
+        username: req.username
+      },
+    }
+
+    switch (mimeType) {
+      case "image":
+        document = Image.create(documentBody)
+        break;
+      case "video":
+        documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
+        document = Video.create(documentBody)
+        break;
+      case "audio":
+        documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
+        document = Audio.create(documentBody)
+        break;
+    }
+
     res.status(200).json({
       success: true,
       message: "Initialized chunked upload",
-      fileId: fileId
+      fileId: fileId // Return the file ID to the client for uploading
     })
   } catch (error) {
     res.status(500).json({
