@@ -8,7 +8,7 @@ const { streamFile } = require("../helpers/gridFsMethods")
 
 exports.viewVideo = async (req, res) => {
   try {
-    streamFile(req, res, req.params.fileId)
+    streamFile(req, res, req.params.fileId, 'video')
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -23,7 +23,7 @@ exports.viewVideo = async (req, res) => {
 
 exports.viewImage = async (req, res) => {
   try {
-    streamFile(req, res, req.params.fileId)
+    streamFile(req, res, req.params.fileId, 'image')
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -38,7 +38,7 @@ exports.viewImage = async (req, res) => {
 
 exports.viewAudio = async (req, res) => {
   try {
-    streamFile(req, res, req.params.fileId)
+    streamFile(req, res, req.params.fileId, 'audio')
   } catch (error) {
     res.status(500).json({
       success: false,

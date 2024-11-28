@@ -1,5 +1,5 @@
 const { Readable } = require('stream')
-const { MongoClient, GridFSBucket } = require("mongodb")
+const { MongoClient, GridFSBucket, ObjectId } = require("mongodb")
 const mongoose = require("mongoose")
 const multer = require('multer')
 
@@ -116,126 +116,76 @@ const retrieveFiles = async function(req, res, query) {
 
 /* ------------------------------- Stream file ------------------------------ */
 
-/* const streamFile = async function(req, res, fileId) {
-  try {
-    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
-    // Get the mimetype from the url, this works because only the /view routes stream.
-    const dbName = req.originalUrl.split("/")[2]
-    const db = client.db(dbName)
-    const bucket = new mongodb.GridFSBucket(db)
+  const streamFile = async function (req, res, fileId, mimeType) {
+    try {
+        let bucket;
+        // Select the bucket based on the MIME type
+        switch (mimeType) {
+            case 'video':
+                bucket = videoBucket;
+                break;
+            case 'image':
+                bucket = imageBucket;
+                break;
+            case 'audio':
+                bucket = audioBucket;
+                break;
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid MIME type'
+                });
+        }
 
-    // Convert the fileId string to an ObjectId
-    const searchId = new mongodb.ObjectId(fileId)
-    
-    const fileStream = bucket.openDownloadStream(searchId)
-      .on('error', (error) => {
-        return res.status(404).json({
-          success: false,
-          message: `File: ${fileId} not found in container: ${dbName}`,
-          errorMessage: error.message,
-          error
-        })
-      })
-    
-    fileStream.pipe(res)
+        // Convert fileId to ObjectId
+        const searchId = new ObjectId(fileId);
 
-    // Close the MongoDB connection once the response is finished
-    res.on('finish', () => {
-      client.close()
-    })
-  }
-   catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch file",
-      errorMessage: error.message,
-      error
-    })
-  }
-} */
+        // Find file metadata to get its length
+        const file = await bucket.find({ _id: searchId }).next();
+        if (!file) {
+            return res.status(404).json({
+                success: false,
+                message: `File: ${fileId} not found in container`,
+            });
+        }
 
-const streamFile = async function (req, res, fileId) {
-  try {
-    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
-    const dbName = req.originalUrl.split("/")[2]
-    const db = client.db(dbName)
-    const bucket = new mongodb.GridFSBucket(db, { bucketName: "fs" })
+        const fileSize = file.length;
+        const range = req.headers.range;
 
-    // Convert the fileId string to an ObjectId
-    const searchId = new mongodb.ObjectId(fileId)
+        if (range) {
+            // Parse the Range header
+            const [start, end] = range.replace(/bytes=/, '').split('-');
+            const startByte = parseInt(start, 10);
+            const endByte = end ? parseInt(end, 10) : fileSize - 1;
+            const chunkSize = endByte - startByte + 1;
 
-    // Check for the Range header
-    const range = req.headers.range
-    if (!range) {
-      // If no range header, return the whole file as usual
-      const fileStream = bucket.openDownloadStream(searchId)
-      res.setHeader("Content-Type", "video/mp4")
-      fileStream.pipe(res)
+            // Set partial content headers
+            res.writeHead(206, {
+                'Content-Range': `bytes ${startByte}-${endByte}/${fileSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunkSize,
+                'Content-Type': mimeType,
+            });
 
-      // Close MongoDB connection when done
-      res.on("finish", () => {
-        client.close()
-      })
-      return
+            // Create a stream for the requested range
+            bucket.openDownloadStream(searchId, { start: startByte, end: endByte + 1 }).pipe(res);
+        } else {
+            // Stream the entire file if no range is specified
+            res.writeHead(200, {
+                'Content-Length': fileSize,
+                'Content-Type': mimeType,
+            });
+            bucket.openDownloadStream(searchId).pipe(res);
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch file',
+            errorMessage: error.message,
+            error,
+        });
     }
-
-    // Parse the range, assuming it looks like "bytes=start-end"
-    const [start, end] = range.replace(/bytes=/, "").split("-").map(Number)
-    
-    // Get file metadata (optional but useful for Content-Length)
-    const fileInfo = await bucket.find({ _id: searchId }).toArray()
-    // console.log(fileInfo)
-    if (!fileInfo.length) {
-      return res.status(404).json({ success: false, message: "File not found" })
-    }
-    const fileSize = fileInfo[0].length
-    const chunkEnd = end ? end : fileSize - 1
-
-    // Set Cache-Control and Last-Modified headers for caching
-    res.setHeader("Cache-Control", "public, max-age=3600") // Cache for 1 hour
-    res.setHeader("Last-Modified", fileInfo[0].uploadDate.toUTCString())
-    res.setHeader("ETag", fileInfo[0]._id.toString())
-
-
-    // Set response headers for partial content
-    res.writeHead(206, {
-      "Content-Range": `bytes ${start}-${chunkEnd}/${fileSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunkEnd - start + 1,
-      "Content-Type": "video/mp4" // Adjust MIME type as needed
-    })
-
-    // Stream the requested byte range
-    const fileStream = bucket.openDownloadStream(searchId, { start, end: chunkEnd })
-    
-    // Pipe stream to response and handle errors
-    fileStream.pipe(res)
-      .on('error', (error) => {
-        console.error('Stream error:', error)
-        res.status(500).end()
-        client.close()
-      })
-
-    // Ensure connection stays open until the streaming completes
-    /* res.on("close", () => {
-      console.log("Connection closed by client")
-      fileStream.destroy()
-    }) */
-
-    // If playback is finished naturally, close Mongo connection
-    /* res.on("finish", () => {
-      client.close()
-    }) */
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch file",
-      errorMessage: error.message,
-      error
-    })
-  }
-}
-  
+};
 
 /* ------------------------------- Delete file ------------------------------ */
 
@@ -312,17 +262,21 @@ const startChunkedUpload = async (req, res) => {
     throw new Error(`Failed to open upload stream with mime type: ${mimeType}`)
   }
 
-  const fileId = uploadStream.id
+  const fileId = uploadStream.id.toString()
 
-  uploadStreams.set(fileId.toString(), { uploadStream, metadata })
-  
+  uploadStreams.set(fileId, { uploadStream, metadata })
+
   return  { uploadStream, metadata, fileId }
 }
 
 /* ---------------------- Upload a file chunk to GridFS --------------------- */
 
 const uploadChunk = async (req, res) => {
-  const { chunkIndex, totalChunks, fileId } = req.body
+  let { chunkIndex, totalChunks, fileId } = req.body
+
+  // Make chunkIndex and totalChunks into numbers
+  chunkIndex = Number(chunkIndex)
+  totalChunks = Number(totalChunks)
 
   // Ensure the file was uploaded by multer
   if (!req.file || !req.file.buffer) {
@@ -360,24 +314,11 @@ const uploadChunk = async (req, res) => {
     })
 
     // If this is the last chunk, finalize the upload stream
-    if (parseInt(chunkIndex, 10) === parseInt(totalChunks, 10) - 1) {
+    if (chunkIndex === totalChunks - 1) {
       await new Promise((resolve, reject) => {
         uploadStream.end(() => {
           console.log(`File ${fileId} uploaded successfully.`)
           uploadStreams.delete(fileId) // Clean up the stream
-
-          // Create the document for the file
-          // TODO: Use the 'metadata' object from the request.
-          // TODO: also use, if possible
-          /*
-            ...(file.duration && { duration: file.duration }),
-            ...(file.dimensions && { dimensions: file.dimensions }),
-            user: {
-              userId: req.userId,
-              username: req.username
-            } 
-          */
-
           resolve()
         })
         uploadStream.on('error', reject) // Handle errors during end
@@ -392,7 +333,7 @@ const uploadChunk = async (req, res) => {
         chunkIndex,
         totalChunks,
         fileId,
-        uploadPercentage: ((chunkIndex + 1) / totalChunks) * 100
+        uploadPercentage: Math.round(((chunkIndex + 1) / totalChunks) * 100, 2) // round percentage to 2 decimal places
       }
     })
   } catch (err) {
