@@ -36,7 +36,7 @@ async function initializeGridFS() {
 
 
 (async () => {
-  // Wait for GridFS to initialize before running the rest of the app
+  // Wait for GridFS to initialize before running the rest of the file
   await initializeGridFS()
 })()
 
@@ -116,75 +116,71 @@ const retrieveFiles = async function(req, res, query) {
 
 /* ------------------------------- Stream file ------------------------------ */
 
-  const streamFile = async function (req, res, fileId, mimeType) {
-    try {
-        let bucket;
-        // Select the bucket based on the MIME type
-        switch (mimeType) {
-            case 'video':
-                bucket = videoBucket;
-                break;
-            case 'image':
-                bucket = imageBucket;
-                break;
-            case 'audio':
-                bucket = audioBucket;
-                break;
-            default:
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid MIME type'
-                });
-        }
-
-        // Convert fileId to ObjectId
-        const searchId = new ObjectId(fileId);
-
-        // Find file metadata to get its length
-        const file = await bucket.find({ _id: searchId }).next();
-        if (!file) {
-            return res.status(404).json({
-                success: false,
-                message: `File: ${fileId} not found in container`,
-            });
-        }
-
-        const fileSize = file.length;
-        const range = req.headers.range;
-
-        if (range) {
-            // Parse the Range header
-            const [start, end] = range.replace(/bytes=/, '').split('-');
-            const startByte = parseInt(start, 10);
-            const endByte = end ? parseInt(end, 10) : fileSize - 1;
-            const chunkSize = endByte - startByte + 1;
-
-            // Set partial content headers
-            res.writeHead(206, {
-                'Content-Range': `bytes ${startByte}-${endByte}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunkSize,
-                'Content-Type': mimeType,
-            });
-
-            // Create a stream for the requested range
-            bucket.openDownloadStream(searchId, { start: startByte, end: endByte + 1 }).pipe(res);
-        } else {
-            // Stream the entire file if no range is specified
-            res.writeHead(200, {
-                'Content-Length': fileSize,
-                'Content-Type': mimeType,
-            });
-            bucket.openDownloadStream(searchId).pipe(res);
-        }
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch file',
-            errorMessage: error.message,
-            error,
+const streamFile = async function (req, res, fileId, mimeType) {
+  try {
+    let bucket;
+    // Select the bucket based on the MIME type
+    switch (mimeType) {
+      case 'video':
+        bucket = videoBucket;
+        break;
+      case 'image':
+        bucket = imageBucket;
+        break;
+      case 'audio':
+        bucket = audioBucket;
+        break;
+      default:
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid MIME type'
         });
     }
+
+    // Convert fileId to ObjectId
+    const searchId = new ObjectId(fileId);
+
+    // Find file metadata to get its length
+    const file = await bucket.find({ _id: searchId }).next();
+    if (!file) {
+      return res.status(404).json({
+        success: false,
+        message: `File: ${fileId} not found in container`,
+      });
+    }
+
+    const fileSize = file.length;
+    const range = req.headers.range;
+
+    if (range) {
+      // Parse the Range header
+      const [start, end] = range.replace(/bytes=/, '').split('-');
+      const startByte = parseInt(start, 10);
+      const endByte = end ? parseInt(end, 10) : fileSize - 1;
+      const chunkSize = endByte - startByte + 1;
+
+      // Set partial content headers
+      res.writeHead(206, {
+        'Content-Range': `bytes ${startByte}-${endByte}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': mimeType,
+      });
+
+      // Create a stream for the requested range
+      bucket.openDownloadStream(searchId, { start: startByte, end: endByte + 1 }).pipe(res);
+    } else {
+      // Throw an error to only allow file streaming
+      throw new Error("No range specified, please view through a browser")
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch file',
+      errorMessage: error.message,
+      error,
+    });
+  }
 };
 
 /* ------------------------------- Delete file ------------------------------ */
@@ -272,7 +268,7 @@ const startChunkedUpload = async (req, res) => {
 /* ---------------------- Upload a file chunk to GridFS --------------------- */
 
 const uploadChunk = async (req, res) => {
-  let { chunkIndex, totalChunks, fileId } = req.body
+  let { chunkIndex, totalChunks, fileId, fileExt } = req.body
 
   // Make chunkIndex and totalChunks into numbers
   chunkIndex = Number(chunkIndex)
