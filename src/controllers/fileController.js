@@ -10,7 +10,6 @@ const getFileExt = require('../helpers/getFileExt')
 const { uploadFile, retrieveFiles, streamFile, deleteFile, uploadChunk, startChunkedUpload } = require("../helpers/gridFsMethods")
 /* -------------------------- Fetch the folder path ------------------------- */
 
-
 /* // ! I might remove this
 exports.findFiles = async (req, res) => {
   try {
@@ -40,8 +39,8 @@ exports.findFiles = async (req, res) => {
  */
 /* ---------------------------- Upload file batch --------------------------- */
 
-// ! Fix response not showing successfully uploaded files. something to do with promises.
-exports.batchUpload = async (req, res) => {
+// TODO: Depreceate this
+/* exports.batchUpload = async (req, res) => {
   try {
     // File extensions that can be uploaded
     const acceptedVideoExt = ["mp4"]
@@ -140,55 +139,9 @@ exports.batchUpload = async (req, res) => {
     })
   }
 }
-/* exports.batchUpload = async (req, res) => {
-  try {
-
-
-    res.status(201).json({
-      success: true,
-      message: "Uploaded files to account"
-    })
-  } catch (error) {
-    
-    
-    res.status(500).json({
-      success: false,
-      message: "Failed to uploaded files to account"
-    })
-  }
-}
  */
+
 /* ------------------------- Start a chunked upload ------------------------- */
-
-/* exports.startChunkUpload = async (req, res) => {
-  try {
-    const UPLOAD_DIR = path.join(__dirname, '..', '..', 'chunked-uploads')
-    await fs.ensureDir(UPLOAD_DIR)
-
-    const { fileName } = req.body
-
-    // Generate a unique file ID to send back to the client for uploading
-    const fileId = `${Date.now()}-${fileName}`
-
-    const fileMetaDataPath = path.join(UPLOAD_DIR, `${fileId}.json`)
-
-    // await fs.writeJson(fileMetaDataPath, JSON.stringify(req.body))
-
-    res.status(200).json({
-      success: true,
-      message: "Initialized chunked upload",
-      fileId: fileId
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to start chunked upload",
-      errorMessage: error.message,
-      error
-    })
-  }
-} */
-
 
 exports.startChunkUpload = async (req, res) => {
   try {
@@ -218,14 +171,14 @@ exports.startChunkUpload = async (req, res) => {
         case "image":
           document = Image.create(documentBody).catch(err => new Error("Error creating image document"))
           break;
-      case "video":
-        documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
-        document = Video.create(documentBody).catch(err => new Error("Error creating video document"))
-        break;
-      case "audio":
-        documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
-        document = Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
-        break;
+        case "video":
+          documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
+          document = Video.create(documentBody).catch(err => new Error("Error creating video document"))
+          break;
+        case "audio":
+          documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
+          document = Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
+          break;
       }
     } catch (error) {
       return res.status(500).json({

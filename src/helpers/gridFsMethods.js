@@ -169,6 +169,12 @@ const streamFile = async function (req, res, fileId, mimeType) {
 
       // Create a stream for the requested range
       bucket.openDownloadStream(searchId, { start: startByte, end: endByte + 1 }).pipe(res);
+    } else if (mimeType === 'image') {
+      res.writeHead(200, {
+          'Content-Length': fileSize,
+          'Content-Type': mimeType,
+      });
+      bucket.openDownloadStream(searchId).pipe(res);
     } else {
       // Throw an error to only allow file streaming
       throw new Error("No range specified, please view through a browser")
