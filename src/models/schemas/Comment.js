@@ -4,8 +4,8 @@ const Schema = mongoose.Schema
 const Vote = require('./sub-documents/Vote')
 const SubUser = require('./sub-documents/SubUser')
 
-/* --------------------------------- Helpers -------------------------------- */
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
+/* ------------------------------- Middleware ------------------------------- */
+const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const commentSchema = new Schema({

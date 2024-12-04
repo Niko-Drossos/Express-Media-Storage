@@ -5,8 +5,8 @@ const Vote = require('./sub-documents/Vote')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 
-/* --------------------------------- Helpers -------------------------------- */
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
+/* ------------------------------- Middleware ------------------------------- */
+const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const imageSchema = new Schema({

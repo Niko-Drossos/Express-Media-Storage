@@ -6,8 +6,8 @@ const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 const Transcription = require('./sub-documents/Transcription')
 
-/* --------------------------------- Helpers -------------------------------- */
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
+/* ------------------------------- Middleware ------------------------------- */
+const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const audioSchema = new Schema({
