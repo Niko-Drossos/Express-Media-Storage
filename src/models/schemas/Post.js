@@ -97,10 +97,8 @@ const postSchema = new Schema({
 })
 
 // Middleware to update voteCount when likes array is modified
-postSchema.pre('save', function(next) {
-  this.voteCount = calculateVoteCount(this.votes)
-  console.log(this.votes)
-  next()
+postSchema.pre('save', function (next) { 
+  updateVoteCount.call(this, next)
 })
 
 // Define the Post model

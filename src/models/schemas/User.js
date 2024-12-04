@@ -80,10 +80,8 @@ const userSchema = new Schema({
   collection: 'users'
 })
 
-userSchema.pre('save', function(next) {
-	this.voteCount = calculateVoteCount(this.votes)
-
-  next()
+userSchema.pre('save', function (next) { 
+  updateVoteCount.call(this, next)
 })
 
 const User = mongoose.model('User', userSchema)

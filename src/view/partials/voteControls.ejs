@@ -14,7 +14,6 @@
 <script>
     async function vote(vote, { id, mediaType }) {
         // Vote on a document
-        console.log(vote, id, mediaType)
         const request = await fetch(`/vote/${mediaType}/${id}`, {
             method: "POST",
             headers: {
@@ -33,6 +32,6 @@
             return
         }   
 
-        window.location.reload()
+        // window.location.reload()
     }
 </script>

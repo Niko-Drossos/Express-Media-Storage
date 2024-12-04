@@ -67,16 +67,8 @@ const audioSchema = new Schema({
 })
 
 // Middleware to update likeCount when votes array is modified
-audioSchema.pre('save', function(next) {
-  // Get the date in the format MM-DD-YYYY instead of MM/DD/YYYY
-  const dateString = this.date.toLocaleDateString().replace(/(\d+)\/(\d+)\/(\d+)/, "$1-$2-$3");
-
-  this.likeCount = calculateVoteCount(this.votes)
-  if (!this.title) {
-    this.title ?? dateString + '-Untitled'
-  }
-
-  next()
+audioSchema.pre('save', function (next) { 
+  updateVoteCount.call(this, next)
 })
 
 const Audio = mongoose.model('Audio', audioSchema)

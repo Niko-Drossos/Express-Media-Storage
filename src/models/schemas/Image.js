@@ -55,18 +55,9 @@ const imageSchema = new Schema({
   collection: 'images'
 })
 
-// Middleware to update voteCount when votes array is modified
-/* imageSchema.pre('save', function(next) {
-  this.voteCount = calculateVoteCount(this.votes)
-  next()
-}) */
-  imageSchema.pre('save', async function(next) {
-    if (!this.isModified('votes')) return next();
-  
-    await this.populate('votes'); // Populate only within this middleware
-    this.voteCount = calculateVoteCount(this.votes);
-    next();
-  });
+imageSchema.pre('save', function (next) { 
+  updateVoteCount.call(this, next)
+})
 
 const Image = mongoose.model('Image', imageSchema)
 

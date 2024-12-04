@@ -6,8 +6,8 @@ const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 const Transcription = require('./sub-documents/Transcription')
 
-/* --------------------------------- Helpers -------------------------------- */
-const calculateVoteCount = require('../../helpers/calculateVoteCount')
+/* ------------------------------- Middleware ------------------------------- */
+const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const videoSchema = new Schema({
@@ -77,19 +77,8 @@ const videoSchema = new Schema({
 })
 
 // Middleware to update likeCount when votes array is modified
-videoSchema.pre('save', function(next) {
-  // Get the date in the format MM-DD-YYYY instead of MM/DD/YYYY
-  const dateString = this.date.toLocaleDateString().replace(/(\d+)\/(\d+)\/(\d+)/, "$1-$2-$3");
-
-  // const hostServer = "http://localhost:3000" Possibly add this functionality in the future
-
-  this.likeCount = calculateVoteCount(this.votes)
-
-  if (!this.title) {
-    this.title ?? dateString + '-Untitled'
-  }
-
-  next()
+videoSchema.pre('save', function (next) { 
+  updateVoteCount.call(this, next)
 })
 
 const Video = mongoose.model('Video', videoSchema)

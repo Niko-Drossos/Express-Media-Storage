@@ -23,7 +23,7 @@ exports.voteOnPost = async (req, res) => {
       vote: req.body.vote
     }
     
-    const post = await Post.findById(postId).select('votes');
+    const post = await Post.findById(postId)
     
     const updated = await castVote(post, newVote)
 
@@ -61,7 +61,7 @@ exports.voteOnComment = async (req, res) => {
       vote: req.body.vote
     }
     
-    const comment = await Comment.findById(commentId).select('votes');
+    const comment = await Comment.findById(commentId)
     
     const updated = await castVote(comment, newVote)
 
@@ -99,7 +99,7 @@ exports.voteOnUser = async (req, res) => {
       vote: req.body.vote
     }
     
-    const user = await User.findById(paramUserId).select('votes');
+    const user = await User.findById(paramUserId)
     
     const updated = await castVote(user, newVote)
 
@@ -136,9 +136,9 @@ exports.voteOnVideo = async (req, res) => {
       },
       vote: req.body.vote
     }
-    
-    const video = await Video.findById(videoId).select('votes');
-    
+
+    const video = await Video.findById(videoId)
+
     const updated = await castVote(video, newVote)
 
     res.status(200).json({
@@ -175,7 +175,7 @@ exports.voteOnImage = async (req, res) => {
       vote: req.body.vote
     }
     
-    const image = await Image.findById(imageId).select('votes');
+    const image = await Image.findById(imageId)
     
     const updated = await castVote(image, newVote)
 
@@ -213,7 +213,7 @@ exports.voteOnAudio = async (req, res) => {
       vote: req.body.vote
     }
     
-    const audio = await Audio.findById(audioId).select('votes');
+    const audio = await Audio.findById(audioId)
     
     const updated = await castVote(audio, newVote)
 

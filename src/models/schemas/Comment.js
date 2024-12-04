@@ -79,9 +79,8 @@ const commentSchema = new Schema({
 
 /* ------------- Update the voteCount when the document is saved ------------ */
 
-commentSchema.pre('save', function(next) {
-  this.voteCount = calculateVoteCount(this.votes)
-  next()
+commentSchema.pre('save', function (next) { 
+  updateVoteCount.call(this, next)
 })
 
 /* --- Validate that that the originType and originId combination is valid -- */

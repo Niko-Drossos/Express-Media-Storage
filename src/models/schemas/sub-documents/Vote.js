@@ -4,13 +4,11 @@ const SubUser = require('./SubUser')
 
 const voteSchema = new Schema({
   user: {
-    type: SubUser,
-    select: false
+    type: SubUser
   },
   vote: {
     type: Boolean,
     required: true,
-    select: false
   }
 }, {
   timestamps: true
