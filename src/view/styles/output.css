@@ -709,6 +709,10 @@ video {
   margin-left: 0.5rem;
 }
 
+.ml-8 {
+  margin-left: 2rem;
+}
+
 .mr-1 {
   margin-right: 0.25rem;
 }
@@ -739,14 +743,6 @@ video {
 
 .mt-5 {
   margin-top: 1.25rem;
-}
-
-.ml-4 {
-  margin-left: 1rem;
-}
-
-.ml-8 {
-  margin-left: 2rem;
 }
 
 .line-clamp-2 {
@@ -1326,11 +1322,6 @@ video {
 
 .font-sans {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
 }
 
 .text-3xl {

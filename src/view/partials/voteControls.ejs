@@ -5,13 +5,15 @@
 
 
 <!-- Vote counter -->
-<span class="text-gray-600 text-sm font-bold text-center px-2"><%= voteCount %></span>
+<span class="text-gray-600 text-sm font-bold text-center px-2 <%= voteCount > 0 ? 'text-green-600' : voteCount === 0 ? 'text-gray-600' : 'text-red-600' %>" id="vote-count"><%= voteCount %></span>
 
 <button onclick="vote(false, { id: '<%= id %>', mediaType: '<%= mediaType %>' })" class="mr-3 inline-flex items-center cursor-pointer">
     <img class="inline-block h-8 w-8" src="../icons/downvote.svg" alt="upvote button">
 </button>
 
 <script>
+    const voteCounter = document.getElementById("vote-count")
+
     async function vote(vote, { id, mediaType }) {
         // Vote on a document
         const request = await fetch(`/vote/${mediaType}/${id}`, {
@@ -32,6 +34,22 @@
             return
         }   
 
-        // window.location.reload()
+        const voteCount = response.data.voteCount
+
+        if (voteCount > 0) {
+            voteCounter.classList.remove("text-red-600")
+            voteCounter.classList.remove("text-gray-600")
+            voteCounter.classList.add("text-green-600")
+        } else if (voteCount === 0) {
+            voteCounter.classList.remove("text-green-600")
+            voteCounter.classList.remove("text-red-600")
+            voteCounter.classList.add("text-gray-600")
+        } else {
+            voteCounter.classList.remove("text-green-600")
+            voteCounter.classList.remove("text-gray-600")
+            voteCounter.classList.add("text-red-600")
+        }
+
+        voteCounter.innerText = voteCount
     }
 </script>
