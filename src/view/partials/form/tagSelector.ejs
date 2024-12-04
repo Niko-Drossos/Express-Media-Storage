@@ -6,30 +6,50 @@
         <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10" id="add-tag" type="text" placeholder="Festival">
         <img class="absolute right-4 top-9 transform -translate-y-0.5 cursor-pointer size-8" onclick="addTag(event)" src='./icons/plus-symbol.svg' alt="Add tag icon">
     </div>
-    <div class="md:w-1/2 pr-3 mb-3 md:mb-0 flex items-center flex-wrap h-auto flex-row mt-2" id="display-tags">
-        <input id="tags" name="tags" value="<%= query.tags %>" type="hidden"/>
-    </div>
+    <div class="md:w-1/2 pr-3 mb-3 md:mb-0 flex items-center flex-wrap h-auto flex-row mt-2" id="display-tags"></div>
+    <input id="tags" name="tags" value="<%= query.tags %>" type="hidden"/>
 </div>
 
 <script>
     // Display media tags from query
     const displayTags = document.getElementById('display-tags')
+    const hiddenTags = document.getElementById('tags')
     const queryTags = "<%= query.tags %>"
+    const tagArray = queryTags === "" ? [] : queryTags.split(',')
+
     if (queryTags) {   
-        const tagArray = queryTags.split(',')
-        tagArray.forEach(tag => displayTags.innerHTML += `<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">${tag}</span>`)
+        tagArray.forEach(tag => displayTags.innerHTML += tagPill(tag))
     }
 
     function addTag(event) {
         const inputTag = document.getElementById('add-tag')
         const tag = inputTag.value
-        const hiddenTags = document.getElementById('tags')
 
-        if (!tagArray.includes(tag) && tag != '') {
-            displayTags.innerHTML += `<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">${tag}</span>`
+        if (tag === '') {
+            alert("You can't search for an empty tag\nPlease add another tag before searching")
+        } else if (tagArray.includes(tag)) {
+            alert("You can't search for the same tag twice\nPlease add a different tag before searching")
+        } else {
+            displayTags.innerHTML += tagPill(tag)
             tagArray.push(tag)
             hiddenTags.value = tagArray.join(',')
             inputTag.value = ''
         }
+    }
+
+    function removeTag(tagName) {
+        // Find the location of a tag in the array
+        const index = tagArray.indexOf(tagName)
+        tagArray.splice(index, 1)
+        hiddenTags.value = tagArray.join(',')
+        displayTags.innerHTML = tagArray.map(tag => tagPill(tag)).join('')
+    }
+
+    function tagPill(tagName) {
+        return `
+            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                ${tagName} 
+                <span class="text-red-500 cursor-pointer" onclick="removeTag('${tagName}')">X</span>
+            </span>`
     }
 </script>

@@ -9,17 +9,12 @@ RAG Docs: https://medium.com/@ingridwickstevens/chat-with-your-audio-locally-a-g
 https://www.assemblyai.com/blog/javascript-audio-transcript/
 
 
-FIX VOTE MIDDLEWARE.  the pre('save') doesn't even run on document update
-Update all the routes in the voteController to be a $set instead of $push
-
 FIX the search routes to work with the new user: { userId, username } schema
 
 Docs: 
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
 
 Find out how to transcribe audio and video to text to store in documents
-
-Fix the routes to not use localhost, use current location
 
 Add favorites to routes and to user schemas
 
@@ -50,3 +45,5 @@ Add thumbnail support
 Add a feature that deletes a document if a file fails to upload
 
 Add a feature that will update the document with th status of the file, uploading, completed, or deleted
+
+Add a feature that shows available usernames for search
