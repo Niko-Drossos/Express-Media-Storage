@@ -70,16 +70,18 @@ app.get("/auth/login", (req, res) => {
 /* --------------------------- Register an account -------------------------- */
 
 app.get("/auth/register", (req, res) => {
+  // Allow for a redirect url after registration
+  const redirectURL = req.query.redirect || req.headers.referer
+
   res.render("auth.ejs", {
-    register: true
+    register: true,
+    redirectURL
   })
 })
 
 /* -------------------------- Form to upload files -------------------------- */
 
 app.get("/upload", authenticateUserJWT, async (req, res) => {
-  // await uploadFolder(req, res)
-
   res.render("upload.ejs")
 })
 
