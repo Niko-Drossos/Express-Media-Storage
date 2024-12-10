@@ -31,7 +31,7 @@ slogan: ©Where your story becomes His-Story
 pipe data from video compression to GridFs
 Make files store original file date before running it through middleware
 
-Maybe rename "Posts" to "Pools"
+Maybe rename "Pools" to "Pools"
 
 Fix uploaded files not showing up on response, they are getting uploaded but there is not a confirmation on the frontend.
 

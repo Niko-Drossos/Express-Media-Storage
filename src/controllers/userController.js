@@ -68,7 +68,7 @@ exports.getMyFiles = async (req, res) => {
 
 /* -------------------------- Get user media titles ------------------------- */
 
-// This is used for getting data to add media to Posts
+// This is used for getting data to add media to Pools
 exports.mediaTitles = async (req, res) => {
   try {
     const images = await Image.find({ "user.userId": req.userId })

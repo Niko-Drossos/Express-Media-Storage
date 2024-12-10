@@ -1,6 +1,6 @@
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Pool")
+const Pool = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
@@ -60,7 +60,7 @@ exports.searchUsers = async (req, res) => {
 
 /* ------------------ Search for posts within a time frame ------------------ */
 
-exports.searchPosts = async (req, res) => {
+exports.searchPools = async (req, res) => {
   try {
     const query = req.query
 
@@ -91,11 +91,11 @@ exports.searchPosts = async (req, res) => {
     ]
 
     // Get the total number of documents that match the search query
-    const totalDocuments = await Post.countDocuments(searchQuery);
+    const totalDocuments = await Pool.countDocuments(searchQuery);
 
     const totalPages = Math.ceil(totalDocuments / limit);
 
-    const searchResults = await Post.find(searchQuery)
+    const searchResults = await Pool.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit ? limit : 16)
       .skip((page - 1) * (limit ? limit : 16))
