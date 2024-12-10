@@ -1,6 +1,6 @@
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Post")
+const Post = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")

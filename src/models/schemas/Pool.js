@@ -9,7 +9,7 @@ const Privacy = require('./sub-documents/Privacy')
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
-const postSchema = new Schema({
+const poolSchema = new Schema({
   user: SubUser,
   date: {
     type: Date,
@@ -97,12 +97,10 @@ const postSchema = new Schema({
 })
 
 // Middleware to update voteCount when likes array is modified
-postSchema.pre('save', function (next) { 
+poolSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)
 })
 
-// Define the Post model
-const Post = mongoose.model('Post', postSchema)
+const Post = mongoose.model('Post', poolSchema)
 
-// Export the Post model
 module.exports = Post

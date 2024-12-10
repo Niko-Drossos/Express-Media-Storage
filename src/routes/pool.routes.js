@@ -11,12 +11,12 @@ router.all("/*", authenticateUserJWT)
 
 router.post("/create", upload.none(), postController.createPost)
 
-router.post("/journal/add/:postId", upload.none(), postController.addJournal)
+router.post("/journal/add/:poolId", upload.none(), postController.addJournal)
 
-router.put("/edit/:postId", upload.none(), postController.editPost)
+router.put("/edit/:poolId", upload.none(), postController.editPost)
 
-router.delete("/delete/:postId", postController.deletePost)
+router.delete("/delete/:poolId", postController.deletePost)
 
-router.get("/:postId", postController.getPost)
+router.get("/:poolId", postController.getPost)
 
 module.exports = router
