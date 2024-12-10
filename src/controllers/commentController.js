@@ -1,6 +1,6 @@
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Post")
+const Post = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
@@ -38,12 +38,12 @@ exports.commentOnPost = async (req, res) => {
         username: req.username
       },
       originType: "Post",
-      originId: req.params.postId,
+      originId: req.params.poolId,
       content: req.body.content
     })
 
     // Update the post with the new comment
-    await Post.findByIdAndUpdate(req.params.postId, {
+    await Post.findByIdAndUpdate(req.params.poolId, {
       $push: {
         comments: postedComment._id
       }

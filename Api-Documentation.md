@@ -2,7 +2,7 @@
 # Routes
 view
 (all routes return a populated document to be rendered , all GET requests)
-/post/:postId
+/pool/:poolId
 /comment/:commentId
 /video/:videoId
 /image/:imageId
@@ -33,7 +33,7 @@ POST
 
 vote
 POST
-/:postId
+/:poolId
 /:commentId
 
 # Middleware
@@ -141,8 +141,8 @@ Auth routes are used to create and login users, this is the only route that <b>D
 # Post
 <p>This is the routes for interacting with posts created by users</p>
 
-## GET: /post/:postId
-<p><code>postId</code> is the <code>doc id</code> of the post you are fetching.</p>
+## GET: /post/:poolId
+<p><code>poolId</code> is the <code>doc id</code> of the post you are fetching.</p>
 <p><code>foundPost</code> is the MongoDB post document.</p>
 <p>This should never throw an error, if it does then somethings wrong.</p>
 
@@ -208,8 +208,8 @@ Auth routes are used to create and login users, this is the only route that <b>D
 }
 ```
 
-## PUT: /post/edit/:postId
-<p><code>postId</code> is the <code>doc id</code> of the post to be edited.</p>
+## PUT: /post/edit/:poolId
+<p><code>poolId</code> is the <code>doc id</code> of the post to be edited.</p>
 <p>Because all of the <code>post</code> routes are passed through the <code>authenticateUserJWT</code> you inherently need to be signed in.</p>
 <p>Only the creator of a post can edit it.</p>
 
@@ -249,8 +249,8 @@ Auth routes are used to create and login users, this is the only route that <b>D
 }
 ```
 
-## DELETE: /post/delete/:postId
-<p><code>postId</code> is the <code>doc id</code> of the post.</p>
+## DELETE: /post/delete/:poolId
+<p><code>poolId</code> is the <code>doc id</code> of the post.</p>
 <p>To delete a post you need to be the original poster.</p>
 <p>It also returns back the deleted document.</p>
 
@@ -309,7 +309,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 ## POST: /comment/create/:ORIGIN-TYPE/:ORIGIN-ID
 <p>This is the route I was referring to earlier.</p>
 <p>Each of the 6 create routes is the same except for the last word, Which is just name of the schema</p>
-<p>For example, to create a comment on a post you would write, <code>/comment/create/post/myPostId3824</code>.</p>
+<p>For example, to create a comment on a post you would write, <code>/comment/create/post/mypoolId3824</code>.</p>
 <p>To comment on a <code>comment</code> you would write, <code>comment/create/comment/myCommentId2479</code> ect.</p>
 <p>Each of these routes differs because they each update the parent document with their own <code>doc id</code>, So they need different routes.</p>
 

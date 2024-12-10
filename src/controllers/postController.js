@@ -2,7 +2,7 @@ const path = require("path")
 
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Post")
+const Post = require("../models/schemas/Pool")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
@@ -12,7 +12,7 @@ const { deleteFiles } = require("../helpers/gridFsMethods")
 
 exports.getPost = async (req, res) => {
   try {
-    const foundPost = await Post.findById(req.params.postId).populate(['comments', 'videos', 'images', 'audios'])
+    const foundPost = await Post.findById(req.params.poolId).populate(['comments', 'videos', 'images', 'audios'])
 
     res.status(200).json({
       success: true,
@@ -95,7 +95,7 @@ exports.editPost = async (req, res) => {
 
     // Make sure that the person updating the post is the one who created it
     const updatedPost = await Post.findOneAndUpdate(
-      { _id: req.params.postId, "user.userId": req.userId }, 
+      { _id: req.params.poolId, "user.userId": req.userId }, 
       updatedInformation,
       { new: true }
     )
@@ -127,7 +127,7 @@ exports.addJournal = async (req, res) => {
 
     const updatedPost = await Post.findOneAndUpdate({ 
       "user.userId": req.userId,
-      _id: req.params.postId,
+      _id: req.params.poolId,
     },{
       $push: {
         journal: {
@@ -163,7 +163,7 @@ exports.addJournal = async (req, res) => {
 exports.deletePost = async (req, res) => {
   try {
     const deletedPost = await Post.findOneAndUpdate({
-      _id: req.params.postId,
+      _id: req.params.poolId,
       // This is to prevent users from deleting other users' posts
       "user.userId": req.userId
     }, {

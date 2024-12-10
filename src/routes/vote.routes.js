@@ -8,7 +8,7 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.post("/post/:postId", voteController.voteOnPost)
+router.post("/post/:poolId", voteController.voteOnPost)
 
 router.post("/comment/:commentId", voteController.voteOnComment)
 
