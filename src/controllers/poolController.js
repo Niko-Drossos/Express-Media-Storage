@@ -8,7 +8,7 @@ const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
 /* --------------------------------- Helpers -------------------------------- */
 const { deleteFiles } = require("../helpers/gridFsMethods")
-/* ------------------------------- Get a post ------------------------------- */
+/* ------------------------------- Get a pool ------------------------------- */
 
 exports.getPool = async (req, res) => {
   try {
@@ -16,15 +16,15 @@ exports.getPool = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Successfully fetched post",
+      message: "Successfully fetched pool",
       data: {
-        post: foundPool
+        pool: foundPool
       }
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to get post",
+      message: "Failed to get pool",
       errorMessage: error.message,
       error
     })
@@ -32,7 +32,7 @@ exports.getPool = async (req, res) => {
 }
 
 
-/* ------------------------------ Create a post ----------------------------- */
+/* ------------------------------ Create a pool ----------------------------- */
 
 exports.createPool = async (req, res) => {
   try {
@@ -55,28 +55,28 @@ exports.createPool = async (req, res) => {
 
     await User.findByIdAndUpdate(req.userId, {
       $push: {
-        posts: createdPool._id
+        pools: createdPool._id
       }
     })
 
     res.status(201).json({
       success: true,
-      message: "Successfully created post",
+      message: "Successfully created pool",
       data: {
-        post: createdPool
+        pool: createdPool
       }
     })
   } catch (error) {
     res.status(500).json({ 
       success: false,
-      message: "Failed to create post",
+      message: "Failed to create pool",
       errorMessage: error.message,
       error 
     })
   }
 }
 
-/* ------------------------------ Update a post ----------------------------- */
+/* ------------------------------ Update a pool ----------------------------- */
 
 exports.editPool = async (req, res) => {
   try {
@@ -93,7 +93,7 @@ exports.editPool = async (req, res) => {
 
     if (privacy) updatedInformation.privacy = privacy
 
-    // Make sure that the person updating the post is the one who created it
+    // Make sure that the person updating the pool is the one who created it
     const updatedPool = await Pool.findOneAndUpdate(
       { _id: req.params.poolId, "user.userId": req.userId }, 
       updatedInformation,
@@ -102,7 +102,7 @@ exports.editPool = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Successfully updated post",
+      message: "Successfully updated pool",
       data: {
         newPool: updatedPool
       }
@@ -110,7 +110,7 @@ exports.editPool = async (req, res) => {
   } catch (error) {
     res.status(500).json({ 
       success: false,
-      message: "Failed to update post",
+      message: "Failed to update pool",
       errorMessage: error.message,
       error 
     })
@@ -143,7 +143,7 @@ exports.addJournal = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Successfully updated post",
+      message: "Successfully updated pool",
       data: {
         newPool: updatedPool
       }
@@ -151,20 +151,20 @@ exports.addJournal = async (req, res) => {
   } catch (error) {
     res.status(500).json({ 
       success: false,
-      message: "Failed to update post",
+      message: "Failed to update pool",
       errorMessage: error.message,
       error 
     })
   }
 }
 
-/* ------------------------------ Delete a post ----------------------------- */
+/* ------------------------------ Delete a pool ----------------------------- */
 
 exports.deletePool = async (req, res) => {
   try {
     const deletedPool = await Pool.findOneAndUpdate({
       _id: req.params.poolId,
-      // This is to prevent users from deleting other users' posts
+      // This is to prevent users from deleting other users' pools
       "user.userId": req.userId
     }, {
       title: "Deleted",
@@ -177,7 +177,7 @@ exports.deletePool = async (req, res) => {
 
     if (!deletedPool) throw new Error("Pool not found or not own by the user")
 
-    // Delete all the files associated with the post
+    // Delete all the files associated with the pool
     // I changed my mind and wont delete the files for now
     // const deletedImages = await deleteFiles(req, res, { fileIds: deletedPool.images.map(image => image._id), mimetype: "image" })
     // const deletedVideos = await deleteFiles(req, res, { fileIds: deletedPool.videos.map(video => video._id), mimetype: "video" })
@@ -185,7 +185,7 @@ exports.deletePool = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Successfully deleted post",
+      message: "Successfully deleted pool",
       data: {
         deletedPool,
         // deletedImages,
@@ -196,7 +196,7 @@ exports.deletePool = async (req, res) => {
   } catch (error) {
     res.status(500).json({ 
       success: false,
-      message: "Failed to delete post",
+      message: "Failed to delete pool",
       errorMessage: error.message,
       error 
     })

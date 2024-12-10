@@ -11,7 +11,7 @@ const castVote = require("../helpers/castVote")
 
 exports.voteOnPool = async (req, res) => {
   try {
-    // Update the post with the new vote
+    // Update the pool with the new vote
     const { poolId } = req.params
     const { userId, username } = req
 
@@ -23,13 +23,13 @@ exports.voteOnPool = async (req, res) => {
       vote: req.body.vote
     }
     
-    const post = await Pool.findById(poolId)
+    const pool = await Pool.findById(poolId)
     
-    const updated = await castVote(post, newVote)
+    const updated = await castVote(pool, newVote)
 
     res.status(200).json({
       success: true,
-      message: "voted on post",
+      message: "voted on pool",
       data: {
         vote: req.body.vote,
         voteCount: updated.voteCount
@@ -38,7 +38,7 @@ exports.voteOnPool = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to vote on post",
+      message: "Failed to vote on pool",
       errorMessage: error.message,
       error
     })

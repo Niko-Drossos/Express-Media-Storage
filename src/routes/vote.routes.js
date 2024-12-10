@@ -8,16 +8,16 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.post("/post/:poolId", voteController.voteOnPool)
+router.pool("/pool/:poolId", voteController.voteOnPool)
 
-router.post("/comment/:commentId", voteController.voteOnComment)
+router.pool("/comment/:commentId", voteController.voteOnComment)
 
-router.post("/user/:userId", voteController.voteOnUser)
+router.pool("/user/:userId", voteController.voteOnUser)
 
-router.post("/video/:videoId", voteController.voteOnVideo)
+router.pool("/video/:videoId", voteController.voteOnVideo)
 
-router.post("/image/:imageId", voteController.voteOnImage)
+router.pool("/image/:imageId", voteController.voteOnImage)
 
-router.post("/audio/:audioId", voteController.voteOnAudio)
+router.pool("/audio/:audioId", voteController.voteOnAudio)
 
 module.exports = router
