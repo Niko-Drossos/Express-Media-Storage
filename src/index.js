@@ -187,14 +187,16 @@ app.get("/profile", authenticateUserJWT, async (req, res) => {
   })
 
   const response = await request.json()
+
   console.log(response)
+
   if (response.error) {
     res.redirect(301, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
     console.log(response.error)
     return
   }
 
-  res.render("profile.ejs", response.data.user)
+  res.render("profile.ejs", { user: response.data.user })
 })
 
 /* -------------------- Get a profile with a specific id -------------------- */
@@ -217,7 +219,7 @@ app.get("/profile/:id", authenticateUserJWT, async (req, res) => {
     return
   }
 
-  res.render("profile.ejs", response.data.user)
+  res.render("profile.ejs", { user: response.data.user })
 })
 
 /* -------------------------------------------------------------------------- */

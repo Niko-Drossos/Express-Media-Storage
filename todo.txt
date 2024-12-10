@@ -47,3 +47,8 @@ Add a feature that deletes a document if a file fails to upload
 Add a feature that will update the document with th status of the file, uploading, completed, or deleted
 
 Add a feature that shows available usernames for search
+
+Add profile images to User model
+
+Resources:
+  - Profile card: https://tailwindflex.com/@najoui-youness/user-profile-card-6

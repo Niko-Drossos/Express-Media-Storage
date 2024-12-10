@@ -11,6 +11,10 @@ exports.getUser = async (req, res) => {
   try {
     const userId = req.params.userId
 
+    if (!userId) {
+      throw new Error("No userId was provided")
+    }
+    
     const user = await User.findById(userId)
 
     res.status(200).json({
@@ -186,6 +190,36 @@ exports.unfollow = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to unfollow user",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+/* ------------------------- Update a users profile ------------------------- */
+
+// TODO: Finish this method 
+exports.updateProfile = async (req, res) => {
+  try {
+    const { email, username } = req.body
+
+
+
+    const updatedUser = await User.findByIdAndUpdate(req.userId, req.body, {
+      new: true
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: "Updated user profile",
+      data: {
+        user: updatedUser
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update user profile",
       errorMessage: error.message,
       error
     })

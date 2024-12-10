@@ -20,4 +20,9 @@ router.post("/unfollow/:userId", userController.unfollow)
 
 router.get("/:userId", userController.getUser)
 
+/* ----------------------------- Profile routes ----------------------------- */
+
+// TODO: Finish this method
+router.post("update-profile", userController.updateProfile)
+
 module.exports = router
