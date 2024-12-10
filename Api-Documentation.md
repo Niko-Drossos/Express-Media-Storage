@@ -138,12 +138,12 @@ Auth routes are used to create and login users, this is the only route that <b>D
 }
 ```
 
-# Post
+# Pool
 <p>This is the routes for interacting with posts created by users</p>
 
 ## GET: /post/:poolId
 <p><code>poolId</code> is the <code>doc id</code> of the post you are fetching.</p>
-<p><code>foundPost</code> is the MongoDB post document.</p>
+<p><code>foundPool</code> is the MongoDB post document.</p>
 <p>This should never throw an error, if it does then somethings wrong.</p>
 
 ### RESPONSE
@@ -153,7 +153,7 @@ Auth routes are used to create and login users, this is the only route that <b>D
     success: true,
     message: "Successfully fetched post",
     data: {
-        post: foundPost
+        post: foundPool
     }
 }
 ```
@@ -193,7 +193,7 @@ Auth routes are used to create and login users, this is the only route that <b>D
     success: true,
     message: "Successfully created post",
     data: {
-        post: createdPost
+        post: createdPool
     }
 }
 ```
@@ -234,7 +234,7 @@ Auth routes are used to create and login users, this is the only route that <b>D
     success: true,
     message: "Successfully edited post",
     data: {
-        newPost: updatedPost
+        newPool: updatedPool
     }
 }
 ```
@@ -261,7 +261,7 @@ Auth routes are used to create and login users, this is the only route that <b>D
     success: true,
     message: "Successfully deleted post",
     data: {
-        deletedPost: deletedPost
+        deletedPool: deletedPool
     }
 }
 ```

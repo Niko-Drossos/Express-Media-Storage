@@ -1,6 +1,6 @@
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Pool")
+const Pool = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
@@ -9,7 +9,7 @@ const Audio = require("../models/schemas/Audio")
 const castVote = require("../helpers/castVote")
 /* -------------------------------------------------------------------------- */
 
-exports.voteOnPost = async (req, res) => {
+exports.voteOnPool = async (req, res) => {
   try {
     // Update the post with the new vote
     const { poolId } = req.params
@@ -23,7 +23,7 @@ exports.voteOnPost = async (req, res) => {
       vote: req.body.vote
     }
     
-    const post = await Post.findById(poolId)
+    const post = await Pool.findById(poolId)
     
     const updated = await castVote(post, newVote)
 

@@ -71,7 +71,8 @@ const poolSchema = new Schema({
   tags: [{
     type: String
   }],
-  journal: {
+  // I don't know why this is here, I might keep it though
+  /* journal: {
     type: [{
       time: {
         type: String,
@@ -82,7 +83,7 @@ const poolSchema = new Schema({
         required: true
       }
     }]
-  },
+  }, */
   votes: [{
     type: Vote,
     select: false
@@ -101,6 +102,6 @@ poolSchema.pre('save', function (next) {
   updateVoteCount.call(this, next)
 })
 
-const Post = mongoose.model('Post', poolSchema)
+const Pool = mongoose.model('Pool', poolSchema)
 
-module.exports = Post
+module.exports = Pool

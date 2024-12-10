@@ -2,7 +2,7 @@ const path = require("path")
 
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Post = require("../models/schemas/Pool")
+const Pool = require("../models/schemas/Pool")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
@@ -10,15 +10,15 @@ const Audio = require("../models/schemas/Audio")
 const { deleteFiles } = require("../helpers/gridFsMethods")
 /* ------------------------------- Get a post ------------------------------- */
 
-exports.getPost = async (req, res) => {
+exports.getPool = async (req, res) => {
   try {
-    const foundPost = await Post.findById(req.params.poolId).populate(['comments', 'videos', 'images', 'audios'])
+    const foundPool = await Pool.findById(req.params.poolId).populate(['comments', 'videos', 'images', 'audios'])
 
     res.status(200).json({
       success: true,
       message: "Successfully fetched post",
       data: {
-        post: foundPost
+        post: foundPool
       }
     })
   } catch (error) {
@@ -34,11 +34,11 @@ exports.getPost = async (req, res) => {
 
 /* ------------------------------ Create a post ----------------------------- */
 
-exports.createPost = async (req, res) => {
+exports.createPool = async (req, res) => {
   try {
     const { title, description, privacy, images, videos, audios, tags, journal } = req.body
 
-    const createdPost = await Post.create({
+    const createdPool = await Pool.create({
       user: {
         userId: req.userId,
         username: req.username
@@ -55,7 +55,7 @@ exports.createPost = async (req, res) => {
 
     await User.findByIdAndUpdate(req.userId, {
       $push: {
-        posts: createdPost._id
+        posts: createdPool._id
       }
     })
 
@@ -63,7 +63,7 @@ exports.createPost = async (req, res) => {
       success: true,
       message: "Successfully created post",
       data: {
-        post: createdPost
+        post: createdPool
       }
     })
   } catch (error) {
@@ -78,7 +78,7 @@ exports.createPost = async (req, res) => {
 
 /* ------------------------------ Update a post ----------------------------- */
 
-exports.editPost = async (req, res) => {
+exports.editPool = async (req, res) => {
   try {
     const { title, description, privacy, images, videos, audios, tags } = req.body
 
@@ -94,7 +94,7 @@ exports.editPost = async (req, res) => {
     if (privacy) updatedInformation.privacy = privacy
 
     // Make sure that the person updating the post is the one who created it
-    const updatedPost = await Post.findOneAndUpdate(
+    const updatedPool = await Pool.findOneAndUpdate(
       { _id: req.params.poolId, "user.userId": req.userId }, 
       updatedInformation,
       { new: true }
@@ -104,7 +104,7 @@ exports.editPost = async (req, res) => {
       success: true,
       message: "Successfully updated post",
       data: {
-        newPost: updatedPost
+        newPool: updatedPool
       }
     })
   } catch (error) {
@@ -125,7 +125,7 @@ exports.addJournal = async (req, res) => {
     // Format the date to 24 hours and only time
     const formattedTime = date.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit', hour12: false })
 
-    const updatedPost = await Post.findOneAndUpdate({ 
+    const updatedPool = await Pool.findOneAndUpdate({ 
       "user.userId": req.userId,
       _id: req.params.poolId,
     },{
@@ -139,13 +139,13 @@ exports.addJournal = async (req, res) => {
       new: true 
     })
 
-    if (!updatedPost) throw new Error("Post not found or not own by the user")
+    if (!updatedPool) throw new Error("Pool not found or not own by the user")
 
     res.status(200).json({
       success: true,
       message: "Successfully updated post",
       data: {
-        newPost: updatedPost
+        newPool: updatedPool
       }
     })
   } catch (error) {
@@ -160,34 +160,34 @@ exports.addJournal = async (req, res) => {
 
 /* ------------------------------ Delete a post ----------------------------- */
 
-exports.deletePost = async (req, res) => {
+exports.deletePool = async (req, res) => {
   try {
-    const deletedPost = await Post.findOneAndUpdate({
+    const deletedPool = await Pool.findOneAndUpdate({
       _id: req.params.poolId,
       // This is to prevent users from deleting other users' posts
       "user.userId": req.userId
     }, {
       title: "Deleted",
-      description: `Post deleted ${new Date().toLocaleDateString}`,
+      description: `Pool deleted ${new Date().toLocaleDateString}`,
       deleted: {
         isDeleted: true,
         date: new Date().toISOString()
       }
     })
 
-    if (!deletedPost) throw new Error("Post not found or not own by the user")
+    if (!deletedPool) throw new Error("Pool not found or not own by the user")
 
     // Delete all the files associated with the post
     // I changed my mind and wont delete the files for now
-    // const deletedImages = await deleteFiles(req, res, { fileIds: deletedPost.images.map(image => image._id), mimetype: "image" })
-    // const deletedVideos = await deleteFiles(req, res, { fileIds: deletedPost.videos.map(video => video._id), mimetype: "video" })
-    // const deletedAudios = await deleteFiles(req, res, { fileIds: deletedPost.audios.map(audio => audio._id), mimetype: "audio" })
+    // const deletedImages = await deleteFiles(req, res, { fileIds: deletedPool.images.map(image => image._id), mimetype: "image" })
+    // const deletedVideos = await deleteFiles(req, res, { fileIds: deletedPool.videos.map(video => video._id), mimetype: "video" })
+    // const deletedAudios = await deleteFiles(req, res, { fileIds: deletedPool.audios.map(audio => audio._id), mimetype: "audio" })
 
     res.status(200).json({
       success: true,
       message: "Successfully deleted post",
       data: {
-        deletedPost,
+        deletedPool,
         // deletedImages,
         // deletedVideos,
         // deletedAudios

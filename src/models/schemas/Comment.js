@@ -48,7 +48,7 @@ const commentSchema = new Schema({
   },
   originType: {
     type: String,
-    enum: ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'],
+    enum: ['Pool', 'Comment', 'User', 'Video', 'Image', 'Audio'],
     required: true
   },
   originId: {
@@ -87,7 +87,7 @@ commentSchema.pre('save', function (next) {
 
 commentSchema.path('originId').validate(function(value) {
   // Validate that the originType and originId combination is valid
-  const modelNames = ['Post', 'Comment', 'User', 'Video', 'Image', 'Audio'];
+  const modelNames = ['Pool', 'Comment', 'User', 'Video', 'Image', 'Audio'];
   return modelNames.includes(this.originType) && value != null;
 }, 'Invalid combination of originType and originId');
 

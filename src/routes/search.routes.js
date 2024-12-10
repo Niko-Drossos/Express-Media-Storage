@@ -10,7 +10,7 @@ router.all("/*", authenticateUserJWT)
 
 router.get("/users", searchController.searchUsers)
 
-router.get("/posts", searchController.searchPosts)
+router.get("/posts", searchController.searchPools)
 
 router.get("/comments", searchController.searchComments)
 

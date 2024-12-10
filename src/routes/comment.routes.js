@@ -18,7 +18,7 @@ router.get("/:commentId", commentController.getComments)
 /*                            Create comment routes                           */
 /* -------------------------------------------------------------------------- */
 
-router.post("/create/post/:poolId", commentController.commentOnPost)
+router.post("/create/post/:poolId", commentController.commentOnPool)
 
 router.post("/create/comment/:commentId", commentController.commentOnComment)
 

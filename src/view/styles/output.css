@@ -624,6 +624,10 @@ video {
   top: 2.25rem;
 }
 
+.top-1\/2 {
+  top: 50%;
+}
+
 .z-20 {
   z-index: 20;
 }
@@ -1285,6 +1289,11 @@ video {
   background-color: rgb(255 255 255 / 0.9);
 }
 
+.bg-blue-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
+
 .bg-\[url\(\'\.\.\/icons\/defaultUser\.svg\'\)\] {
   background-image: url('../icons/defaultUser.svg');
 }
@@ -1514,6 +1523,11 @@ video {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 
 .font-bold {
