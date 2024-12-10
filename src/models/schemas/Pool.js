@@ -94,7 +94,7 @@ const poolSchema = new Schema({
   }
 }, {
   timestamps: true,
-  collection: 'posts'
+  collection: 'pools'
 })
 
 // Middleware to update voteCount when likes array is modified

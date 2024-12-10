@@ -32,7 +32,7 @@ exports.getComments = async (req, res) => {
 
 exports.commentOnPool = async (req, res) => {
   try {
-    const postedComment = await Comment.create({
+    const pooledComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -42,24 +42,24 @@ exports.commentOnPool = async (req, res) => {
       content: req.body.content
     })
 
-    // Update the post with the new comment
+    // Update the pool with the new comment
     await Pool.findByIdAndUpdate(req.params.poolId, {
       $push: {
-        comments: postedComment._id
+        comments: pooledComment._id
       }
     })
 
     res.status(200).json({
       success: true,
-      message: "Commented on post",
+      message: "Commented on pool",
       data: {
-        comment: postedComment
+        comment: pooledComment
       }
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to comment on post",
+      message: "Failed to comment on pool",
       errorMessage: error.message,
       error
     })
@@ -70,7 +70,7 @@ exports.commentOnPool = async (req, res) => {
 
 exports.commentOnComment = async (req, res) => {
   try {
-    const postedComment = await Comment.create({
+    const pooledComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -83,7 +83,7 @@ exports.commentOnComment = async (req, res) => {
     // Update the comment with the new comment
     await Comment.findByIdAndUpdate(req.params.commentId, {
       $push: {
-        comments: postedComment._id
+        comments: pooledComment._id
       }
     })
 
@@ -91,7 +91,7 @@ exports.commentOnComment = async (req, res) => {
       success: true,
       message: "Commented on comment",
       data: {
-        comment: postedComment
+        comment: pooledComment
       }
     })
   } catch (error) {
@@ -108,7 +108,7 @@ exports.commentOnComment = async (req, res) => {
 
 exports.commentOnUser = async (req, res) => {
   try {
-    const postedComment = await Comment.create({
+    const pooledComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -121,7 +121,7 @@ exports.commentOnUser = async (req, res) => {
     // Update the user with the new comment
     await User.findByIdAndUpdate(req.params.userId, {
       $push: {
-        comments: postedComment._id
+        comments: pooledComment._id
       }
     })
 
@@ -129,7 +129,7 @@ exports.commentOnUser = async (req, res) => {
       success: true,
       message: "Commented on user",
       data: {
-        comment: postedComment
+        comment: pooledComment
       }
     })
   } catch (error) {
@@ -146,7 +146,7 @@ exports.commentOnUser = async (req, res) => {
 
 exports.commentOnVideo = async (req, res) => {
   try {
-    const postedComment = await Comment.create({
+    const pooledComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -159,7 +159,7 @@ exports.commentOnVideo = async (req, res) => {
     // Update the user with the new comment
     await Video.findByIdAndUpdate(req.params.videoId, {
       $push: {
-        comments: postedComment._id
+        comments: pooledComment._id
       }
     })
 
@@ -167,7 +167,7 @@ exports.commentOnVideo = async (req, res) => {
       success: true,
       message: "Commented on video",
       data: {
-        comment: postedComment
+        comment: pooledComment
       }
     })
   } catch (error) {
@@ -184,7 +184,7 @@ exports.commentOnVideo = async (req, res) => {
 
 exports.commentOnImage = async (req, res) => {
   try {
-    const postedComment = await Comment.create({
+    const pooledComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -197,7 +197,7 @@ exports.commentOnImage = async (req, res) => {
     // Update the user with the new comment
     await Image.findByIdAndUpdate(req.params.imageId, {
       $push: {
-        comments: postedComment._id
+        comments: pooledComment._id
       }
     })
 
@@ -205,7 +205,7 @@ exports.commentOnImage = async (req, res) => {
       success: true,
       message: "Commented on image",
       data: {
-        comment: postedComment
+        comment: pooledComment
       }
     })
   } catch (error) {
@@ -222,7 +222,7 @@ exports.commentOnImage = async (req, res) => {
 
 exports.commentOnAudio = async (req, res) => {
   try {
-    const postedComment = await Comment.create({
+    const pooledComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -235,7 +235,7 @@ exports.commentOnAudio = async (req, res) => {
     // Update the user with the new comment
     await Audio.findByIdAndUpdate(req.params.audioId, {
       $push: {
-        comments: postedComment._id
+        comments: pooledComment._id
       }
     })
 
@@ -243,7 +243,7 @@ exports.commentOnAudio = async (req, res) => {
       success: true,
       message: "Commented on audio",
       data: {
-        comment: postedComment
+        comment: pooledComment
       }
     })
   } catch (error) {

@@ -58,7 +58,7 @@ exports.searchUsers = async (req, res) => {
   }
 }
 
-/* ------------------ Search for posts within a time frame ------------------ */
+/* ------------------ Search for pools within a time frame ------------------ */
 
 exports.searchPools = async (req, res) => {
   try {
@@ -103,7 +103,7 @@ exports.searchPools = async (req, res) => {
     
     res.status(200).json({ 
       success: true, 
-      message: "Successfully searched for posts" ,
+      message: "Successfully searched for pools" ,
       data: {
         resultCount: searchResults.length,
         totalDocuments: totalDocuments,
@@ -117,7 +117,7 @@ exports.searchPools = async (req, res) => {
   } catch (error) {
     res.status(500).json({ 
       success: false,
-      message: "Failed to search for posts",
+      message: "Failed to search for pools",
       errorMessage: error.message,
       error 
     })

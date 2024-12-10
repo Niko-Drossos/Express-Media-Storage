@@ -139,11 +139,11 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```
 
 # Pool
-<p>This is the routes for interacting with posts created by users</p>
+<p>This is the routes for interacting with pools created by users</p>
 
-## GET: /post/:poolId
-<p><code>poolId</code> is the <code>doc id</code> of the post you are fetching.</p>
-<p><code>foundPool</code> is the MongoDB post document.</p>
+## GET: /pool/:poolId
+<p><code>poolId</code> is the <code>doc id</code> of the pool you are fetching.</p>
+<p><code>foundPool</code> is the MongoDB pool document.</p>
 <p>This should never throw an error, if it does then somethings wrong.</p>
 
 ### RESPONSE
@@ -151,9 +151,9 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: true,
-    message: "Successfully fetched post",
+    message: "Successfully fetched pool",
     data: {
-        post: foundPool
+        pool: foundPool
     }
 }
 ```
@@ -162,15 +162,15 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: false,
-    message: "Failed to get post",
+    message: "Failed to get pool",
     errorMessage: error.message,
     error
 }
 ```
 
-## POST: /post/create
-<p>This route is used for creating posts.</p>  
-<p>A post is just a collection of pre uploaded media that is grouped together as one event.</p>
+## POST: /pool/create
+<p>This route is used for creating pools.</p>  
+<p>A pool is just a collection of pre uploaded media that is grouped together as one event.</p>
 
 ```javascript
 {
@@ -191,9 +191,9 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: true,
-    message: "Successfully created post",
+    message: "Successfully created pool",
     data: {
-        post: createdPool
+        pool: createdPool
     }
 }
 ```
@@ -202,16 +202,16 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: false,
-    message: "Failed to create post",
+    message: "Failed to create pool",
     errorMessage: error.message,
     error
 }
 ```
 
-## PUT: /post/edit/:poolId
-<p><code>poolId</code> is the <code>doc id</code> of the post to be edited.</p>
-<p>Because all of the <code>post</code> routes are passed through the <code>authenticateUserJWT</code> you inherently need to be signed in.</p>
-<p>Only the creator of a post can edit it.</p>
+## PUT: /pool/edit/:poolId
+<p><code>poolId</code> is the <code>doc id</code> of the pool to be edited.</p>
+<p>Because all of the <code>pool</code> routes are passed through the <code>authenticateUserJWT</code> you inherently need to be signed in.</p>
+<p>Only the creator of a pool can edit it.</p>
 
 ```javascript
 {
@@ -232,7 +232,7 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: true,
-    message: "Successfully edited post",
+    message: "Successfully edited pool",
     data: {
         newPool: updatedPool
     }
@@ -243,15 +243,15 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: false,
-    message: "Failed to update post",
+    message: "Failed to update pool",
     errorMessage: error.message,
     error
 }
 ```
 
-## DELETE: /post/delete/:poolId
-<p><code>poolId</code> is the <code>doc id</code> of the post.</p>
-<p>To delete a post you need to be the original poster.</p>
+## DELETE: /pool/delete/:poolId
+<p><code>poolId</code> is the <code>doc id</code> of the pool.</p>
+<p>To delete a pool you need to be the original pooler.</p>
 <p>It also returns back the deleted document.</p>
 
 ### RESPONSE
@@ -259,7 +259,7 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: true,
-    message: "Successfully deleted post",
+    message: "Successfully deleted pool",
     data: {
         deletedPool: deletedPool
     }
@@ -270,14 +270,14 @@ Auth routes are used to create and login users, this is the only route that <b>D
 ```javascript
 {
     success: false,
-    message: "Failed to delete post",
+    message: "Failed to delete pool",
     errorMessage: error.message,
     error
 }
 ```
 
 # Comment
-This is all the comment routes.  Comments can be placed on <code>posts</code>, <code>comments</code>, <code>users</code>, <code>videos</code>, <code>images</code>, and <code>audios</code>.
+This is all the comment routes.  Comments can be placed on <code>pools</code>, <code>comments</code>, <code>users</code>, <code>videos</code>, <code>images</code>, and <code>audios</code>.
 <p>There is a separate route for creating each different type of comment, for simplicity, im not writing all of them separately.</p>  
 <p>Each of the routes are basically identical but they store the <code>originType</code> differently for each route depending on where the comment is going.</p>
 
@@ -309,7 +309,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 ## POST: /comment/create/:ORIGIN-TYPE/:ORIGIN-ID
 <p>This is the route I was referring to earlier.</p>
 <p>Each of the 6 create routes is the same except for the last word, Which is just name of the schema</p>
-<p>For example, to create a comment on a post you would write, <code>/comment/create/post/mypoolId3824</code>.</p>
+<p>For example, to create a comment on a pool you would write, <code>/comment/create/pool/mypoolId3824</code>.</p>
 <p>To comment on a <code>comment</code> you would write, <code>comment/create/comment/myCommentId2479</code> ect.</p>
 <p>Each of these routes differs because they each update the parent document with their own <code>doc id</code>, So they need different routes.</p>
 
@@ -327,7 +327,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
     success: true,
     message: "Commented on ORIGIN-TYPE",
     data: {
-        comment: postedComment
+        comment: pooledComment
     }
 }
 ```
@@ -457,25 +457,25 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 }
 ```
 
-## GET: /search/posts
-<p>Searching for posts has a lot more versatility as there is more information to search.</p>
+## GET: /search/pools
+<p>Searching for pools has a lot more versatility as there is more information to search.</p>
 
 
 ## Query's
 - title: String (uses regex expression),
-- user: Doc id of poster, 
+- user: Doc id of pooler, 
 - tags: String with "," to separate tags, 
-- startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
-- endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
+- startDate: Date with format "5-6-2024". returns pools <b>AFTER</b> this date, 
+- endDate: Date with format "5-7-2024". returns pools <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
 
 ### RESPONSE
 **Success:** `200`
 ```javascript
 {
     success: true,
-    message: "Successfully searched for posts",
+    message: "Successfully searched for pools",
     data: {
-      postCount: searchResults.length,
+      poolCount: searchResults.length,
       query,
       searchResults
     }
@@ -486,7 +486,7 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 ```javascript
 {
     success: false,
-    message: "Failed to search for posts",
+    message: "Failed to search for pools",
     errorMessage: error.message,
     error
 }
@@ -498,10 +498,10 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 
 ## Query's
 - content: String (uses regex expression),
-- user: Doc id of poster, 
+- user: Doc id of pooler, 
 - originId: Doc id document that the comment was attached to, 
-- startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
-- endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
+- startDate: Date with format "5-6-2024". returns pools <b>AFTER</b> this date, 
+- endDate: Date with format "5-7-2024". returns pools <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
 
 ### RESPONSE
 **Success:** `200`
@@ -533,8 +533,8 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 ## Query's
 - user: Doc id of the user,
 - title: String (uses regex expression), 
-- startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
-- endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
+- startDate: Date with format "5-6-2024". returns pools <b>AFTER</b> this date, 
+- endDate: Date with format "5-7-2024". returns pools <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
 
 ### RESPONSE
 **Success:** `200`
@@ -566,8 +566,8 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 ## Query's
 - user: Doc id of the user,
 - title: String (uses regex expression), 
-- startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
-- endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
+- startDate: Date with format "5-6-2024". returns pools <b>AFTER</b> this date, 
+- endDate: Date with format "5-7-2024". returns pools <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
 
 ### RESPONSE
 **Success:** `200`
@@ -599,8 +599,8 @@ This is all the comment routes.  Comments can be placed on <code>posts</code>, <
 ## Query's
 - user: Doc id of the user,
 - title: String (uses regex expression), 
-- startDate: Date with format "5-6-2024". returns posts <b>AFTER</b> this date, 
-- endDate: Date with format "5-7-2024". returns posts <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
+- startDate: Date with format "5-6-2024". returns pools <b>AFTER</b> this date, 
+- endDate: Date with format "5-7-2024". returns pools <b>BEFORE</b> this date. Date is <b>inclusive</b>. 
 
 ### RESPONSE
 **Success:** `200`

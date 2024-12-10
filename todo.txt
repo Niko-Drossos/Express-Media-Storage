@@ -20,7 +20,7 @@ Add favorites to routes and to user schemas
 
 Write documentation for "view" routes.
 
-Currently working on: creating a delete api for posts to delete associated files, needs testing
+Currently working on: creating a delete api for pools to delete associated files, needs testing
 
 Add ability to download files (low priority) 
 

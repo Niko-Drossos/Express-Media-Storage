@@ -47,7 +47,7 @@ const userSchema = new Schema({
     ref: 'Comment',
     select: false
   }],
-  posts: [{
+  pools: [{
     type: Schema.Types.ObjectId,
     ref: 'Pool',
     select: false

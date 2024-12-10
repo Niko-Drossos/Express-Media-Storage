@@ -5,7 +5,7 @@
             <% if (mediaType === 'image') { %>
                 <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/image/<%= media.fileId %>" alt="<%= media.title %>">
             <% } else if (mediaType === 'video') { %>
-                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" poster="<%= media.thumbnail %>" controls>
+                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" pooler="<%= media.thumbnail %>" controls>
                     <source src="/view/video/<%= media.fileId %>" type="video/mp4">
                 </video>
             <% } else if (mediaType === 'audio') { %>
@@ -63,7 +63,7 @@
                 <div class="pb-4">
                     <div class="flex items-center">
                         <textarea class="w-full resize-none outline-none appearance-none rounded-lg p-2 leading-tight focus:outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
-                        <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="postComment(event)">
+                        <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="poolComment(event)">
                             <img src="../icons/right-arrow.svg" alt="Send">
                         </button>
                     </div>
@@ -74,7 +74,7 @@
 </div>
 
 <script>    
-    async function postComment(event) {
+    async function poolComment(event) {
         event.preventDefault();
         
         // Get the routing information from the URL

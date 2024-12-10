@@ -6,7 +6,7 @@
             </p>
             <p class="font-bold ml-2 cursor-pointer">
                 <%= comment.user.username %>
-                <!-- Display uploader tag if original poster -->
+                <!-- Display uploader tag if original pooler -->
                 <% if (comment.user.userId === uploader.userId) { %>
                     <span class="bg-gray-200 hover:bg-gray-300 rounded-full p-1 font-light text-xs">OP</span>
                 <% } %>

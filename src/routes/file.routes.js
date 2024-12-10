@@ -25,14 +25,14 @@ router.all("/*", authenticateUserJWT)
 // router.get("/get", fileController.findFiles)
 
 // TODO: Deprecated in the future
-// router.post("/upload", /* upload.fields(uploadFields), processUploads, */ fileController.batchUpload)
+// router.pool("/upload", /* upload.fields(uploadFields), processUploads, */ fileController.batchUpload)
 
 // Chunked file uploading
-router.post("/start-chunk-upload", fileController.startChunkUpload)
+router.pool("/start-chunk-upload", fileController.startChunkUpload)
 
 // TODO: Fix compression middleware to accept file chunks and use it when ready
-router.post("/chunked-upload", upload.single("chunk"), /* compressMedia, */ fileController.chunkedUpload)
+router.pool("/chunked-upload", upload.single("chunk"), /* compressMedia, */ fileController.chunkedUpload)
 
-router.post("/delete", fileController.deleteFiles)
+router.pool("/delete", fileController.deleteFiles)
 
 module.exports = router

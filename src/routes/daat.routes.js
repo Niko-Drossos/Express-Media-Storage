@@ -10,7 +10,7 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.post("/ask", daatController.ask)
+router.pool("/ask", daatController.ask)
 
 
 module.exports = router
