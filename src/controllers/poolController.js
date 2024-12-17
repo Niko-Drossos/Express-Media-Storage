@@ -139,7 +139,7 @@ exports.addJournal = async (req, res) => {
       new: true 
     })
 
-    if (!updatedPool) throw new Error("Pool not found or not own by the user")
+    if (!updatedPool) throw new Error("Pool not found or not owned by the user")
 
     res.status(200).json({
       success: true,

@@ -14,9 +14,9 @@ router.get("/my-files", userController.getMyFiles)
 
 router.get("/media-titles", userController.mediaTitles)
 
-router.pool("/follow/:userId", userController.follow)
+router.post("/follow/:userId", userController.follow)
 
-router.pool("/unfollow/:userId", userController.unfollow)
+router.post("/unfollow/:userId", userController.unfollow)
 
 router.get("/:userId", userController.getUser)
 

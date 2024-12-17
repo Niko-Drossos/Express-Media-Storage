@@ -1,5 +1,4 @@
 
-# Routes
 view
 (all routes return a populated document to be rendered , all GET requests)
 /pool/:poolId
@@ -42,7 +41,7 @@ This is a list of all the middlewares used in the server. <br>
 
 ## authenticateUserJWT
 <p>This middleware is used to validate that a JWT token stored in the cookie <code>media_authentication</code> is valid.</p>
-<p>all routes besides the auth routes use the <code>authenticateUserJWT</code> to verify login status.</p>
+<p>all routes <b>besides</b> the auth routes use the <code>authenticateUserJWT</code> to verify login status.</p>
 <p>The <code>authenticateUserJWT</code> middleware only returns error responses if there are problems with JWT, like <code>expired</code>, <code>invalid</code> or <code>not provided</code></p>
 
 **returns** <br>
@@ -69,9 +68,13 @@ This is a list of all the middlewares used in the server. <br>
 ```
 
 <!-- ---------------------------- Actual routes ---------------------------- -->
+# Routes
+<p>This is a comprehensive list of API routes that are on the backend server.</p>
+<!-- TODO: Add a separate section that is just for the frontend routes -->
+<p>Some routes will only be used on the frontend to render pages, this will be in a separate location. </p>
 
 # Auth
-Auth routes are used to create and login users, this is the only route that <b>DOESN'T</b> use the `authenticateUserJWT` middleware
+Auth routes are used to create and login users, this is the only route that <b>DOESN'T</b> use the `authenticateUserJWT` middleware, as you don't have a JWT yet.
 ## POST: /auth/register
 <p>The body must contain a <code>username</code>, <code>password</code> and <code>email</code> to register a user.  Email is not currently being used for user validation but in the future will be used for password resetting.</p>
 

@@ -5,7 +5,7 @@ const router = express.Router()
 const authController = require("../controllers/authController")
 /* -------------------------------------------------------------------------- */
 
-router.pool("/register", authController.registerUser)
-router.pool("/login", authController.loginUser)
+router.post("/register", authController.registerUser)
+router.post("/login", authController.loginUser)
 
 module.exports = router

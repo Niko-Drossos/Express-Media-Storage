@@ -9,9 +9,9 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-router.pool("/create", upload.none(), poolController.createPool)
+router.post("/create", upload.none(), poolController.createPool)
 
-router.pool("/journal/add/:poolId", upload.none(), poolController.addJournal)
+router.post("/journal/add/:poolId", upload.none(), poolController.addJournal)
 
 router.put("/edit/:poolId", upload.none(), poolController.editPool)
 

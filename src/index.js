@@ -87,7 +87,7 @@ app.get("/upload", authenticateUserJWT, async (req, res) => {
 
 /* ----------------------- Navigate to the search page ---------------------- */
 
-app.get("/search-media", async (req, res) => {
+app.get("/search", async (req, res) => {
   const query = req.query
 
   if (query.mediaType) {   
@@ -136,12 +136,50 @@ app.get("/search-media", async (req, res) => {
     searchType: "users"
   })
 })
+*/
 
-app.get("/search-pools", (req, res) => {
-  res.render("search.ejs", {
-    searchType: "pools"
-  })
-}) */
+app.get("/search-pools", async (req, res) => {
+  const query = req.query
+
+  if (query.mediaType) {   
+    // Construct the search URL
+    const searchURL = `${API_URL}/search/${query.mediaType}?${new URLSearchParams(query)}`
+
+    const request = await fetch(searchURL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
+
+    const response = await request.json()
+    
+    if (response.error) {
+      res.render("search.ejs", {
+        searchType: "media",
+        query,
+        response: [],
+        error: response.error
+      })
+      return
+    }
+
+    res.render("search.ejs", {
+      searchType: "media",
+      query,
+      response: response.data.searchResults || []
+    })
+  } else { 
+    // Render the page without searching for anything
+    res.render("search.ejs", {
+      searchType: "pools",
+      query,
+      response: []
+    })
+  }
+}) 
 
 /* ---------------------- View a file with document id ---------------------- */
 

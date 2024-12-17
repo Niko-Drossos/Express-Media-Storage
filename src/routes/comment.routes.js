@@ -18,17 +18,17 @@ router.get("/:commentId", commentController.getComments)
 /*                            Create comment routes                           */
 /* -------------------------------------------------------------------------- */
 
-router.pool("/create/pool/:poolId", commentController.commentOnPool)
+router.post("/create/pool/:poolId", commentController.commentOnPool)
 
-router.pool("/create/comment/:commentId", commentController.commentOnComment)
+router.post("/create/comment/:commentId", commentController.commentOnComment)
 
-router.pool("/create/user/:userId", commentController.commentOnUser)
+router.post("/create/user/:userId", commentController.commentOnUser)
 
-router.pool("/create/video/:videoId", commentController.commentOnVideo)
+router.post("/create/video/:videoId", commentController.commentOnVideo)
 
-router.pool("/create/image/:imageId", commentController.commentOnImage)
+router.post("/create/image/:imageId", commentController.commentOnImage)
 
-router.pool("/create/audio/:audioId", commentController.commentOnAudio)
+router.post("/create/audio/:audioId", commentController.commentOnAudio)
 
 /* -------------------------------------------------------------------------- */
 /*                             Edit comment routes                            */

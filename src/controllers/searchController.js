@@ -62,6 +62,7 @@ exports.searchUsers = async (req, res) => {
 
 exports.searchPools = async (req, res) => {
   try {
+    console.log(req.query)
     const query = req.query
 
     // Object that will be searched for in the db
