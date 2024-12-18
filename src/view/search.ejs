@@ -2,10 +2,21 @@
 
 <%- include('./partials/searchForm.ejs') %>
 <div>
+    <div class="flex justify-between px-8">
+        <b class="text-2xl">Result count: <span class="text-green-400"><%= response.totalDocuments %></span></b>
+
+        <!-- Pagination -->
+        <div class="flex justify-center">
+            <button class="rounded-lg bg-gray-400 px-4 py-2 hover:bg-gray-500 hover:text-green-400" onclick="pagination(false, '<%= response.page %>', '<%= response.pageCount %>')"><</button>
+            <div class="flex items-center"><span class="mx-2"><%= response.page %> / <%= response.pageCount %></span></div>
+            <button class="rounded-lg bg-gray-400 px-4 py-2 hover:bg-gray-500 hover:text-green-400" onclick="pagination(true, '<%= response.page %>', '<%= response.pageCount %>')">></button>
+        </div>
+    </div>
+    
     <div class="grid grid-cols-3 gap-4 p-8">
         <!-- Finish file display -->
-        <% if (response.length) { %>
-            <% response.map(data => { %>
+        <% if (response.searchResults.length) { %>
+            <% response.searchResults.map(data => { %>
                 <div class="mb-8">                                                    <!--! Finish thumbnail display -->
                     <%- include('./partials/mediaCard.ejs', { ...data, query, thumbnail: null }) %>
                 </div>
@@ -13,6 +24,29 @@
         <% } %>
     </div>
 </div>
+
+<script>
+    function pagination(isNextPage, currentPage, totalPages) {
+        // Prevent string addition
+        currentPage = parseInt(currentPage)
+
+        const oldQuery = new URLSearchParams(window.location.search);
+
+        // Goofy ahh logic
+        if (isNextPage) {
+            if (currentPage + 1 > totalPages) return
+            oldQuery.set('page', currentPage + 1);
+        } else {
+            if (currentPage - 1 < 1) return
+            oldQuery.set('page', currentPage - 1);
+        }
+
+        // Route to the new location
+        const newQuery = oldQuery.toString();
+        window.location.search = newQuery
+    } 
+</script>
+
 
     <!-- I might use this for something else at some point -->
 <!-- <div class='max-w-md mx-auto'>

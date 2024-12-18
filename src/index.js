@@ -118,7 +118,7 @@ app.get("/search", async (req, res) => {
     res.render("search.ejs", {
       searchType: "media",
       query,
-      response: response.data.searchResults || []
+      response: response.data || []
     })
   } else { 
     // Render the page without searching for anything
