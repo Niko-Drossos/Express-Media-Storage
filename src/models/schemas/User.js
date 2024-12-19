@@ -32,6 +32,33 @@ const userSchema = new Schema({
     type: [String],
     default: []
   },
+  favorites: {
+    videos: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Video',
+      select: false
+    }], 
+    images: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Image',
+      select: false
+    }],
+    audios: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Audio',
+      select: false
+    }],
+    comments: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Comment',
+      select: false
+    }],
+    pools: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Pool',
+      select: false
+    }]
+  },
   followers: [{
     type: Schema.Types.ObjectId,
     ref: 'User',

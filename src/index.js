@@ -48,6 +48,7 @@ app.use("/comment", require("./routes/comment.routes"))
 app.use("/view", require("./routes/view.routes"))
 app.use("/vote", require("./routes/vote.routes"))
 app.use("/daat", require("./routes/daat.routes"))
+app.use("/favorite", require("./routes/favorite.routes"))
 
 /* -------------------------------- Homepage -------------------------------- */
 
@@ -109,7 +110,8 @@ app.get("/search", async (req, res) => {
       res.render("search.ejs", {
         searchType: "media",
         query,
-        response: [],
+        response: response.data,
+        searchResults: [],
         error: response.error
       })
       return
@@ -118,14 +120,25 @@ app.get("/search", async (req, res) => {
     res.render("search.ejs", {
       searchType: "media",
       query,
-      response: response.data || []
+      response: response.data,
+      searchResults: response.data.searchResults
     })
   } else { 
     // Render the page without searching for anything
     res.render("search.ejs", {
       searchType: "media",
       query,
-      response: []
+      // Default response to prevent throwing "undefined" errors
+      response: {
+        resultCount: 0,
+        totalDocuments: 0,
+        page: 1,
+        pageCount: 1,
+        limit: 12,
+        query: {},
+        searchResults: []
+      },
+      searchResults: []
     })
   }
 })
