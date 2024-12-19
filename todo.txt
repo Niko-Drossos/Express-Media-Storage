@@ -8,11 +8,11 @@ Finish the Daat routes
 RAG Docs: https://medium.com/@ingridwickstevens/chat-with-your-audio-locally-a-guide-to-rag-with-whisper-ollama-and-faiss-6656b0b40a68
 https://www.assemblyai.com/blog/javascript-audio-transcript/
 
-
-FIX the search routes to work with the new user: { userId, username } schema
-
 Docs: 
 Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#debian-and-ubuntu
+
+
+
 
 Find out how to transcribe audio and video to text to store in documents
 

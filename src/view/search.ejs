@@ -1,8 +1,9 @@
-<h1 class="flex justify-center">Search</h1> 
+<h1 class="flex justify-center py-2">Search</h1> 
 
 <%- include('./partials/searchForm.ejs') %>
 <div>
-    <div class="flex justify-between px-8">
+    <hr class="my-4 border">
+    <div class="flex justify-between items-center px-8">
         <b class="text-2xl">Result count: <span class="text-green-400"><%= response.totalDocuments %></span></b>
 
         <!-- Pagination -->
@@ -12,11 +13,12 @@
             <button class="rounded-lg bg-gray-400 px-4 py-2 hover:bg-gray-500 hover:text-green-400" onclick="pagination(true, '<%= response.page %>', '<%= response.pageCount %>')">></button>
         </div>
     </div>
+    <hr class="my-4 border">
     
     <div class="grid grid-cols-3 gap-4 p-8">
         <!-- Finish file display -->
-        <% if (response.searchResults.length) { %>
-            <% response.searchResults.map(data => { %>
+        <% if (searchResults.length) { %>
+            <% searchResults.map(data => { %>
                 <div class="mb-8">                                                    <!--! Finish thumbnail display -->
                     <%- include('./partials/mediaCard.ejs', { ...data, query, thumbnail: null }) %>
                 </div>
