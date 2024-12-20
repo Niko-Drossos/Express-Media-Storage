@@ -1,0 +1,36 @@
+
+<div class="mr-1">
+  <% if (favorited) { %>
+    <button onclick="favoriteDoc('<%= id %>')">
+      <img src="../icons/gold-star.svg" alt="Gold star, click to unfavorite">
+    </button>
+  <% } else if (!favorited) { %>
+    <button onclick="favoriteDoc('<%= id %>')">
+      <img src="../icons/hollow-star.svg" alt="Hollow star, click to favorite">
+    </button>
+  <% } %>
+</div>
+
+<script>
+  async function favoriteDoc(id) {
+    const mediaType = window.location.pathname.split("/")[2]
+    console.log(mediaType)
+
+    const request = await fetch(`/favorite/${mediaType}/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include"
+    })
+
+    const response = await request.json()
+
+    if (response.error) {
+      
+    }
+
+    console.log(response)
+    window.location.reload()
+  }
+</script>

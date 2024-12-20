@@ -101,6 +101,22 @@ exports.searchPools = async (req, res) => {
       .limit(limit ? limit : 16)
       .skip((page - 1) * (limit ? limit : 16))
       .populate(comments ? 'comments' : '')
+      .lean()
+
+      // Get the users favorite pools
+      const user = await User.findById(req.userId).select("favorites.pools")
+      const favoritedPools = user.favorites.pools
+
+      // Add a property to see is the video is in the users favorites array
+      if (favoritedPools) {
+        searchResults.forEach((doc) => {
+          doc.favorited = favoritedPools.includes(doc._id.toString());
+        });
+      } else {
+        searchResults.forEach((doc) => {
+          doc.favorited = false;
+        });
+      }
     
     res.status(200).json({ 
       success: true, 
@@ -159,6 +175,22 @@ exports.searchComments = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
       .populate(comments ? 'comments' : '')
+      .lean()
+
+      // Get the users favorite comments
+      const user = await User.findById(req.userId).select("favorites.comments")
+      const favoritedComments = user.favorites.comments
+
+      // Add a property to see is the video is in the users favorites array
+      if (favoritedComments) {
+        searchResults.forEach((doc) => {
+          doc.favorited = favoritedComments.includes(doc._id.toString());
+        });
+      } else {
+        searchResults.forEach((doc) => {
+          doc.favorited = false;
+        });
+      }
     
     res.status(200).json({
       success: true, 
@@ -223,6 +255,22 @@ exports.searchVideos = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
       .populate(comments ? 'comments' : '')
+      .lean()
+
+    // Get the users favorite videos
+    const user = await User.findById(req.userId).select("favorites.videos")
+    const favoritedVideos = user.favorites.videos
+
+    // Add a property to see is the video is in the users favorites array
+    if (favoritedVideos) {
+      searchResults.forEach((doc) => {
+        doc.favorited = favoritedVideos.includes(doc._id.toString());
+      });
+    } else {
+      searchResults.forEach((doc) => {
+        doc.favorited = false;
+      });
+    }
 
     res.status(200).json({
       success: true, 
@@ -287,6 +335,22 @@ exports.searchImages = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
       .populate(comments ? 'comments' : '')
+      .lean()
+
+      // Get the users favorite images
+      const user = await User.findById(req.userId).select("favorites.images")
+      const favoritedImages = user.favorites.images
+
+      // Add a property to see is the video is in the users favorites array
+      if (favoritedImages) {
+        searchResults.forEach((doc) => {
+          doc.favorited = favoritedImages.includes(doc._id.toString());
+        });
+      } else {
+        searchResults.forEach((doc) => {
+          doc.favorited = false;
+        });
+      }
     
     res.status(200).json({
       success: true, 
@@ -351,6 +415,22 @@ exports.searchAudios = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * (limit ? limit : 16))
       .populate(comments ? 'comments' : '')
+      .lean()
+
+      // Get the users favorite audios
+      const user = await User.findById(req.userId).select("favorites.audios")
+      const favoritedAudios = user.favorites.audios
+
+      // Add a property to see is the video is in the users favorites array
+      if (favoritedAudios) {
+        searchResults.forEach((doc) => {
+          doc.favorited = favoritedAudios.includes(doc._id.toString());
+        });
+      } else {
+        searchResults.forEach((doc) => {
+          doc.favorited = false;
+        });
+      }
     
     res.status(200).json({
       success: true, 

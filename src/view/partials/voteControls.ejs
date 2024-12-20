@@ -1,15 +1,19 @@
-<button onclick="vote(true, { id: '<%= id %>', mediaType: '<%= mediaType %>' })"
-    class="inline-flex items-center cursor-pointer ring-[1px] ring-blue-500/50 shadow-[0_0_20px_3px_rgba(65,105,225,0.5)] rounded-full transition-all">
-<img class="inline-block h-8 w-8" src="../icons/upvote.svg" alt="upvote button">
-</button>
+<div class="flex items-center">
+    <button onclick="vote(true, { id: '<%= id %>', mediaType: '<%= mediaType %>' })"
+        class="inline-flex items-center cursor-pointer ring-[1px] ring-blue-500/50 shadow-[0_0_20px_3px_rgba(65,105,225,0.5)] rounded-full transition-all">
+    <img class="inline-block h-8 w-8" src="../icons/upvote.svg" alt="upvote button">
+    </button>
+    
+    
+    <!-- Vote counter -->
+    <span class="text-gray-600 text-sm font-bold text-center px-2 <%= voteCount > 0 ? 'text-green-600' : voteCount === 0 ? 'text-gray-600' : 'text-red-600' %>" id="vote-count"><%= voteCount %></span>
+    
+    <button onclick="vote(false, { id: '<%= id %>', mediaType: '<%= mediaType %>' })" class="mr-3 inline-flex items-center cursor-pointer">
+        <img class="inline-block h-8 w-8" src="../icons/downvote.svg" alt="upvote button">
+    </button>
+</div>
 
-
-<!-- Vote counter -->
-<span class="text-gray-600 text-sm font-bold text-center px-2 <%= voteCount > 0 ? 'text-green-600' : voteCount === 0 ? 'text-gray-600' : 'text-red-600' %>" id="vote-count"><%= voteCount %></span>
-
-<button onclick="vote(false, { id: '<%= id %>', mediaType: '<%= mediaType %>' })" class="mr-3 inline-flex items-center cursor-pointer">
-    <img class="inline-block h-8 w-8" src="../icons/downvote.svg" alt="upvote button">
-</button>
+<%- include('./favoriteButton.ejs', { id: id, favorited: favorited }) %>
 
 <script>
     const voteCounter = document.getElementById("vote-count")
