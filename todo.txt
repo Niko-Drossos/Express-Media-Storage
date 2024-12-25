@@ -16,8 +16,6 @@ Mongodb local server: https://www.prisma.io/dataguide/mongodb/setting-up-a-local
 
 Find out how to transcribe audio and video to text to store in documents
 
-Add favorites to routes and to user schemas
-
 Write documentation for "view" routes.
 
 Currently working on: creating a delete api for pools to delete associated files, needs testing
@@ -47,3 +45,21 @@ Add a feature that deletes a document if a file fails to upload
 Add a feature that will update the document with th status of the file, uploading, completed, or deleted
 
 Add a feature that shows available usernames for search
+
+Finish create create-pool page
+
+Color palette:
+
+Dark-theme:
+Royal-purple: 7e22ce
+Violet-blaze: 8d43ad 
+Lavender-haze: a66abe
+Lilac-mist: d2b5de
+Golden-glow: f1c40e
+
+Light-theme:
+#9a72c6
+#b377d6
+#c9a3df
+#ebe1f2
+#ffe078

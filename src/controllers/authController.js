@@ -102,6 +102,7 @@ exports.loginUser = async (req, res) => {
       username,
       email
     }
+    
     // Generate the login token for a user
     const loginToken = generateJWT(payload)
 

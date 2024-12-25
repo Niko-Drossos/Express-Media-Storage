@@ -15,3 +15,19 @@ h1 {
     background-position: calc(100% - 1rem) center; /* Position the icon within the input */
     cursor: pointer;
 }
+
+.theme-light {
+    --royal-purple: #9a72c6;
+    --violet-blaze: #b377d6;
+    --lavender-haze: #c9a3df;
+    --lilac-mist: #ebe1f2;
+    --golden-glow: #ffe078;
+}
+
+.theme-dark {
+    --royal-purple: #7e22ce;
+    --violet-blaze: #8d43ad;
+    --lavender-haze: #a66abe;
+    --lilac-mist: #d2b5de;
+    --golden-glow: #f1c40e;
+}

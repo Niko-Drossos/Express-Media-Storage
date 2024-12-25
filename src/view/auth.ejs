@@ -1,40 +1,45 @@
 <div class="flex flex-col items-center justify-center">
     <% if (register) { %> 
-        <h1 class="pb-4">Register</h1>
+        <h1 class="py-2">Register</h1>
         <form class="bg-white shadow-md rounded px-8 pt-6 pb-4 mb-4 flex flex-col" onsubmit="register(event)">
-			<div class="mb-4">
-				<label class="block text-grey-darker text-sm font-bold mb-2" for="email">
-					Email
-				</label>
-				<input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="email" type="email" placeholder="johndoe@example.com">
-			</div>
-            <div class="mb-4">
-				<label class="block text-grey-darker text-sm font-bold mb-2" for="username">
-					Username
-				</label>
-				<input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="username" type="text" placeholder="Username">
-            </div>
-            <div class="mb-4">
-                <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
-                    Password
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="password" type="password" placeholder="******************">
-            </div>
-            <div class="">
-				<label class="block text-grey-darker text-sm font-bold mb-2" for="confirm-password">
-					Confirm Password
-				</label>
-				<input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="confirm-password" type="password" placeholder="******************">
-            </div>
-            <div class="flex h-8 items-center justify-center">
-				<button class="bg-blue hover:bg-blue-dark text-white font-bold py-2 px-4 rounded" type="submit">
-					Sign up
-				</button>
-            </div>
+          <div class="mb-4">
+            <label class="block text-grey-darker text-sm font-bold mb-2" for="email">
+              Email
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="email" type="email" placeholder="johndoe@example.com">
+          </div>
+          <div class="mb-4">
+            <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
+              Username
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="username" type="text" placeholder="Username">
+          </div>
+          <div class="mb-4">
+            <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
+                Password
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="password" type="password" placeholder="******************">
+          </div>
+          <div class="">
+            <label class="block text-grey-darker text-sm font-bold mb-2" for="confirm-password">
+              Confirm Password
+            </label>
+            <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="confirm-password" type="password" placeholder="******************">
+          </div>
+          <div class="flex items-center justify-between mb-4">
+            <pre>| </pre>
+            <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="/auth/login">
+              Already have an account?
+            </a>
+            <pre> |</pre>
+          </div>
+          <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded" type="submit">
+            Sign up
+          </button>
         </form>
     <% } else { %>
-        <h1 class="pb-4">Login</h1>
-        <form class="bg-white shadow-md rounded px-8 pt-6 pb-4 mb-4 flex flex-col" onsubmit="login(event)">
+        <h1 class="py-2">Login</h1>
+        <form class="bg-white shadow-md rounded px-8 py-4 mb-4 flex flex-col" onsubmit="login(event)">
             <div class="mb-4">
               <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
                 Username
@@ -47,14 +52,20 @@
               </label>
               <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="password" type="password" placeholder="******************">
             </div>
-            <div class="flex items-center justify-between">
-              <button class="bg-blue hover:bg-blue-dark text-white font-bold py-2 px-4 rounded" type="submit">
-                Sign In
-              </button>
-              <a class="inline-block align-baseline font-bold text-sm text-blue hover:text-blue-darker" href="#" onclick="alert('Sorry, but, no~')">
+            <div class="flex items-center justify-between mb-4">
+              <pre>| </pre>
+              <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="#" onclick="forgotPassword()">
                 Forgot Password?
               </a>
+              <pre> | </pre>
+              <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="/auth/register">
+                Create account
+              </a>
+              <pre> |</pre>
             </div>
+            <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded" type="submit">
+              Sign In
+            </button>
         </form>
     <% } %>
 </div>
@@ -122,5 +133,13 @@
       console.log(returnedData)
       alert("Registration successful")
       window.location = "/auth/login"
+    }
+
+    // Prompt the user if they want to send an email to support
+    function forgotPassword() {
+      const contactSupport = confirm("Automatic password reset not yet implemented.\nYou may contact support for help.\nWould you like to send en email to request a reset?")
+      if (contactSupport) {
+        window.location = "mailto:bethkavodinfo@gmail.com?cc=droniko777@gmail.com&subject=Password reset request"
+      }
     }
 </script>

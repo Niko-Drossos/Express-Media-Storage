@@ -1,4 +1,4 @@
-<div class="relative flex flex-col  rounded-xl bg-white bg-clip-border text-gray-700 shadow-md h-96">
+<div class="relative flex flex-col  rounded-xl bg-lilac-mist bg-clip-border text-gray-700 shadow-md h-96">
     <div class="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40">
         <% if (thumbnail) { %>
             <img src="data:image/jpeg;base64,<%= thumbnail %>" alt="img-blur-shadow" layout="fill"/>
@@ -18,7 +18,7 @@
     <div class="p-6 pt-0 flex">
         <% const { mediaType } = query %>
         <% const docType = mediaType.slice(0, -1) %>
-        <a class="cursor-pointer justify-end select-none rounded-lg bg-pink-500 py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" href="media/<%= docType %>?id=<%= _id %>">
+        <a class="cursor-pointer justify-end select-none rounded-lg bg-royal-purple hover:bg-violet-blaze py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" href="media/<%= docType %>?id=<%= _id %>">
             Read More
         </a>
     </div>

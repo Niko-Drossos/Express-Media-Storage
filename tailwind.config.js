@@ -4,7 +4,15 @@ module.exports = {
     "./src/**/*.{html,js,ejs}", // Adjust paths as necessary
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'royal-purple': 'var(--royal-purple)',
+        'violet-blaze': 'var(--violet-blaze)',
+        'lavender-haze': 'var(--lavender-haze)',
+        'lilac-mist': 'var(--lilac-mist)',
+        'golden-glow': 'var(--golden-glow)'
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/line-clamp')

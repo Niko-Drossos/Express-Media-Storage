@@ -1,0 +1,57 @@
+<div>
+  <label for="searchMedia" class="flex items-center">
+    <span class="text-2xl">Search</span>
+    <input type="text" id="searchMedia" placeholder="title" class="rounded bg-white mx-2 px-1">
+    <button>
+      <img src="../../icons/magnifying-glass.svg" alt="">
+    </button>
+  </label>
+</div>
+<div class="w-full lg:w-2/3 bg-white shadow-lg text-lg rounded-sm border border-gray-200">
+  <div class="overflow-x-auto rounded-lg">
+      <table class="table-auto w-full border-collapse">
+          <thead class="text-sm font-semibold uppercase text-gray-800 bg-gray-50 mx-auto">
+              <tr class="flex flex-row justify-between ">
+                  <th></th>
+                  <th><svg xmlns="http://www.w3.org/2000/svg" class="fill-current w-5 h-5 mx-auto"><path d="M6 22h12a2 2 0 0 0 2-2V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zm7-18 5 5h-5V4zm-4.5 7a1.5 1.5 0 1 1-.001 3.001A1.5 1.5 0 0 1 8.5 11zm.5 5 1.597 1.363L13 13l4 6H7l2-3z"></path></svg></th>
+                  <th class="p-2">
+                      <div class="font-semibold">Title</div>
+                  </th>
+                  <th class="p-2">
+                      <div class="font-semibold text-left">Description</div>
+                  </th>
+                  <th class="p-2">
+                      <div class="font-semibold text-center">Action</div>
+                  </th>
+              </tr>
+              <tr class="flex justify-between">
+                <!-- Add the media data here -->
+                  <td>
+                    <input type="checkbox" name="media-select" value="" id="">
+                  </td>
+                  <td><img src="https://images.pexels.com/photos/25652584/pexels-photo-25652584/free-photo-of-elegant-man-wearing-navy-suit.jpeg?auto=compress&cs=tinysrgb&w=400" class="h-8 w-8 mx-auto" /></td>
+                  <td>Sample Name</td>
+                  <td>Sample Description</td>
+                  <td class="p-2">
+                      <div class="flex justify-center">
+                      <a href="#" class="rounded-md hover:bg-green-100 text-green-600 p-2 flex justify-between items-center">
+                          <span>
+                            <FaEdit class="w-4 h-4 mr-1"/>
+                          </span> Edit
+                      </a>
+                      <button class="rounded-md hover:bg-red-100 text-red-600 p-2 flex justify-between items-center">
+                          <span><FaTrash class="w-4 h-4 mr-1" /></span> Delete
+                      </button>
+                      </div>
+                  </td>
+              </tr>
+          </thead>
+      </table>
+  </div>
+</div>
+
+<script>
+  async function searchMedia() {
+    
+  }
+</script>

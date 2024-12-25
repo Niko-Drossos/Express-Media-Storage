@@ -1,3 +1,4 @@
+const { createFromHexString } = require("mongoose").Types.ObjectId
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
 const Image = require("../models/schemas/Image")
@@ -43,9 +44,28 @@ exports.getUser = async (req, res) => {
 
 exports.getMyFiles = async (req, res) => {
   try {
-    const fetchImages = await Image.find({ "user.userId": req.userId }) || []
-    const fetchVideos = await Video.find({ "user.userId": req.userId }) || []
-    const fetchAudios = await Audio.find({ "user.userId": req.userId }) || []
+    // const fetchImages = await Image.find({ "user.userId": req.userId }) || []
+
+    // Return only the fields used for the UI for creating pools.
+    // title, _id, privacy, date, tags, voteCount, and description
+    const includedFields = { title: 1, _id: 1, privacy: 1, date: 1, tags: 1, voteCount: 1, description: 1 }
+
+    const userId = createFromHexString(req.userId)
+
+    const fetchImages = await Image.aggregate([
+      { $match: { "user.userId": userId }},
+      { $project: includedFields }
+    ])
+
+    const fetchVideos = await Video.aggregate([
+      { $match: { "user.userId": userId }},
+      { $project: includedFields }
+    ])
+
+    const fetchAudios = await Audio.aggregate([
+      { $match: { "user.userId": userId }},
+      { $project: includedFields }
+    ])
 
     return res.status(200).json({
       success: true,
