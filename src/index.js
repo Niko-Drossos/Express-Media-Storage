@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const expressLayouts = require('express-ejs-layouts')
 /* ------------------------------- Middlewares ------------------------------- */
-const authenticateUserJWT = require("./models/middleware/authenticateUserJWT")
+const userLoggedIn = require("./models/middleware/userLoggedIn")
 const getCookies = require('./models/middleware/getCookies')
 /* -------------------------------------------------------------------------- */
 dotenv.config()
@@ -82,13 +82,50 @@ app.get("/auth/register", (req, res) => {
 
 /* -------------------------- Form to upload files -------------------------- */
 
-app.get("/upload", authenticateUserJWT, async (req, res) => {
+app.get("/upload", userLoggedIn, async (req, res) => {
   res.render("upload.ejs")
+})
+
+/* ------------------------------- Create pool ------------------------------ */
+
+app.get("/create-pool", userLoggedIn, async (req, res) => {
+  const query = req.query
+
+  const request = await fetch(`${API_URL}/user/my-files?${new URLSearchParams(query)}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": getCookies(req, "media_authentication")
+    },
+    credentials: "include"
+  })
+
+  const response = await request.json()
+
+  // Don't let the user access the page is there is an error.
+  // This only throws an error if the user is not logged in, or login has expired
+  if (response.error) {
+    res.redirect(301, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
+    console.log(response.error)
+    return
+  }
+
+  const { images, videos, audios } = response.data
+
+  res.render("pool.ejs", {
+    query,
+    response: response.data,
+    results: {
+      images,
+      videos,
+      audios
+    }
+  })
 })
 
 /* ----------------------- Navigate to the search page ---------------------- */
 
-app.get("/search", async (req, res) => {
+app.get("/search", userLoggedIn, async (req, res) => {
   const query = req.query
 
   if (query.mediaType) {   
@@ -151,7 +188,7 @@ app.get("/search", async (req, res) => {
 })
 */
 
-app.get("/search-pools", async (req, res) => {
+app.get("/search-pools", userLoggedIn, async (req, res) => {
   const query = req.query
 
   if (query.mediaType) {   
@@ -196,7 +233,7 @@ app.get("/search-pools", async (req, res) => {
 
 /* ---------------------- View a file with document id ---------------------- */
 
-app.get("/media/:mediaType", async (req, res) => {
+app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
   const { mediaType } = req.params
   const { id } = req.query
 
@@ -227,7 +264,7 @@ app.get("/media/:mediaType", async (req, res) => {
 
 /* ------------------------ Get the users own profile ----------------------- */
 
-app.get("/profile", authenticateUserJWT, async (req, res) => {
+app.get("/profile", userLoggedIn, async (req, res) => {
   const request = await fetch(`${API_URL}/user/${req.userId}`, {
     method: "GET",
     headers: {
@@ -249,7 +286,7 @@ app.get("/profile", authenticateUserJWT, async (req, res) => {
 })
 
 /* -------------------- Get a profile with a specific id -------------------- */
-app.get("/profile/:id", authenticateUserJWT, async (req, res) => {
+app.get("/profile/:id", userLoggedIn, async (req, res) => {
   const id = req.params.id
 
   const request = await fetch(`${API_URL}/user/${id}`, {
