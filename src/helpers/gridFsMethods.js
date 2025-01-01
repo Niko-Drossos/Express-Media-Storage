@@ -1,9 +1,12 @@
 const { Readable } = require('stream')
 const { MongoClient, GridFSBucket, ObjectId } = require("mongodb")
+const getFileExt = require('./getFileExt')
 const mongoose = require("mongoose")
 const multer = require('multer')
 
 const dotenv = require("dotenv")
+const { error } = require('console')
+const Video = require('../models/schemas/Video')
 dotenv.config()
 
 // Multer storage configuration
@@ -40,14 +43,19 @@ async function initializeGridFS() {
   await initializeGridFS()
 })()
 
+/* ----------------------------- Upload mapping ----------------------------- */
+
 // Keeps track of all ongoing uploads
 const uploadStreams = new Map()
 
+// Create a map to store the timers for file uploads
+// Upload streams will be destroyed if the client doesn't send any data for 5 minutes
+const fileTimers = new Map()
+
 /* -------------------------------------------------------------------------- */
 
-// Middleware function to handle video compression upon upload
-
-const uploadFile = async function(req, file) {
+// TODO: Deprecate, changed the way how files get uploaded
+/* const uploadFile = async function(req, file) {
 
   // Either video, image, or audio
   const dbName = file.mimetype.split("/")[0]
@@ -87,7 +95,7 @@ const uploadFile = async function(req, file) {
       reject(error)
     })
   })
-}
+} */
 
 /* ------------------------------ Retrieve file ----------------------------- */
 
@@ -118,76 +126,80 @@ const retrieveFiles = async function(req, res, query) {
 
 const streamFile = async function (req, res, fileId, mimeType) {
   try {
-    let bucket;
+    let bucket
     // Select the bucket based on the MIME type
     switch (mimeType) {
       case 'video':
-        bucket = videoBucket;
-        break;
+        bucket = videoBucket
+        break
       case 'image':
-        bucket = imageBucket;
-        break;
+        bucket = imageBucket
+        break
       case 'audio':
-        bucket = audioBucket;
-        break;
+        bucket = audioBucket
+        break
       default:
         return res.status(400).json({
           success: false,
-          message: 'Invalid MIME type'
-        });
+          message: 'Invalid MIME type',
+          errorMessage: 'Invalid MIME type provided',
+          error: {}
+        })
     }
 
     // Convert fileId to ObjectId
-    const searchId = new ObjectId(fileId);
+    const searchId = new ObjectId(fileId)
 
     // Find file metadata to get its length
-    const file = await bucket.find({ _id: searchId }).next();
+    const file = await bucket.find({ _id: searchId }).next()
     if (!file) {
       return res.status(404).json({
         success: false,
         message: `File: ${fileId} not found in container`,
-      });
+        errorMessage: `File: ${fileId} not found in container`,
+        error: {}
+      })
     }
 
-    const fileSize = file.length;
-    const range = req.headers.range;
+    // Create a header for the Content-Type
+    const contentType = `${mimeType}/${getFileExt(file.filename)}`
 
+    const fileSize = file.length
+    const range = req.headers.range
     if (range) {
       // Parse the Range header
-      const [start, end] = range.replace(/bytes=/, '').split('-');
-      const startByte = parseInt(start, 10);
-      const endByte = end ? parseInt(end, 10) : fileSize - 1;
-      const chunkSize = endByte - startByte + 1;
-
+      const [start, end] = range.replace(/bytes=/, '').split('-')
+      const startByte = parseInt(start, 10)
+      const endByte = end ? parseInt(end, 10) : fileSize - 1
+      const chunkSize = endByte - startByte + 1
+      
       // Set partial content headers
       res.writeHead(206, {
         'Content-Range': `bytes ${startByte}-${endByte}/${fileSize}`,
         'Accept-Ranges': 'bytes',
         'Content-Length': chunkSize,
-        'Content-Type': mimeType,
-      });
+        'Content-Type': contentType,
+      })
 
       // Create a stream for the requested range
-      bucket.openDownloadStream(searchId, { start: startByte, end: endByte + 1 }).pipe(res);
-    } else if (mimeType === 'image') {
+      bucket.openDownloadStream(searchId, { start: startByte, end: endByte + 1 }).pipe(res)
+    } else {
       res.writeHead(200, {
           'Content-Length': fileSize,
-          'Content-Type': mimeType,
-      });
-      bucket.openDownloadStream(searchId).pipe(res);
-    } else {
-      // Throw an error to only allow file streaming
-      throw new Error("No range specified, please view through a browser")
+          'Content-Type': contentType,
+      })
+      bucket.openDownloadStream(searchId).pipe(res)
     }
+
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch file',
       errorMessage: error.message,
       error,
-    });
+    })
   }
-};
+}
 
 /* ------------------------------- Delete file ------------------------------ */
 
@@ -266,9 +278,12 @@ const startChunkedUpload = async (req, res) => {
 
   const fileId = uploadStream.id.toString()
 
-  uploadStreams.set(fileId, { uploadStream, metadata })
+  // I generate a document _id for the document so that it is initialized when you start the upload.
+  const documentId = new mongoose.Types.ObjectId()
 
-  return  { uploadStream, metadata, fileId }
+  uploadStreams.set(fileId, { uploadStream, metadata, mimeType, documentId })
+
+  return  { uploadStream, metadata, fileId, documentId }
 }
 
 /* ---------------------- Upload a file chunk to GridFS --------------------- */
@@ -290,7 +305,7 @@ const uploadChunk = async (req, res) => {
   }
 
   const chunkBuffer = req.file.buffer
-  const { uploadStream, metadata } = uploadStreams.get(fileId)
+  const { uploadStream, metadata, mimeType, documentId } = uploadStreams.get(fileId)
 
   // Check if the upload stream exists
   if (!uploadStream) {
@@ -300,6 +315,44 @@ const uploadChunk = async (req, res) => {
       data: { chunkIndex, totalChunks, fileId }
     })
   }
+
+  // Reset or initialize the timer for this file
+  if (fileTimers.has(fileId)) {
+    clearTimeout(fileTimers.get(fileId)) // Clear the existing timer
+  }
+
+  // Set a timer for the upload stream to be cleaned up
+  const timer = setTimeout(async () => {
+    console.warn(`Upload for file ${fileId} timed out.`)
+    uploadStream.destroy() // Destroy the upload stream
+    uploadStreams.delete(fileId) // Remove from the uploadStreams map
+    fileTimers.delete(fileId) // Remove from the timers map
+
+    let documentType
+    switch(mimeType) {
+      case "video":
+        documentType = Video
+        break
+      case "image":
+        documentType = Image
+        break
+      case "audio":
+        documentType = Audio
+        break
+    }
+
+    try {
+      // Delete the document in the proper collection
+      await documentType.findByIdAndDelete(documentId)
+      // Remove partial file from GridFS
+      await cleanupOrphanedChunks(mimeType)
+      console.log(`Timed-out file ${fileId} deleted successfully.`)
+    } catch (err) {
+      console.error(`Failed to delete timed-out file ${fileId}:`, err)
+    }
+  }, 5 * 60 * 1000) // Set a timeout of 5 minutes
+
+  fileTimers.set(fileId, timer) // Save the new timer
 
   try {
     // Write the chunk to the upload stream
@@ -321,6 +374,7 @@ const uploadChunk = async (req, res) => {
         uploadStream.end(() => {
           console.log(`File ${fileId} uploaded successfully.`)
           uploadStreams.delete(fileId) // Clean up the stream
+          clearTimeout(fileTimers.get(fileId)) // Remove the timer so the file doesn't delete itself after upload
           resolve()
         })
         uploadStream.on('error', reject) // Handle errors during end
@@ -350,4 +404,44 @@ const uploadChunk = async (req, res) => {
   }
 }
 
-module.exports = { upload, uploadFile, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload }
+/* ------------------ Clean up orphaned chunks from GridFS ------------------ */
+
+async function cleanupOrphanedChunks(bucketName) {
+  try {
+    const chunksCollection = db.collection(`${bucketName}.chunks`)
+
+    console.log(`Checking for orphaned chunks in ${bucketName} bucket...`)
+
+    // Find orphaned chunks
+    const orphanedChunks = await chunksCollection.aggregate([
+      {
+        $lookup: {
+          from: `${bucketName}.files`, // Match chunks with their files
+          localField: 'files_id',     // Chunks reference `files_id`
+          foreignField: '_id',        // Files use `_id`
+          as: 'file',
+        },
+      },
+      {
+        $match: {
+          file: { $size: 0 }, // Orphaned chunks have no matching file
+        },
+      },
+    ]).toArray()
+
+    if (orphanedChunks.length > 0) {
+      const idsToDelete = orphanedChunks.map((chunk) => chunk._id)
+
+      // Delete orphaned chunks
+      await chunksCollection.deleteMany({ _id: { $in: idsToDelete } })
+      console.log(`Deleted ${idsToDelete.length} orphaned chunks from ${bucketName} bucket.`)
+    } else {
+      console.log(`No orphaned chunks found in ${bucketName} bucket.`)
+    }
+  } catch (err) {
+    console.error(`Error cleaning orphaned chunks from ${bucketName} bucket:`, err)
+  }
+}
+
+
+module.exports = { upload, /* uploadFile, */ retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload }

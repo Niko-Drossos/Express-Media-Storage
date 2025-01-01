@@ -37,126 +37,26 @@ exports.findFiles = async (req, res) => {
   }
 }
  */
-/* ---------------------------- Upload file batch --------------------------- */
-
-// TODO: Depreceate this
-/* exports.batchUpload = async (req, res) => {
-  try {
-    // File extensions that can be uploaded
-    const acceptedVideoExt = ["mp4"]
-    const acceptedImageExt = ["jpg", "jpeg", "png"] 
-    const acceptedAudioExt = ["mp3", "m4a", "wav"]
-
-    const { body } = req
-
-    // Arrays for response to user about results
-    const successfulUploads = [], failedUploads = []
-
-    const newUploads = await req.uploads.map(async file => {
-      try {
-        // Get the index of the file from the fieldname that uploaded it (returns 0 - 9)
-        const index = file.fieldname.split("file")[1]
-
-        // Upload the file and return the file ID
-        const uploadedFileId = await uploadFile(req, file)
-
-        const fileExtension = getFileExt(file.originalname)
-        
-        // Add custom file information
-        const customTitle = body[`title${index}`]
-        const date = body[`date${index}`]
-        const description = body[`description${index}`]
-
-        // TODO: Create transcription function audios and videos
-        if (acceptedAudioExt.includes(fileExtension) || acceptedVideoExt.includes(fileExtension)) {
-          var completedTranscription = {
-            status: "none",
-            text: ""
-          }
-        }
-
-        const documentBody = {
-          title: customTitle || file.originalname.split(".").slice(0, -1).join("."),
-          filename: `${req.username}-${file.originalname}`,
-          user: {
-            userId: req.userId,
-            username: req.username
-          },
-          description: description || "No description",
-          fileId: uploadedFileId,
-          date: new Date(date)
-        }
-
-        // Create exactly one document per upload
-        if (acceptedImageExt.includes(fileExtension)) {
-          return await Image.create(documentBody)
-        } else if (acceptedVideoExt.includes(fileExtension)) {
-          // TODO: make function to determine media length with byte size
-          return await Video.create({ ...documentBody, transcription: completedTranscription || "" })
-        } else if (acceptedAudioExt.includes(fileExtension)) {
-          return await Audio.create({ ...documentBody, transcription: completedTranscription || ""})
-        }
-
-        successfulUploads.push({ file: file.originalname })
-      } catch (error) {
-        // If an upload fails then add it to the failed uploads
-        failedUploads.push({ file: file.originalname, error: error.message })
-      }
-    })
-    
-    // Attempt to upload all files
-    await Promise.allSettled(newUploads)
-
-    // Sort the uploads into videos, images, and audios
-    let videos = [], images = [], audios = []
-    successfulUploads.forEach(upload => {
-      const fileExt = getFileExt(upload.filename)
-
-      if (acceptedVideoExt.includes(fileExt)) videos.push(upload)
-      else if (acceptedImageExt.includes(fileExt)) images.push(upload)
-      else if (acceptedAudioExt.includes(fileExt)) audios.push(upload)
-    })
-
-    res.status(201).json({
-      success: failedUploads.length ? false : true,
-      message: "Uploaded files to account",
-      data: {
-        // separate the images and videos
-        uploadedFiles: {
-          images,
-          videos,
-          audios
-        },
-        failedUploads
-      }
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to upload files",
-      errorMessage: error.message,
-      error
-    })
-  }
-}
- */
 
 /* ------------------------- Start a chunked upload ------------------------- */
 
 exports.startChunkUpload = async (req, res) => {
   try {
     const { mimeType, metadata } = req.body
-
+    console.log(req.body)
     // Generate a unique file name to send back to the client for uploading
     req.generatedFileName = `${Date.now()}-${metadata.fileName}`
 
-    const { uploadStream, fileId } = await startChunkedUpload(req, res)
-
+    const { uploadStream, fileId, documentId } = await startChunkedUpload(req, res)
+    
     // Create a document for the file
     let document
     let documentBody = {
+      // I set the document _id so that it is initialized when you start the upload.
+      // I do this to prevent having to send the document _id back to the client
+      _id :documentId,
       title: metadata.title || metadata.fileName.split(".").slice(0, -1).join("."),
-      filename: metadata.fileName,
+      filename: `${req.userId}-${metadata.fileName}`,
       description: metadata.description || "No description",
       fileId: fileId,
       date: new Date(metadata.date),
@@ -181,6 +81,7 @@ exports.startChunkUpload = async (req, res) => {
           break;
       }
     } catch (error) {
+      console.log(error)
       return res.status(500).json({
         success: false,
         message: "Failed to create document for file",
