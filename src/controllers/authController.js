@@ -15,7 +15,9 @@ exports.registerUser = async (req, res) => {
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Missing username, password or email"
+        message: "Not all registration fields were provided",
+        errorMessage: "Missing username, password or email fields",
+        error: {}
       })
     }
 
@@ -25,7 +27,9 @@ exports.registerUser = async (req, res) => {
     if (!isStrongPassword) {
       return res.status(400).json({
         success: false,
-        message: "Password is not strong enough, must contain 1 uppercase, 1 lowercase, 1 number, 1 special character and at least 8 characters"
+        message: "Password is not strong enough, must contain 1 uppercase, 1 lowercase, 1 number, 1 special character and at least 8 characters",
+        errorMessage: "Password is not strong enough, must contain 1 uppercase, 1 lowercase, 1 number, 1 special character and at least 8 characters",
+        error: {}
       })
     }
     
@@ -72,26 +76,31 @@ exports.loginUser = async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: "Missing username or password"
+        message: "Not all login fields were provided",
+        errorMessage: "Missing username or password fields",
+        error: {}
       }) 
     }
 
     // Find the user in the database and throw an error if none found
     const foundUser = await User.findOne({ username }, { password: 1 })
-    if (!foundUser || foundUser == undefined) {
+
+    // TODO: Depreciate error message as it decreases security
+    /* if (!foundUser || foundUser == undefined) {
       return res.status(404).json({
         success: false,
         message: "User not found"
       })
     }
-
+ */
     // Check if password is a match 
     const passwordMatch = await compareHash(password, foundUser.password)
     if (!passwordMatch) {
       return res.status(403).json({
         success: false,
-        message: "Failed to log in",
-        errorMessage: "Incorrect credentials"
+        message: "Failed to login",
+        errorMessage: "Incorrect account credentials",
+        error: {}
       })
     }
 

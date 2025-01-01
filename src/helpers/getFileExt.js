@@ -1,3 +1,3 @@
-module.exports = getFileExt = (fileUrl) => {
-  return fileUrl.split('.').pop().toLowerCase()
+module.exports = getFileExt = (fileName) => {
+  return fileName.split('.').pop().toLowerCase()
 } 

@@ -62,7 +62,6 @@ exports.searchUsers = async (req, res) => {
 
 exports.searchPools = async (req, res) => {
   try {
-    console.log(req.query)
     const query = req.query
 
     // Object that will be searched for in the db
@@ -271,6 +270,11 @@ exports.searchVideos = async (req, res) => {
         doc.favorited = false;
       });
     }
+
+    // Add a property to see if the user voted and return the result
+    /* searchResults.forEach((doc) => {
+      doc.voted = user.votes.videos.includes(doc._id.toString());
+    }); */
 
     res.status(200).json({
       success: true, 

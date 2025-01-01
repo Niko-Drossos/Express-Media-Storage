@@ -124,15 +124,16 @@
         body: JSON.stringify({ username, email, password })
       })
       
-      if (!registerAttempt.ok) {
-        alert(`Registration failed: ${registerAttempt.status}`)
+      if (!registerAttempt.success) {
+        alert(`Registration failed: ${registerAttempt.errorMessage});
+        }`)
         return  
       }
 
       let returnedData = await registerAttempt.json()
-      console.log(returnedData)
+
       alert("Registration successful")
-      window.location = "/auth/login"
+      window.location = "/auth/login?redirect=/"
     }
 
     // Prompt the user if they want to send an email to support

@@ -48,6 +48,12 @@ Add a feature that shows available usernames for search
 
 Finish create create-pool page
 
+Fix the search routes returning the actual vote data instead of just the voteCount
+
+Add support for deleting files
+
+Add support for changing color themes
+
 Color palette:
 
 Dark-theme:

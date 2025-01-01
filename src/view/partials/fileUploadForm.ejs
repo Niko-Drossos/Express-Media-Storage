@@ -120,7 +120,7 @@
         if (uploadResponse.success) {
             // Wait half a second to allow the server to process the request
             setTimeout(async () => {
-                await uploadFile(file, uploadResponse.data.fileId, uploadResponse.data.ext)
+                await uploadFile(file, uploadResponse.data.ext, uploadResponse.data.fileId)
             }, 500)
         }
     }
@@ -140,46 +140,50 @@
         }
 
         progressBarFill.textContent = stringUploadPercentage
+
+        if (uploadPercentage === 100) {
+            setTimeout(() => {
+                alert('File successfully uploaded')
+                progressBar.classList.add('hidden')
+            }, 0)
+        }
     }
 
-    async function uploadFile(file, fileId, fileExt) {
-        const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
-        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    async function uploadFile(file, fileExt, fileId) {
+        const CHUNK_SIZE = 4 * 1024 * 1024 // 4MB
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
 
         // Display the progress bar
         progressBar.classList.remove('hidden')
 
         for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-            const start = chunkIndex * CHUNK_SIZE;
-            const end = Math.min(start + CHUNK_SIZE, file.size);
-            const chunk = file.slice(start, end);
+            const start = chunkIndex * CHUNK_SIZE
+            const end = Math.min(start + CHUNK_SIZE, file.size)
+            const chunk = file.slice(start, end)
 
-            const formData = new FormData();
-            formData.append('chunk', chunk);
-            formData.append('chunkIndex', chunkIndex);
-            formData.append('totalChunks', totalChunks);
-            formData.append('fileExt', fileExt);
-            formData.append('fileId', fileId);
-
-            // TODO: Keep track of the number of failed uploads
-            // let failedUploads = 0;
+            const formData = new FormData()
+            formData.append('chunk', chunk)
+            formData.append('chunkIndex', chunkIndex)
+            formData.append('totalChunks', totalChunks)
+            formData.append('fileExt', fileExt)
+            formData.append('fileId', fileId)
 
             try {
                 const response = await fetch('/file/chunked-upload', {
                     method: 'POST',
                     body: formData
-                });
+                })
 
-                const result = await response.json();
-                console.log(result.message);
+                const result = await response.json()
+                console.log(result.message)
 
                 if (result.success) {
-                    updateProgressBar(result.data.uploadPercentage);
+                    updateProgressBar(result.data.uploadPercentage)
                 } else {
-                    throw new Error(result.message);
+                    throw new Error(result.message)
                 }
             } catch (error) {
-                console.error('Error uploading chunk:', error);
+                console.error('Error uploading chunk:', error)
                 // Retry the last failed chunk
                 chunkIndex--
             }

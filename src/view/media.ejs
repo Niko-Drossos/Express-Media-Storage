@@ -5,7 +5,7 @@
             <% if (mediaType === 'image') { %>
                 <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/image/<%= media.fileId %>" alt="<%= media.title %>">
             <% } else if (mediaType === 'video') { %>
-                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" pooler="<%= media.thumbnail %>" controls>
+                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" controls> 
                     <source src="/view/video/<%= media.fileId %>" type="video/mp4">
                 </video>
             <% } else if (mediaType === 'audio') { %>
@@ -45,14 +45,14 @@
 
             <div class="bottom-0 left-0 right-0">
                 <div class="flex items-center justify-between mb-2 pt-4 pb-2">
-                    <%- include('./partials/voteControls.ejs', { id: media._id, voteCount: media.voteCount, mediaType, favorited: media.favorited }) %>
+                    <%- include('./partials/voteControls.ejs', { id: media._id, voteCount: media.voteCount, mediaType, favorited: media.favorited, voted: media.voted }) %>
                 </div>
 
                 <div class="pb-4">
                     <div class="flex items-center">
                         <textarea class="w-full resize-none outline-none appearance-none rounded-lg p-2 leading-tight focus:outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
                         <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="poolComment(event)">
-                            <img src="../icons/right-arrow.svg" alt="Send">
+                            <img src="../icons/arrows/right-arrow.svg" alt="Send">
                         </button>
                     </div>
                 </div>

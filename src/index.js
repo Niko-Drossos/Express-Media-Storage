@@ -308,6 +308,20 @@ app.get("/profile/:id", userLoggedIn, async (req, res) => {
   res.render("profile.ejs", response.data.user)
 })
 
+/* --------------------- Temporary global error handler --------------------- */
+
+// Global uncaught exception handler
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1); // Optionally restart the process
+});
+
+// Global unhandled rejection handler
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1); // Optionally restart the process
+});
+
 /* -------------------------------------------------------------------------- */
 
 app.listen(port, host, () => console.log(`server started at http://localhost:${port}`))
