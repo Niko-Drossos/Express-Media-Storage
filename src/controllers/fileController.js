@@ -57,7 +57,7 @@ exports.startChunkUpload = async (req, res) => {
       _id :documentId,
       title: metadata.title || metadata.fileName.split(".").slice(0, -1).join("."),
       filename: `${req.userId}-${metadata.fileName}`,
-      description: metadata.description || "No description",
+      description: metadata.description || "",
       fileId: fileId,
       date: new Date(metadata.date),
       user: {

@@ -32,9 +32,9 @@ async function initializeGridFS() {
   db = client.db(dbName)
 
   // Initialize multiple buckets for different media types
-  videoBucket = new GridFSBucket(db, { bucketName: 'video' })
-  audioBucket = new GridFSBucket(db, { bucketName: 'audio' })
-  imageBucket = new GridFSBucket(db, { bucketName: 'image' })
+  videoBucket = new GridFSBucket(db, { bucketName: 'video', chunkSizeBytes: 4 * 1024 * 1024 }) // 4 MB Chunks
+  audioBucket = new GridFSBucket(db, { bucketName: 'audio', chunkSizeBytes: 2 * 1024 * 1024 }) // 2 MB Chunks
+  imageBucket = new GridFSBucket(db, { bucketName: 'image', chunkSizeBytes: 512 * 1024 }) // 512KB Chunks
 }
 
 
@@ -324,7 +324,8 @@ const uploadChunk = async (req, res) => {
   // Set a timer for the upload stream to be cleaned up
   const timer = setTimeout(async () => {
     console.warn(`Upload for file ${fileId} timed out.`)
-    uploadStream.destroy() // Destroy the upload stream
+    uploadStream.filename = `DELETE-${uploadStream.options.filename}` // Update the filename so the database cleans up the file
+    uploadStream.end() // Destroy the upload stream
     uploadStreams.delete(fileId) // Remove from the uploadStreams map
     fileTimers.delete(fileId) // Remove from the timers map
 
@@ -345,7 +346,7 @@ const uploadChunk = async (req, res) => {
       // Delete the document in the proper collection
       await documentType.findByIdAndDelete(documentId)
       // Remove partial file from GridFS
-      await cleanupOrphanedChunks(mimeType)
+      await cleanupDeletedChunks(mimeType, fileId)
       console.log(`Timed-out file ${fileId} deleted successfully.`)
     } catch (err) {
       console.error(`Failed to delete timed-out file ${fileId}:`, err)
@@ -371,6 +372,8 @@ const uploadChunk = async (req, res) => {
     // If this is the last chunk, finalize the upload stream
     if (chunkIndex === totalChunks - 1) {
       await new Promise((resolve, reject) => {
+        uploadStream.metadata = metadata
+        console.log(uploadStream)
         uploadStream.end(() => {
           console.log(`File ${fileId} uploaded successfully.`)
           uploadStreams.delete(fileId) // Clean up the stream
@@ -406,28 +409,39 @@ const uploadChunk = async (req, res) => {
 
 /* ------------------ Clean up orphaned chunks from GridFS ------------------ */
 
-async function cleanupOrphanedChunks(bucketName) {
+async function cleanupDeletedChunks(bucketName, fileId) {
   try {
     const chunksCollection = db.collection(`${bucketName}.chunks`)
+    const filesCollection = db.collection(`${bucketName}.files`)
 
     console.log(`Checking for orphaned chunks in ${bucketName} bucket...`)
 
-    // Find orphaned chunks
+    // Find orphaned chunks that have the filename DELETED-{filename}
     const orphanedChunks = await chunksCollection.aggregate([
       {
         $lookup: {
-          from: `${bucketName}.files`, // Match chunks with their files
-          localField: 'files_id',     // Chunks reference `files_id`
-          foreignField: '_id',        // Files use `_id`
+          from: `${bucketName}.files`, // Join with the files collection
+          localField: 'files_id',     // Match the files_id in chunks
+          foreignField: '_id',        // Match the _id in files
           as: 'file',
         },
       },
       {
-        $match: {
-          file: { $size: 0 }, // Orphaned chunks have no matching file
+        $unwind: {
+          path: '$file',             // Unwind the joined file array
+          preserveNullAndEmptyArrays: true, // Preserve null for orphaned chunks
         },
       },
-    ]).toArray()
+      {
+        $match: {
+          files_id: new mongoose.Types.ObjectId(fileId), // Match chunks with the fileId to get deleted
+        },
+      },
+    ]).toArray();
+
+    // Delete orphaned file from files collection
+    const deletedFile = await filesCollection.deleteOne({ _id: new mongoose.Types.ObjectId(fileId) })
+    console.log(`Deleted file ${fileId} from ${bucketName} bucket.`)
 
     if (orphanedChunks.length > 0) {
       const idsToDelete = orphanedChunks.map((chunk) => chunk._id)

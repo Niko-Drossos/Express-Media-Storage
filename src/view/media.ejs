@@ -30,7 +30,7 @@
                     </p>
                 </div>
                 <b class="text-xl"><%= media.title %></b>
-                <p class="pb-4 max-h-36 overflow-y-auto"><%= media.description %></p>
+                <p class="pb-4 max-h-36 overflow-y-auto"><%= media.description || "(No Description)"%></p>
             </header>
 
             <div class="flex-grow content-end overflow-y-auto max-h-full">
