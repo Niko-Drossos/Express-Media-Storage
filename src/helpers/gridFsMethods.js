@@ -52,51 +52,6 @@ const uploadStreams = new Map()
 // Upload streams will be destroyed if the client doesn't send any data for 5 minutes
 const fileTimers = new Map()
 
-/* -------------------------------------------------------------------------- */
-
-// TODO: Deprecate, changed the way how files get uploaded
-/* const uploadFile = async function(req, file) {
-
-  // Either video, image, or audio
-  const dbName = file.mimetype.split("/")[0]
-  const db = client.db(dbName)
-  const bucket = new mongodb.GridFSBucket(db)
-
-  // Create a promise to wrap the pipeline operation
-  return new Promise((resolve, reject) => {
-    // Create a readable stream from the buffer
-    const bufferStream = Readable.from(file.buffer)
-
-    const newFileName = `${req.username}-${file.originalname}`
-
-    // Pipe the buffer stream through the video compressor
-    const uploadStream = bufferStream.pipe(bucket.openUploadStream(newFileName, {
-      metadata: {
-        // Conditionally add the duration and dimensions to the metadata
-        ...(file.duration && { duration: file.duration }),
-        ...(file.dimensions && { dimensions: file.dimensions }),
-        user: {
-          userId: req.userId,
-          username: req.username
-        }
-      }
-    }))
-
-    // Listen for the 'finish' event on the upload stream
-    uploadStream.on('finish', () => {
-      // Retrieve the ID of the uploaded file
-      const fileId = uploadStream.id // Use uploadStream.id to access the _id property
-      resolve(fileId) // Resolve with the file ID
-    })
-
-    // Listen for errors on the upload stream
-    uploadStream.on('error', (error) => {
-      console.error("Error:", error)
-      reject(error)
-    })
-  })
-} */
-
 /* ------------------------------ Retrieve file ----------------------------- */
 
 // Maybe remove, I don't know what I would need this for
@@ -256,19 +211,28 @@ const startChunkedUpload = async (req, res) => {
   const { mimeType, metadata } = req.body
   const generatedFileName = req.generatedFileName
 
+  // Save the file metadata to add to the upload stream
+  const fileMetadata = {
+    ...metadata,
+    user: {
+      userId: req.userId,
+      username: req.username
+    }
+  }
+
   let uploadStream
 
   // Open up a new upload stream for the file to be written to and save the metadata with it.
   // Use a different bucket depending on the mimeType of the file
   switch(mimeType) {
     case "video":
-      uploadStream = videoBucket.openUploadStream(generatedFileName)
+      uploadStream = videoBucket.openUploadStream(generatedFileName, fileMetadata)
       break
     case "image":
-      uploadStream = imageBucket.openUploadStream(generatedFileName)
+      uploadStream = imageBucket.openUploadStream(generatedFileName, fileMetadata)
       break
     case "audio":
-      uploadStream = audioBucket.openUploadStream(generatedFileName)
+      uploadStream = audioBucket.openUploadStream(generatedFileName, fileMetadata)
       break
   }
 
@@ -276,14 +240,16 @@ const startChunkedUpload = async (req, res) => {
     throw new Error(`Failed to open upload stream with mime type: ${mimeType}`)
   }
 
+  // Get the files _id to be used as a key
   const fileId = uploadStream.id.toString()
 
-  // I generate a document _id for the document so that it is initialized when you start the upload.
+  // I generate a document _id for the document so that it is initialized when you start the upload
+  // This is to prevent having to send the document _id back to the client ad a lot of other things
   const documentId = new mongoose.Types.ObjectId()
 
-  uploadStreams.set(fileId, { uploadStream, metadata, mimeType, documentId })
+  uploadStreams.set(fileId, { uploadStream, mimeType, documentId })
 
-  return  { uploadStream, metadata, fileId, documentId }
+  return  { uploadStream, fileId, documentId }
 }
 
 /* ---------------------- Upload a file chunk to GridFS --------------------- */
@@ -305,7 +271,7 @@ const uploadChunk = async (req, res) => {
   }
 
   const chunkBuffer = req.file.buffer
-  const { uploadStream, metadata, mimeType, documentId } = uploadStreams.get(fileId)
+  const { uploadStream, mimeType, documentId } = uploadStreams.get(fileId)
 
   // Check if the upload stream exists
   if (!uploadStream) {
@@ -324,7 +290,7 @@ const uploadChunk = async (req, res) => {
   // Set a timer for the upload stream to be cleaned up
   const timer = setTimeout(async () => {
     console.warn(`Upload for file ${fileId} timed out.`)
-    uploadStream.filename = `DELETE-${uploadStream.options.filename}` // Update the filename so the database cleans up the file
+    uploadStream.filename = `DELETE-${uploadStream.options.filename}` // Update the filename so if it doesn't get deleted you know the file was deleted 
     uploadStream.end() // Destroy the upload stream
     uploadStreams.delete(fileId) // Remove from the uploadStreams map
     fileTimers.delete(fileId) // Remove from the timers map
@@ -372,7 +338,6 @@ const uploadChunk = async (req, res) => {
     // If this is the last chunk, finalize the upload stream
     if (chunkIndex === totalChunks - 1) {
       await new Promise((resolve, reject) => {
-        uploadStream.metadata = metadata
         console.log(uploadStream)
         uploadStream.end(() => {
           console.log(`File ${fileId} uploaded successfully.`)
@@ -458,4 +423,4 @@ async function cleanupDeletedChunks(bucketName, fileId) {
 }
 
 
-module.exports = { upload, /* uploadFile, */ retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload }
+module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload }
