@@ -107,8 +107,14 @@ const userSchema = new Schema({
   collection: 'users'
 })
 
-// Index the usernames for faster searching
-userSchema.index({ username: 1 })
+/* --------------------------------- Indexes -------------------------------- */
+
+// Already created because of unique username
+// userSchema.index({ username: 1 })
+
+userSchema.index({ tags: 1 })
+
+/* ------------------------------- Middleware ------------------------------- */
 
 userSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)

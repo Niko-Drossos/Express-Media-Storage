@@ -97,7 +97,11 @@ const poolSchema = new Schema({
   collection: 'pools'
 })
 
+/* --------------------------------- Indexes -------------------------------- */
+
 poolSchema.index({ tags: 1 })
+
+/* ------------------------------- Middleware ------------------------------- */
 
 // Middleware to update voteCount when likes array is modified
 poolSchema.pre('save', function (next) { 

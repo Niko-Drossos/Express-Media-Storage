@@ -17,7 +17,7 @@ const app = express()
 const port = PORT || 3000
 const host = '0.0.0.0' // This makes the server listen on all available interfaces
 
-connectDB()
+connectDB() // Connect to MongoDB
 
 const corsOptions = {
   origin: frontendUrl,

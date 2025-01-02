@@ -55,7 +55,11 @@ const imageSchema = new Schema({
   collection: 'images'
 })
 
+/* --------------------------------- Indexes -------------------------------- */
+
 imageSchema.index({ tags: 1 })
+
+/* ------------------------------- Middleware ------------------------------- */
 
 imageSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)

@@ -66,9 +66,13 @@ const audioSchema = new Schema({
   collection: 'audios'
 })
 
+/* --------------------------------- Indexes -------------------------------- */
+
 audioSchema.index({ tags: 1 })
 
-// Middleware to update likeCount when votes array is modified
+/* ------------------------------- Middleware ------------------------------- */
+
+// Update likeCount when votes array is modified
 audioSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)
 })

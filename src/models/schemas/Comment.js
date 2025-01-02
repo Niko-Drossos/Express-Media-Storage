@@ -77,7 +77,11 @@ const commentSchema = new Schema({
   collection: 'comments'
 })
 
-/* ------------- Update the voteCount when the document is saved ------------ */
+/* --------------------------------- Indexes -------------------------------- */
+
+commentSchema.index({ content: 'text' })
+
+/* ------------------------------- Middleware ------------------------------- */
 
 commentSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)
