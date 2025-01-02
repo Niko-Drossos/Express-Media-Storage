@@ -4,9 +4,8 @@ const User = require("../models/schemas/User")
 const Image = require("../models/schemas/Image")
 const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
-/* ------------------------------- Middleware ------------------------------- */
 
-/* --------------------------------- Helpers -------------------------------- */
+/* ---------------------- Get one user for profile page --------------------- */
 
 exports.getUser = async (req, res) => {
   try {

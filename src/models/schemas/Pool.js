@@ -97,6 +97,8 @@ const poolSchema = new Schema({
   collection: 'pools'
 })
 
+poolSchema.index({ tags: 1 })
+
 // Middleware to update voteCount when likes array is modified
 poolSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)

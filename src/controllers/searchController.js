@@ -223,7 +223,7 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, content, id, comments=false,page=1, limit=12 } = query
+    const { userId, usernames, title, startDate, endDate, content, tags, id, comments=false,page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -237,6 +237,7 @@ exports.searchVideos = async (req, res) => {
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (content) searchQuery.transcription.text = new RegExp(content, 'i')
     if (id) searchQuery._id = id
+    if (tags) searchQuery.tags = { $all: tags.split(",") }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -258,7 +259,7 @@ exports.searchVideos = async (req, res) => {
 
     // Get the users favorite videos
     const user = await User.findById(req.userId).select("favorites.videos")
-    const favoritedVideos = user.favorites.videos
+    const favoritedVideos = user.favorites.videos || []
 
     // Add a property to see is the video is in the users favorites array
     if (favoritedVideos) {
@@ -309,7 +310,7 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, id, comments=false, page=1, limit=12 } = query
+    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -322,6 +323,7 @@ exports.searchImages = async (req, res) => {
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
     if (id) searchQuery._id = id
+    if (tags) searchQuery.tags = { $all: tags.split(",") }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -343,7 +345,7 @@ exports.searchImages = async (req, res) => {
 
       // Get the users favorite images
       const user = await User.findById(req.userId).select("favorites.images")
-      const favoritedImages = user.favorites.images
+      const favoritedImages = user.favorites.images || []
 
       // Add a property to see is the video is in the users favorites array
       if (favoritedImages) {
@@ -388,7 +390,7 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, id, comments=false, page=1, limit=12 } = query
+    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -402,6 +404,7 @@ exports.searchAudios = async (req, res) => {
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (id) searchQuery._id = id
+    if (tags) searchQuery.tags = { $all: tags.split(",") }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -423,7 +426,7 @@ exports.searchAudios = async (req, res) => {
 
       // Get the users favorite audios
       const user = await User.findById(req.userId).select("favorites.audios")
-      const favoritedAudios = user.favorites.audios
+      const favoritedAudios = user.favorites.audios || []
 
       // Add a property to see is the video is in the users favorites array
       if (favoritedAudios) {

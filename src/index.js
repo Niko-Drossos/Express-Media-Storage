@@ -49,6 +49,7 @@ app.use("/view", require("./routes/view.routes"))
 app.use("/vote", require("./routes/vote.routes"))
 app.use("/daat", require("./routes/daat.routes"))
 app.use("/favorite", require("./routes/favorite.routes"))
+app.use("/suggest", require("./routes/suggest.routes"))
 
 /* -------------------------------- Homepage -------------------------------- */
 

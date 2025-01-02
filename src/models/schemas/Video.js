@@ -75,6 +75,8 @@ const videoSchema = new Schema({
   collection: 'videos'
 })
 
+videoSchema.index({ tags: 1 })
+
 // Middleware to update likeCount when votes array is modified
 videoSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)

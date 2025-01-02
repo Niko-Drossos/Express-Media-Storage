@@ -64,6 +64,7 @@ exports.startChunkUpload = async (req, res) => {
         userId: req.userId,
         username: req.username
       },
+      tags: metadata.tags ? metadata.tags.split(",") : []
     }
 
     try {

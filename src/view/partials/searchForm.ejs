@@ -21,16 +21,21 @@
                         <!-- TODO: create new search pages for these options -->
                         <!-- <option value="users">User</option> -->
                         <!-- <option value="comments">Comment</option> -->
-                        <!-- TODO: change the name of pools to pools -->
                         <!-- <option value="pools">Pool</option> -->
                     </select>
                 </div>
             </div>
             <div class="md:w-1/2 px-3">
-                <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="grid-zip">
-                    PLACEHOLDER
+                <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="favorites">
+                    Favorites
                 </label>
-                <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="grid-zip" type="text" placeholder="COMING SOON" disabled>
+                <div class="relative">
+                    <select class="block appearance-none w-full bg-grey-lighter border border-grey-lighter text-grey-darker py-3 px-4 pr-8 rounded" id="favorites" name="favorites">
+                        <option value="any">Any</option>
+                        <option value="include">Include Favorites</option>
+                        <option value="exclude">Exclude Favorites</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="-mx-3 md:flex mb-6">
@@ -57,6 +62,7 @@
         </div>
         <div class="flex-row flex justify-between">
             <%- include('./form/usernameSelector.ejs', query) %>
+            <span class="block mx-3"></span>
             <%- include('./form/tagSelector.ejs', query) %>
         </div>
         

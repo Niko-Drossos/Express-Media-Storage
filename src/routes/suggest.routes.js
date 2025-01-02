@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 
 /* ------------------------------- Controller ------------------------------- */
-const userController = require("../controllers/userController")
+const suggestController = require("../controllers/suggestController")
 /* --------------------------------- Helpers -------------------------------- */
 
 /* ------------------------------- Middlewares ------------------------------ */
@@ -10,16 +10,9 @@ const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)
 /* -------------------------------------------------------------------------- */
 
-// router.get("/search", userController.searchUsers)
+router.get("/usernames", suggestController.usernames)
 
-router.get("/my-files", userController.getMyFiles)
-
-router.get("/media-titles", userController.mediaTitles)
-
-router.post("/follow/:userId", userController.follow)
-
-router.post("/unfollow/:userId", userController.unfollow)
-
-router.get("/:userId", userController.getUser)
+// Allow for searching different collections and their tags
+router.get("/:collection/tags", suggestController.tags)
 
 module.exports = router
