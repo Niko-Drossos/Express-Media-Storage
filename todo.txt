@@ -52,6 +52,8 @@ Fix the search routes returning the actual vote data instead of just the voteCou
 
 Add support for deleting files
 
+Fix mongoose not creating schema indexes by default, https://chatgpt.com/share/67762873-9400-800e-9fc2-66b4579573cd
+
 Add support for changing color themes
 
 Color palette:

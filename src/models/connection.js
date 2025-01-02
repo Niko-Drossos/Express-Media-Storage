@@ -5,7 +5,9 @@ dotenv.config()
 const { Mongo_Connection_Uri } = process.env
 
 // Connect to MongoDB using Mongoose
-const connectDB = () => mongoose.connect(Mongo_Connection_Uri)
+const connectDB = () => mongoose.connect(Mongo_Connection_Uri, {
+  autoIndex: false, // Disable automatic index creation
+})
 const connection = mongoose.connection
 
 connection.on('connected', () => {
