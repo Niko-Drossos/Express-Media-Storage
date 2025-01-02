@@ -43,7 +43,7 @@ exports.findFiles = async (req, res) => {
 exports.startChunkUpload = async (req, res) => {
   try {
     const { mimeType, metadata } = req.body
-    console.log(req.body)
+
     // Generate a unique file name to send back to the client for uploading
     req.generatedFileName = `${Date.now()}-${metadata.fileName}`
 

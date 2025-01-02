@@ -338,9 +338,7 @@ const uploadChunk = async (req, res) => {
     // If this is the last chunk, finalize the upload stream
     if (chunkIndex === totalChunks - 1) {
       await new Promise((resolve, reject) => {
-        console.log(uploadStream)
         uploadStream.end(() => {
-          console.log(`File ${fileId} uploaded successfully.`)
           uploadStreams.delete(fileId) // Clean up the stream
           clearTimeout(fileTimers.get(fileId)) // Remove the timer so the file doesn't delete itself after upload
           resolve()
@@ -423,4 +421,4 @@ async function cleanupDeletedChunks(bucketName, fileId) {
 }
 
 
-module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload }
+module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload, uploadStreams }

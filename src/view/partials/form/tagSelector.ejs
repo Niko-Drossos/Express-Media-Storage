@@ -73,6 +73,12 @@
     let tagSearchTimeout = null
 
     const fetchTagSuggestions = async (query) => {
+        // Don't make a request if the query is empty
+        if (query === '') {
+            updateTagDatalist([])
+            return
+        }
+
         clearTimeout(tagSearchTimeout)
         // Give the user some time to type before making the request
         tagSearchTimeout = setTimeout(async () => {

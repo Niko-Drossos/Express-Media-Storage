@@ -5,9 +5,12 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const expressLayouts = require('express-ejs-layouts')
+const readline = require('readline')
+const { uploadStreams } = require('./helpers/gridFsMethods')
 /* ------------------------------- Middlewares ------------------------------- */
 const userLoggedIn = require("./models/middleware/userLoggedIn")
 const getCookies = require('./models/middleware/getCookies')
+const { acceptUploads } = require('./models/middleware/allowUploads')
 /* -------------------------------------------------------------------------- */
 dotenv.config()
 
@@ -16,8 +19,6 @@ const { PORT, frontendUrl, API_URL } = process.env
 const app = express()
 const port = PORT || 3000
 const host = '0.0.0.0' // This makes the server listen on all available interfaces
-
-connectDB() // Connect to MongoDB
 
 const corsOptions = {
   origin: frontendUrl,
@@ -323,6 +324,51 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1); // Optionally restart the process
 });
 
-/* -------------------------------------------------------------------------- */
+/* ---------------------------- Start the server ---------------------------- */
 
-app.listen(port, host, () => console.log(`server started at http://localhost:${port}`))
+const server = app.listen(port, host, async () => { 
+  console.log(`server started at http://localhost:${port}`)
+  await connectDB() // Connect to MongoDB
+  rl.prompt();
+})
+
+/* ----------------------- Allow for graceful shutdown ---------------------- */
+
+// Graceful shutdown mechanism
+const shutdownServer = async (reason) => {
+  console.log('Stopping new file uploads...');
+  
+  acceptUploads.allow = false; // Stop accepting new requests
+  acceptUploads.reason = reason; // Set the reason for the shutdown
+
+  // Wait for ongoing uploads to complete
+  while (uploadStreams.size > 0) {
+    console.log(`Waiting for ${uploadStreams.size} ongoing uploads to finish...`);
+    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before checking again
+  }
+
+  console.log('All uploads completed. Shutting down server...');
+
+  server.close(() => {
+    console.log('Server shut down successfully.');
+    process.exit(0); // Exit the process
+  });
+};
+
+// Command input handling
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: 'COMMAND> '
+});
+
+// Listen for commands
+rl.on('line', (line) => {
+  const [command, reason] = line.trim().split(' ')
+  if (command === 'shutdown') {
+    shutdownServer(reason);
+  } else {
+    console.log(`Unknown command: ${line.trim()}`);
+  }
+  rl.prompt();
+});
