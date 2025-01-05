@@ -91,6 +91,11 @@
 
       let returnedData = await loginAttempt.json()
 
+      if (!returnedData.success) {
+        alert(`Login failed: ${returnedData.errorMessage}`)
+        return
+      }
+
       alert("Login successful")
       
       document.location = `<%= redirectURL %>` || "/";
@@ -116,13 +121,12 @@
         body: JSON.stringify({ username, email, password })
       })
       
-      if (!registerAttempt.success) {
-        alert(`Registration failed: ${registerAttempt.errorMessage});
-        }`)
+      let returnedData = await registerAttempt.json()
+
+      if (!returnedData.success) {
+        alert(`Registration failed: ${returnedData.errorMessage}`)
         return  
       }
-
-      let returnedData = await registerAttempt.json()
 
       alert("Registration successful")
       window.location = "/auth/login?redirect=/"

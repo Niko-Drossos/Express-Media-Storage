@@ -138,7 +138,7 @@ app.get("/search", userLoggedIn, async (req, res) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        // "x-access-token": getCookies(req, "media_authentication")
+        "x-access-token": getCookies(req, "media_authentication")
       },
       credentials: "include"
     })
