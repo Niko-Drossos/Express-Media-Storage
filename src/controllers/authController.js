@@ -115,6 +115,11 @@ exports.loginUser = async (req, res) => {
     // Generate the login token for a user
     const loginToken = generateJWT(payload)
 
+    res.cookie("media_authentication", loginToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    })
+
     res.status(200).json({
       success: true,
       message: "Successfully logged in",

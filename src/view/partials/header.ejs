@@ -42,6 +42,13 @@
             <img class="h-8 w-8 rounded-full object-cover" src="../icons/defaultUser.svg" alt="">
           </a>
         </li>
+        <% } else { %>
+        <li class="group relative mr-6 mb-1">
+          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+          <a href="/auth/login" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">
+            Login
+          </a>
+        </li>  
         <% } %>
       </ul>
     </div>

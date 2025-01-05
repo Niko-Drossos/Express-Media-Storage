@@ -29,6 +29,8 @@
 
         if (tag === '') {
             alert("You can't search for an empty tag\nPlease add another tag before searching")
+        } else if (tag.length > 25) {
+            alert("Tags cannot be longer than 25 characters\nPlease add a shorter tag before searching")
         } else if (tagArray.includes(tag)) {
             alert("You can't search for the same tag twice\nPlease add a different tag before searching")
         } else {

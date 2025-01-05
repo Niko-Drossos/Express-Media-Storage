@@ -70,14 +70,7 @@
     <% } %>
 </div>
 
-<script>
-    function setCookie(cookieName, cookieValue, expirationDays) {
-      let d = new Date();
-      d.setTime(d.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
-      let expires = "expires=" + d.toUTCString();
-      document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
-    }
-    
+<script>    
     async function login(event) {
       event.preventDefault();
       let username = document.getElementById("username").value;
@@ -98,7 +91,6 @@
 
       let returnedData = await loginAttempt.json()
 
-      setCookie("media_authentication", returnedData.data.JWT, 7)
       alert("Login successful")
       
       document.location = `<%= redirectURL %>` || "/";
@@ -138,7 +130,7 @@
 
     // Prompt the user if they want to send an email to support
     function forgotPassword() {
-      const contactSupport = confirm("Automatic password reset not yet implemented.\nYou may contact support for help.\nWould you like to send en email to request a reset?")
+      const contactSupport = confirm("Automatic password reset not yet implemented.\nYou may contact support for help.\nWould you like to send an email to request a reset?")
       if (contactSupport) {
         window.location = "mailto:bethkavodinfo@gmail.com?cc=droniko777@gmail.com&subject=Password reset request"
       }

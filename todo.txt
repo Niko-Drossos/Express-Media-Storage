@@ -29,10 +29,6 @@ slogan: ©Where your story becomes His-Story
 pipe data from video compression to GridFs
 Make files store original file date before running it through middleware
 
-Maybe rename "Pools" to "Pools"
-
-Fix uploaded files not showing up on response, they are getting uploaded but there is not a confirmation on the frontend.
-
 Add "manage" routes for editing file data
 
 Fix the username and tag fields to update with user input.  I don't know why they won't
@@ -40,19 +36,13 @@ Fix the spacing on the usernameSelector plus icon
 
 Add thumbnail support
 
-Add a feature that deletes a document if a file fails to upload
-
-Add a feature that will update the document with th status of the file, uploading, completed, or deleted
-
-Add a feature that shows available usernames for search
-
 Finish create create-pool page
 
 Fix the search routes returning the actual vote data instead of just the voteCount
 
 Add support for deleting files
 
-Fix mongoose not creating schema indexes by default, https://chatgpt.com/share/67762873-9400-800e-9fc2-66b4579573cd
+Add an error page
 
 Add support for changing color themes
 

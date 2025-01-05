@@ -287,6 +287,20 @@ const uploadChunk = async (req, res) => {
     clearTimeout(fileTimers.get(fileId)) // Clear the existing timer
   }
 
+  // Select the proper document type based on the mimeType
+  let documentType
+  switch(mimeType) {
+    case "video":
+      documentType = Video
+      break
+    case "image":
+      documentType = Image
+      break
+    case "audio":
+      documentType = Audio
+      break
+  }
+
   // Set a timer for the upload stream to be cleaned up
   const timer = setTimeout(async () => {
     console.warn(`Upload for file ${fileId} timed out.`)
@@ -294,19 +308,6 @@ const uploadChunk = async (req, res) => {
     uploadStream.end() // Destroy the upload stream
     uploadStreams.delete(fileId) // Remove from the uploadStreams map
     fileTimers.delete(fileId) // Remove from the timers map
-
-    let documentType
-    switch(mimeType) {
-      case "video":
-        documentType = Video
-        break
-      case "image":
-        documentType = Image
-        break
-      case "audio":
-        documentType = Audio
-        break
-    }
 
     try {
       // Delete the document in the proper collection
@@ -338,8 +339,10 @@ const uploadChunk = async (req, res) => {
     // If this is the last chunk, finalize the upload stream
     if (chunkIndex === totalChunks - 1) {
       await new Promise((resolve, reject) => {
-        uploadStream.end(() => {
+        uploadStream.end(async () => {
           uploadStreams.delete(fileId) // Clean up the stream
+          fileTimers.delete(fileId) // Remove the timer
+          await documentType.findByIdAndUpdate(documentId, { status: "completed" }) // Delete the document
           clearTimeout(fileTimers.get(fileId)) // Remove the timer so the file doesn't delete itself after upload
           resolve()
         })

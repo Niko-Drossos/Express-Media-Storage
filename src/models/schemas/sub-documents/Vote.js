@@ -1,8 +1,6 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
 const SubUser = require('./SubUser')
 
-const voteSchema = new Schema({
+const voteSchema = {
   user: {
     type: SubUser
   },
@@ -10,8 +8,6 @@ const voteSchema = new Schema({
     type: Boolean,
     required: true,
   }
-}, {
-  timestamps: true
-})
+}
 
 module.exports = voteSchema

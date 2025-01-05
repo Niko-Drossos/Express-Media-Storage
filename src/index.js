@@ -138,22 +138,32 @@ app.get("/search", userLoggedIn, async (req, res) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "x-access-token": getCookies(req, "media_authentication")
+        // "x-access-token": getCookies(req, "media_authentication")
       },
       credentials: "include"
     })
 
     const response = await request.json()
-    
-    if (response.error) {
-      res.render("search.ejs", {
-        searchType: "media",
-        query,
-        response: response.data,
-        searchResults: [],
-        error: response.error
+
+    // Handle error cases
+    if (!response.success) {
+      let action = {
+        name: "Home",
+        url: "/"
+      }
+      
+      if (request.status === 401) {
+        action = {
+          name: "Login",
+          url: `/auth/login?redirect=${req.headers.referer}`
+        }
+      }
+
+      return res.render("error.ejs", {
+        status: request.status,
+        message: response.message,
+        action: action
       })
-      return
     }
 
     res.render("search.ejs", {

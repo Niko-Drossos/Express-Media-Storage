@@ -1,11 +1,12 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+/* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
+const Status = require('./sub-documents/Status')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 const Transcription = require('./sub-documents/Transcription')
-
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
@@ -34,6 +35,7 @@ const videoSchema = new Schema({
     required: true,
     unique: true
   },
+  status: Status,
   transcription: Transcription,
   comments: [{
     type: Schema.Types.ObjectId,
@@ -43,6 +45,7 @@ const videoSchema = new Schema({
     type: String 
   }],
   privacy: Privacy,
+  // I don't knw if I can add this field, I need to use ffmpeg for this
   dimensions: {
     width: {
       type: Number,
@@ -53,11 +56,11 @@ const videoSchema = new Schema({
       required: false
     }
   },
-  length: {
+  /* length: {
     type: Number,
     // TODO: uncomment these after testing
     required: false 
-  },
+  }, */
   fileSize: {
     type: String,
     required: false

@@ -1,11 +1,12 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+/* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
+const Status = require('./sub-documents/Status')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 const Transcription = require('./sub-documents/Transcription')
-
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
@@ -35,6 +36,7 @@ const audioSchema = new Schema({
     required: true,
     unique: true
   },
+  status: Status,
   transcription: Transcription,
   comments: [{
     type: Schema.Types.ObjectId,
@@ -44,11 +46,11 @@ const audioSchema = new Schema({
     type: String 
   }],
   privacy: Privacy,
-  length: {
+  /* length: {
     type: Number,
     // TODO: uncomment these after testing
     required: false 
-  },
+  }, */
   fileSize: {
     type: String,
     required: false

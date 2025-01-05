@@ -1,7 +1,6 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const { Schema } = require('mongoose')
 
-const subUserSchema = new Schema({
+const subUserSchema = {
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -11,8 +10,6 @@ const subUserSchema = new Schema({
     type: String,
     required: true
   },
-}, {
-  _id: false
-})
+}
 
 module.exports = subUserSchema

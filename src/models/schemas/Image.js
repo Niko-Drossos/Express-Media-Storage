@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+/* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
+const Status = require('./sub-documents/Status')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
-
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
@@ -28,6 +29,12 @@ const imageSchema = new Schema({
     required: true,
     unique: true
   },
+  fileId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  status: Status,
   user: SubUser,
   comments: [{
     type: Schema.Types.ObjectId,
@@ -37,11 +44,6 @@ const imageSchema = new Schema({
     type: String 
   }],
   privacy: Privacy,
-  fileId: {
-    type: String,
-    required: true,
-    unique: true
-  },
   votes: [{
     type: Vote,
     select: false
