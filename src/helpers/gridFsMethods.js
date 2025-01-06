@@ -1,3 +1,8 @@
+/* --------------------------------- Schemas -------------------------------- */
+const Image = require("../models/schemas/Image")
+const Video = require("../models/schemas/Video")
+const Audio = require("../models/schemas/Audio")
+/* -------------------------------------------------------------------------- */
 const { Readable } = require('stream')
 const { MongoClient, GridFSBucket, ObjectId } = require("mongodb")
 const getFileExt = require('./getFileExt')
