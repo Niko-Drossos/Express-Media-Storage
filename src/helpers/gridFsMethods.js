@@ -11,7 +11,6 @@ const multer = require('multer')
 
 const dotenv = require("dotenv")
 const { error } = require('console')
-const Video = require('../models/schemas/Video')
 dotenv.config()
 
 // Multer storage configuration
