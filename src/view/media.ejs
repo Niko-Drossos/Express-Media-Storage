@@ -16,7 +16,7 @@
         </div>
 
         <div class="col-span-1 relative pl-4 flex flex-col max-h-[calc(100vh-8rem)]">
-            <header class="border-b border-grey-400 flex-none">
+            <header class="flex-none">
                 <!-- TODO: Add border to top of user when in mobile view -->
                 <div class="flex justify-between items-center sm:border-white">
                     <a href="/profile/<%= uploader.userId %>" class="cursor-pointer py-2 flex items-center text-sm outline-none focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
@@ -33,10 +33,20 @@
                 <p class="pb-4 max-h-36 overflow-y-auto"><%= media.description || "(No Description)"%></p>
             </header>
 
-            <div class="flex-grow content-end overflow-y-auto max-h-full">
-                <!-- Comment section -->
-                <hr>
+            <!-- Switch between comment section and transcription -->
+            <div class="flex font-bold border-grey-400 border-y">
+                <button class="flex justify-center w-1/2 bg-violet-blaze" id="commentSwitch" onclick="switchScreen('comment')">
+                    Comments
+                </button>
+                <button class="flex justify-center w-1/2 bg-lilac-mist" id="transcriptionSwitch" onclick="switchScreen('transcription')">
+                    Transcription
+                </button>
+            </div>
 
+            <!-- Comment section -->
+            <div class="flex-grow content-end overflow-y-auto max-h-full hidden">
+                <hr>
+    
                 <% media.comments.forEach(comment => { %>
                     <%- include('./partials/comment.ejs', { comment, uploader }) %>
                     <hr>
@@ -51,18 +61,52 @@
                 <div class="pb-4">
                     <div class="flex items-center">
                         <textarea class="w-full resize-none outline-none appearance-none rounded-lg p-2 leading-tight focus:outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
-                        <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="poolComment(event)">
+                        <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="postComment(event)">
                             <img src="../icons/arrows/right-arrow.svg" alt="Send">
                         </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Transcription section -->
+            <div>
+                
+            </div>
+
+
+
         </div>
     </div>
 </div>
 
 <script>    
-    async function poolComment(event) {
+    // Switch from comment section to transcription
+    function switchScreen(mode) {
+        const commentButton = document.getElementById("commentSwitch")
+        const transcriptionButton = document.getElementById("transcriptionSwitch")
+
+        // Cringe class switcher.  
+        // I am smart enough to know this is wrong, but not smart enought to know the solution. 
+        if (mode === "comment") {
+            commentButton.classList.add("bg-violet-blaze")
+            commentButton.classList.remove("bg-lilac-mist")
+
+            transcriptionButton.classList.add("bg-lilac-mist")
+            transcriptionButton.classList.remove("bg-violet-blaze")
+        } else if (mode === "transcription") {
+            commentButton.classList.add("bg-lilac-mist")
+            commentButton.classList.remove("bg-violet-blaze")
+
+            transcriptionButton.classList.add("bg-violet-blaze")
+            transcriptionButton.classList.remove("bg-lilac-mist")
+        }
+
+
+
+    }
+
+
+    async function postComment(event) {
         event.preventDefault();
         
         // Get the routing information from the URL

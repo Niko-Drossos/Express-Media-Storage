@@ -44,6 +44,14 @@ Add support for deleting files
 
 Add an error page
 
+make a command that cleans the database.  
+stop the server and make sure no files are uploading.
+then, look for any documents that have a status of "uploading".
+Look at their fileid's, if they don't exist, then delete the actual document linking to the file.
+
+Fix issue with large video files not playing.  Likely to do with the metadata not being at the beginning of the file.
+Create a new middleware that will properly encode mp4 files for file streaming.
+
 Add support for changing color themes
 
 Color palette:

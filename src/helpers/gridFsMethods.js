@@ -311,6 +311,7 @@ const uploadChunk = async (req, res) => {
     uploadStream.filename = `DELETE-${uploadStream.options.filename}` // Update the filename so if it doesn't get deleted you know the file was deleted 
     uploadStream.end() // Destroy the upload stream
     uploadStreams.delete(fileId) // Remove from the uploadStreams map
+    clearTimeout(fileTimers.get(fileId)) // Stop the old timer
     fileTimers.delete(fileId) // Remove from the timers map
 
     try {
@@ -322,7 +323,9 @@ const uploadChunk = async (req, res) => {
     } catch (err) {
       console.error(`Failed to delete timed-out file ${fileId}:`, err)
     }
-  }, 5 * 60 * 1000) // Set a timeout of 5 minutes
+  }, 10000)
+  // }, 5 * 60 * 1000) // Set a timeout of 5 minutes
+
 
   fileTimers.set(fileId, timer) // Save the new timer
 
@@ -345,9 +348,9 @@ const uploadChunk = async (req, res) => {
       await new Promise((resolve, reject) => {
         uploadStream.end(async () => {
           uploadStreams.delete(fileId) // Clean up the stream
-          fileTimers.delete(fileId) // Remove the timer
+          clearTimeout(fileTimers.get(fileId)) // Stop the timer so the file doesn't delete itself after upload
+          fileTimers.delete(fileId) // Remove the timer from the map
           await documentType.findByIdAndUpdate(documentId, { status: "completed" }) // Delete the document
-          clearTimeout(fileTimers.get(fileId)) // Remove the timer so the file doesn't delete itself after upload
           resolve()
         })
         uploadStream.on('error', reject) // Handle errors during end

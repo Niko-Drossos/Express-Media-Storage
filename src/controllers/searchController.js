@@ -245,6 +245,9 @@ exports.searchVideos = async (req, res) => {
       { privacy: "Public" }
     ]
 
+    // Only allow for searching of completed videos
+    searchQuery.status = "completed"
+
     // Get the total number of documents that match the search query
     const totalDocuments = await Video.countDocuments(searchQuery);
 
@@ -331,6 +334,9 @@ exports.searchImages = async (req, res) => {
       { privacy: "Public" }
     ]
 
+    // Only allow for searching of completed images
+    searchQuery.status = "completed"
+
     // Get the total number of documents that match the search query
     const totalDocuments = await Image.countDocuments(searchQuery);
 
@@ -411,6 +417,9 @@ exports.searchAudios = async (req, res) => {
       { "user.userId": req.userId },
       { privacy: "Public" }
     ]
+
+    // Only allow for searching of completed audios
+    searchQuery.status = "completed"
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Audio.countDocuments(searchQuery);

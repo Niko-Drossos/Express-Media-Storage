@@ -9,8 +9,8 @@ module.exports = userLoggedIn = (req, res, next) => {
 
     const token = decryptJWT(authentication)
 
-    // Make sure its not expired
-    console.log(token)
+    // TODO: Make sure the token is not expired
+    // console.log(token)
 
     if (!token) {
       return res.redirect(301, "/auth/login")
@@ -18,7 +18,7 @@ module.exports = userLoggedIn = (req, res, next) => {
      
     next()
   } catch (error) {
-    // res.redirect(301, "/auth/login")
     console.log(error)
+    res.redirect(301, "/auth/login")
   }
 }
