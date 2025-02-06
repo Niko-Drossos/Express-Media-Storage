@@ -74,11 +74,9 @@ exports.startChunkUpload = async (req, res) => {
           document = Image.create(documentBody).catch(err => new Error("Error creating image document"))
           break;
         case "video":
-          documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
           document = Video.create(documentBody).catch(err => new Error("Error creating video document"))
           break;
         case "audio":
-          documentBody.transcription = metadata.transcribe ? { status: "queued", text: "" } : { status: "none", text: "" }
           document = Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
           break;
       }

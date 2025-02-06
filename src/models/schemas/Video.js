@@ -6,7 +6,6 @@ const Vote = require('./sub-documents/Vote')
 const Status = require('./sub-documents/Status')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
-const Transcription = require('./sub-documents/Transcription')
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
@@ -36,7 +35,10 @@ const videoSchema = new Schema({
     unique: true
   },
   status: Status,
-  transcription: Transcription,
+  transcription: {
+    type: Schema.Types.ObjectId,
+    ref: 'Transcription'
+  },
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment',

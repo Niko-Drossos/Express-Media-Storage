@@ -12,6 +12,11 @@ const transcriptionSchema = new Schema({
     default: '',
     required: false
   }
+}, {
+  timestamps: true,
+  collection: 'transcriptions'
 })
 
-module.exports = transcriptionSchema
+const Transcription = mongoose.model('Transcription', transcriptionSchema)
+
+module.exports = Transcription
