@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const expressLayouts = require('express-ejs-layouts')
 const readline = require('readline')
+const path = require('path')
+/* --------------------------------- Helpers -------------------------------- */
 const { uploadStreams } = require('./helpers/gridFsMethods')
 /* ------------------------------- Middlewares ------------------------------- */
 const userLoggedIn = require("./models/middleware/userLoggedIn")
@@ -17,7 +19,7 @@ dotenv.config()
 const { PORT, frontendUrl, API_URL } = process.env
 
 const app = express()
-const port = PORT || 3000
+const port = PORT || 3000 // Default port of 3000
 const host = '0.0.0.0' // This makes the server listen on all available interfaces
 
 const corsOptions = {
@@ -32,9 +34,9 @@ app.use(cors(corsOptions))
 app.use(express.json({ limit: '50mb' })) // This is to allow for large file uploads
 app.use(expressLayouts)
 app.set("view engine", "ejs")
-app.set("views", "src/view")
+app.set("views", path.join(__dirname, "/view"))
 app.set("layout", "./layouts/main")
-app.use(express.static('src/view'))
+app.use(express.static(path.join(__dirname, "/view")))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' })) // This is to allow for large file uploads
 app.use(cookieParser())
 
