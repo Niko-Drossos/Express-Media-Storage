@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+/* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
 const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
-
+const Journal = require('./sub-documents/Journal')
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
@@ -72,18 +73,9 @@ const poolSchema = new Schema({
     type: String
   }],
   // I don't know why this is here, I might keep it though
-  /* journal: {
-    type: [{
-      time: {
-        type: String,
-        required: true
-      },
-      entry: {
-        type: String,
-        required: true
-      }
-    }]
-  }, */
+  journal: {
+    type: [Journal]
+  },
   votes: [{
     type: Vote,
     select: false

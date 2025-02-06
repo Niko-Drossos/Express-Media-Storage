@@ -7,6 +7,7 @@
             <% } else if (mediaType === 'video') { %>
                 <video class="w-full max-h-[calc(100vh-8rem)] object-contain" controls> 
                     <source src="/view/video/<%= media.fileId %>" type="video/mp4">
+                    <!-- <track src="/src/Airplane nose dive (transcribed on 13-Oct-2024 17-40-36).vtt" kind="subtitles" srclang="en" label="English"> -->
                 </video>
             <% } else if (mediaType === 'audio') { %>
                 <audio class="w-full max-h-[calc(100vh-8rem)] object-contain" controls>
@@ -34,23 +35,28 @@
             </header>
 
             <!-- Switch between comment section and transcription -->
-            <div class="flex font-bold border-grey-400 border-y">
-                <button class="flex justify-center w-1/2 bg-violet-blaze" id="commentSwitch" onclick="switchScreen('comment')">
+            <div class="flex font-bold border-grey-400 border-y py-2">
+                <button class="flex justify-center w-1/2 bg-violet-blaze rounded-l-lg" id="commentSwitch" onclick="switchScreen('comment')">
                     Comments
                 </button>
-                <button class="flex justify-center w-1/2 bg-lilac-mist" id="transcriptionSwitch" onclick="switchScreen('transcription')">
+                <button class="flex justify-center w-1/2 bg-lilac-mist rounded-r-lg" id="transcriptionSwitch" onclick="switchScreen('transcription')">
                     Transcription
                 </button>
             </div>
 
             <!-- Comment section -->
-            <div class="flex-grow content-end overflow-y-auto max-h-full hidden">
+            <div class="flex-grow content-end overflow-y-auto max-h-full" id="commentSection">
                 <hr>
     
                 <% media.comments.forEach(comment => { %>
                     <%- include('./partials/comment.ejs', { comment, uploader }) %>
                     <hr>
                 <% }) %>
+            </div>
+
+            <!-- Transcription section -->
+            <div class="flex-grow content-end overflow-y-auto max-h-full hidden" id="transcriptionSection">
+                <hr>
             </div>
 
             <div class="bottom-0 left-0 right-0">
@@ -67,14 +73,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Transcription section -->
-            <div>
-                
-            </div>
-
-
-
         </div>
     </div>
 </div>
@@ -84,25 +82,28 @@
     function switchScreen(mode) {
         const commentButton = document.getElementById("commentSwitch")
         const transcriptionButton = document.getElementById("transcriptionSwitch")
+        const commentSection = document.getElementById("commentSection")
+        const transcriptionSection = document.getElementById("transcriptionSection")
 
         // Cringe class switcher.  
-        // I am smart enough to know this is wrong, but not smart enought to know the solution. 
+        // I am smart enough to know this is wrong, but not smart enough to know the solution. 
         if (mode === "comment") {
             commentButton.classList.add("bg-violet-blaze")
             commentButton.classList.remove("bg-lilac-mist")
+            commentSection.classList.remove("hidden")
 
             transcriptionButton.classList.add("bg-lilac-mist")
             transcriptionButton.classList.remove("bg-violet-blaze")
+            transcriptionSection.classList.add("hidden")
         } else if (mode === "transcription") {
             commentButton.classList.add("bg-lilac-mist")
             commentButton.classList.remove("bg-violet-blaze")
+            commentSection.classList.add("hidden")
 
             transcriptionButton.classList.add("bg-violet-blaze")
             transcriptionButton.classList.remove("bg-lilac-mist")
+            transcriptionSection.classList.remove("hidden")
         }
-
-
-
     }
 
 

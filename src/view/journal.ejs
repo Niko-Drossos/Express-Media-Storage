@@ -1,0 +1,30 @@
+<h1 class="flex justify-center py-2">Journal</h1>
+<div class="flex justify-center items-center flex-col">
+  <form action="" class="flex flex-col items-center w-1/2" onsubmit={addJournalEntry(event)}>
+    <label class="block uppercas tracking-wide text-gray-700 text-sm font-bold mb-2" for="entry">Entry</label>
+    <textarea textarea class="appearance-none block w-full bg-white text-gray-900 border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d] flex-grow" type="text" name="entry" placeholder="Tell us about your day" ></textarea>
+    <button type="submit" class="mt-4 w-full bg-royal-purple transition-all text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-blaze">Submit</button>
+  </form>
+  <div class="w-1/2">
+    <!-- TODO: Add journal entries -->
+  </div>
+</div>
+  
+<script>
+  async function addJournalEntry(event) {
+    event.preventDefault();
+
+    const entry = event.target.entry.value
+
+    const request = await fetch(`/pool/journal/add`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ entry })
+    })
+
+    console.log(event.target.entry.value);
+  }
+</script>

@@ -11,7 +11,7 @@ router.all("/*", authenticateUserJWT)
 
 router.post("/create", upload.none(), poolController.createPool)
 
-router.post("/journal/add/:poolId", upload.none(), poolController.addJournal)
+router.post("/journal/add", upload.none(), poolController.addJournal)
 
 router.put("/edit/:poolId", upload.none(), poolController.editPool)
 

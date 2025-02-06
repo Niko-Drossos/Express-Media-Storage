@@ -51,6 +51,7 @@ app.use("/vote", require("./routes/vote.routes"))
 app.use("/daat", require("./routes/daat.routes"))
 app.use("/favorite", require("./routes/favorite.routes"))
 app.use("/suggest", require("./routes/suggest.routes"))
+// app.use("/transcription", require("./routes/transcription.routes"))
 
 /* -------------------------------- Homepage -------------------------------- */
 
@@ -88,6 +89,12 @@ app.get("/upload", userLoggedIn, async (req, res) => {
   res.render("upload.ejs")
 })
 
+/* -------------------------- Form to upload files -------------------------- */
+
+app.get("/journal", userLoggedIn, async (req, res) => {
+  res.render("journal.ejs")
+})
+
 /* ------------------------------- Create pool ------------------------------ */
 
 app.get("/create-pool", userLoggedIn, async (req, res) => {
@@ -107,7 +114,7 @@ app.get("/create-pool", userLoggedIn, async (req, res) => {
   // Don't let the user access the page is there is an error.
   // This only throws an error if the user is not logged in, or login has expired
   if (response.error) {
-    res.redirect(301, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
+    res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
     console.log(response.error)
     return
   }
@@ -127,7 +134,7 @@ app.get("/create-pool", userLoggedIn, async (req, res) => {
 
 /* ----------------------- Navigate to the search page ---------------------- */
 
-app.get("/search", userLoggedIn, async (req, res) => {
+app.get("/search-media", userLoggedIn, async (req, res) => {
   const query = req.query
 
   if (query.mediaType) {   
@@ -251,7 +258,7 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
 
   /* if (mediaType !== ("image" || "video" || "audio")) {
     const redirectUrl = req.headers.referer || `http://${req.headers.host}`
-    res.redirect(301, redirectUrl)
+    res.redirect(307, redirectUrl)
     return
   } */
 
@@ -288,8 +295,9 @@ app.get("/profile", userLoggedIn, async (req, res) => {
 
   const response = await request.json()
   console.log(response)
+
   if (response.error) {
-    res.redirect(301, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
+    res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
     console.log(response.error)
     return
   }
@@ -313,7 +321,7 @@ app.get("/profile/:id", userLoggedIn, async (req, res) => {
   const response = await request.json()
 
   if (response.error) {
-    res.redirect(301, req.headers.referer)
+    res.redirect(307, req.headers.referer)
     return
   }
 

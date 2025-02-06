@@ -31,3 +31,8 @@ h1 {
     --lilac-mist: #d2b5de;
     --golden-glow: #f1c40e;
 }
+
+.disabled-form {
+    opacity: 0.5;
+    pointer-events: none;
+}

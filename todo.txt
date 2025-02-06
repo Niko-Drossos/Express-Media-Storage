@@ -52,6 +52,9 @@ Look at their fileid's, if they don't exist, then delete the actual document lin
 Fix issue with large video files not playing.  Likely to do with the metadata not being at the beginning of the file.
 Create a new middleware that will properly encode mp4 files for file streaming.
 
+Find a way to make the add journal entry form only return the journal entries for the current date and user.
+
+
 Add support for changing color themes
 
 Color palette:
