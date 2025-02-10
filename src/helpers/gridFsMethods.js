@@ -3,15 +3,24 @@ const Image = require("../models/schemas/Image")
 const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
 /* -------------------------------------------------------------------------- */
-const { Readable } = require('stream')
 const { MongoClient, GridFSBucket, ObjectId } = require("mongodb")
-const getFileExt = require('./getFileExt')
 const mongoose = require("mongoose")
+
+const path = require('path');
+const os = require('os');
+const fs = require('fs-extra');
+
 const multer = require('multer')
 
 const dotenv = require("dotenv")
-const { error } = require('console')
 dotenv.config()
+
+const spawn = require('child_process').spawn
+
+/* --------------------------------- Helpers -------------------------------- */
+const getFileExt = require('./getFileExt')
+/* -------------------------------------------------------------------------- */
+
 
 // Multer storage configuration
 const storage = multer.memoryStorage()
@@ -430,5 +439,59 @@ async function cleanupDeletedChunks(bucketName, fileId) {
   }
 }
 
+/* -------- Get a readable stream from a GridFS file for internal use ------- */
 
-module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload, uploadStreams }
+const createTempFile = async (fileId, mimeType) => {
+  try {
+    let bucket
+    switch (mimeType) {
+      case 'video':
+        bucket = videoBucket
+        break
+      case 'audio':
+        bucket = audioBucket
+        break
+    }
+
+    const searchId = new ObjectId(fileId);
+
+    // Create /tmp/transcription directory if it doesn't exist
+    const transcriptionDir = path.join(os.tmpdir(), 'transcription');
+
+    if (!fs.existsSync(transcriptionDir)) {
+      fs.mkdirSync(transcriptionDir, { recursive: true });
+    }
+    
+    // Create .tmp file
+    const tempFilePath = path.join(transcriptionDir, `${fileId}.tmp`);
+    const tempFileStream = fs.createWriteStream(tempFilePath);
+
+    // Create a read stream from GridFS
+    const downloadStream = bucket.openDownloadStream(searchId);
+
+    // Pipe the download stream to the temporary file
+    downloadStream.pipe(tempFileStream);
+
+    // Return a promise that resolves when the file is fully written
+    return new Promise((resolve, reject) => {
+      downloadStream.on('error', (error) => {
+        fs.unlink(tempFilePath, () => reject(error)); // Clean up temp file on error
+      });
+
+      tempFileStream.on('error', (error) => {
+        fs.unlink(tempFilePath, () => reject(error)); // Clean up temp file on error
+      });
+
+      tempFileStream.on('finish', () => {
+        resolve(tempFilePath);
+      });
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload, uploadStreams, createTempFile }

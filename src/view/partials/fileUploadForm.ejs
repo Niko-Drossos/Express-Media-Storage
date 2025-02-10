@@ -77,8 +77,28 @@
         form.classList.add("disabled-form")
         const elements = form.elements; // Get all form elements
         for (let i = 0; i < elements.length; i++) {
-        elements[i].disabled = true;
+            elements[i].disabled = true;
         }
+    }
+
+    function enableForm() {
+        const form = document.getElementById('fileForm');
+        form.classList.remove("disabled-form");
+        const elements = form.elements;
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].disabled = false;
+        }
+
+        // Reset tags
+        const displayTags = document.getElementById('display-tags')
+        displayTags.innerHTML = ''
+
+        // Remove the display for the file name
+        const displayFileName = document.getElementById('display-file-name')
+        displayFileName.classList.remove('block')
+        displayFileName.classList.add('hidden')
+
+        form.reset(); // Reset form to its initial state
     }
 
     function fileChanged(event) {
@@ -202,6 +222,8 @@
                 chunkIndex--
             }
         }
+
+        enableForm()
     }
 
 </script>

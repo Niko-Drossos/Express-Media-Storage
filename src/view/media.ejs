@@ -5,7 +5,7 @@
             <% if (mediaType === 'image') { %>
                 <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/image/<%= media.fileId %>" alt="<%= media.title %>">
             <% } else if (mediaType === 'video') { %>
-                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" controls> 
+                <video class="w-full max-h-[calc(100vh-8rem)] object-contain" id="mediaPlayer" controls> 
                     <source src="/view/video/<%= media.fileId %>" type="video/mp4">
                     <% if (media.transcription) { %>
                         <track src="/transcription/subtitles/<%= media.transcription %>" kind="subtitles" srclang="en" label="English">
@@ -13,7 +13,7 @@
                 </video>
             <% } else if (mediaType === 'audio') { %>
                 <!-- TODO: Fix subtitles for audio files -->
-                <audio class="w-full max-h-[calc(100vh-8rem)] object-contain" controls>
+                <audio class="w-full max-h-[calc(100vh-8rem)] object-contain" id="mediaPlayer" controls>
                     <source src="/view/audio/<%= media.fileId %>" type="audio/mpeg">
                     <% if (media.transcription) { %>
                         <track src="/transcription/subtitles/<%= media.transcription %>" kind="subtitles" srclang="en" label="English">
@@ -45,15 +45,13 @@
                 <button class="flex justify-center w-1/2 bg-violet-blaze rounded-l-lg" id="commentSwitch" onclick="switchScreen('comment')">
                     Comments
                 </button>
-                <button class="flex justify-center w-1/2 bg-lilac-mist rounded-r-lg" id="transcriptionSwitch" onclick="switchScreen('transcription')">
+                <button class="flex justify-center w-1/2 bg-lilac-mist rounded-r-lg" id="transcriptionSwitch" onclick="switchScreen('transcription', '<%= media.transcription %>')">
                     Transcription
                 </button>
             </div>
 
             <!-- Comment section -->
             <div class="flex-grow content-end overflow-y-auto max-h-full" id="commentSection">
-                <hr>
-    
                 <% media.comments.forEach(comment => { %>
                     <%- include('./partials/comment.ejs', { comment, uploader }) %>
                     <hr>
@@ -61,11 +59,13 @@
             </div>
 
             <!-- Transcription section -->
-            <div class="flex-grow content-end overflow-y-auto max-h-full hidden" id="transcriptionSection">
-                <hr>
+            <div class="flex-grow content-start overflow-y-auto max-h-full hidden" id="transcriptionSection">
+                <p class="text-center p-4">No transcription available</p>
             </div>
 
             <div class="bottom-0 left-0 right-0">
+                <hr>
+
                 <div class="flex items-center justify-between mb-2 pt-4 pb-2">
                     <%- include('./partials/voteControls.ejs', { id: media._id, voteCount: media.voteCount, mediaType, favorited: media.favorited, voted: media.voted }) %>
                 </div>
@@ -85,7 +85,7 @@
 
 <script>    
     // Switch from comment section to transcription
-    function switchScreen(mode) {
+    async function switchScreen(mode, transcriptionId="") {
         const commentButton = document.getElementById("commentSwitch")
         const transcriptionButton = document.getElementById("transcriptionSwitch")
         const commentSection = document.getElementById("commentSection")
@@ -102,6 +102,9 @@
             transcriptionButton.classList.remove("bg-violet-blaze")
             transcriptionSection.classList.add("hidden")
         } else if (mode === "transcription") {
+            console.log(transcriptionId)
+            await fetchTranscription(transcriptionId)
+
             commentButton.classList.add("bg-lilac-mist")
             commentButton.classList.remove("bg-violet-blaze")
             commentSection.classList.add("hidden")
@@ -143,5 +146,98 @@
         document.getElementById("comment").value = ""
 
         window.location.reload()
+    }
+
+    let transcription = null
+
+    async function fetchTranscription(transcriptionId) {
+        if (transcription) return
+
+        const transcriptionSection = document.getElementById("transcriptionSection")
+
+        // Get the actual transcription, not the subtitles
+        const requestTranscription = await fetch(`/transcription/${transcriptionId}`)
+
+        const responseTranscription = await requestTranscription.json()
+
+        // Show a message if the transcription is still processing
+        if (responseTranscription.data.transcription.status == "queued") {
+            transcriptionSection.innerHTML = `<p class="text-center p-4">Transcription is still processing, please try again later</p>`
+            return
+        }
+        
+        // Get the transcription array
+        transcription = responseTranscription.data.transcription.text
+        
+        // Create a div for the transcription and add each segment of text to it
+        const mainDiv = document.createElement("div")
+        
+        for (let i = 0; i < transcription.length; i++) {
+            // Create paragraph segments
+            const segment = document.createElement("div")
+            
+            // Add the timestamps with 'a' tags to seek a specific part of a video
+            const timestamp = document.createElement("p")
+            timestamp.classList.add("p-2")
+
+            const startTimeInSeconds = parseTimestampToSeconds(transcription[i].start)
+                        
+            // Create timestamp links
+            const startLink = document.createElement("a")
+            startLink.href = "#"
+            startLink.setAttribute("onclick", `seekPlayer(${startTimeInSeconds})`)
+            startLink.appendChild(document.createTextNode(formatTime(startTimeInSeconds)))
+            startLink.classList.add("text-blue-600")
+
+            // Add the link to the timestamp
+            timestamp.appendChild(startLink)
+
+            const speech = document.createElement("p")
+            speech.classList.add("p-2")
+            speech.appendChild(document.createTextNode(transcription[i].speech))
+            
+            // Add all of the containers together
+            segment.appendChild(timestamp)
+            segment.appendChild(speech)
+            // Add an hr if not the last segment 
+            if (i < transcription.length - 1) {
+                segment.appendChild(document.createElement("hr"))
+            }
+            mainDiv.appendChild(segment)
+        } 
+
+        // Erase the text in the transcription section
+        transcriptionSection.innerHTML = ""
+
+        // Add the whole div to the transcription section
+        transcriptionSection.appendChild(mainDiv)
+    }
+
+    // Allow the user to seek to a specific time in the video using the transcription
+    function seekPlayer(seconds) {
+        const mediaPlayer = document.getElementById('mediaPlayer');
+        if (mediaPlayer) {
+            mediaPlayer.currentTime = seconds; // Seek to the desired time
+        }
+    }
+
+    // parse timestamps in the transcription for seeking in the media player
+    function parseTimestampToSeconds(timestamp) {
+        const parts = timestamp.split(":").map(parseFloat);
+        const seconds = parts.pop(); // Get seconds + milliseconds
+        const minutes = parts.pop() || 0; // Get minutes
+        const hours = parts.pop() || 0; // Get hours
+
+        // Convert to seconds
+        return (hours * 3600) + (minutes * 60) + seconds;
+    }
+
+    // Format the time to HH:MM:SS
+    function formatTime(seconds) {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+
+        return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 </script>

@@ -1,6 +1,6 @@
 const mediaCompressor = require('../../helpers/mediaCompressor')
 const getFileDetails = require('../../helpers/getFileDetails')
-const fs = require('fs').promises;
+const fs = require('fs-extra')
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const { PassThrough } = require('stream');
