@@ -59,7 +59,7 @@ exports.startChunkUpload = async (req, res) => {
       filename: `${req.userId}-${metadata.fileName}`,
       description: metadata.description || "",
       fileId: fileId,
-      date: new Date(metadata.date),
+      date: metadata.date ? new Date(metadata.date) : Date.now(),
       user: {
         userId: req.userId,
         username: req.username

@@ -53,8 +53,8 @@
             <!-- Comment section -->
             <div class="flex-grow content-end overflow-y-auto max-h-full" id="commentSection">
                 <% media.comments.forEach(comment => { %>
-                    <%- include('./partials/comment.ejs', { comment, uploader }) %>
                     <hr>
+                    <%- include('./partials/comment.ejs', { comment, uploader }) %>
                 <% }) %>
             </div>
 
