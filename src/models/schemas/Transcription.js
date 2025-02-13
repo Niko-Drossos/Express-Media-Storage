@@ -9,11 +9,10 @@ const transcriptionSchema = new Schema({
   },
   text: {
     type: [{
-      start: String,
-      end: String,
-      speech: String
+      from: String,
+      to: String,
+      text: String
     }],
-    _id: false,  // Prevents automatic `_id` for each individual sentence
     default: [],
     required: false
   }

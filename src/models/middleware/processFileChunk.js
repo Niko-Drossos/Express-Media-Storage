@@ -1,9 +1,8 @@
-//! NOT YET IMPLEMENTED
+ //! NOT YET IMPLEMENTED
 // TODO: Create a media compressor to compress videos, audio and image chunks as there are uploaded
-
+/*
 const ffmpeg = require('fluent-ffmpeg');
-const sharp = require('sharp');
-const mime = require('mime-types');
+// const sharp = require('sharp');
 const { PassThrough } = require('stream');
 
 const fileProcessors = {
@@ -96,4 +95,4 @@ const compressImage = async (buffer, fileType) => {
   return pipeline.toBuffer();
 }
 
-module.exports = compressMedia
+module.exports = compressMedia */

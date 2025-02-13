@@ -104,7 +104,7 @@ exports.searchPools = async (req, res) => {
 
       // Get the users favorite pools
       const user = await User.findById(req.userId).select("favorites.pools")
-      const favoritedPools = user.favorites.pools
+      const favoritedPools = user?.favorites?.pools
 
       // Add a property to see is the video is in the users favorites array
       if (favoritedPools) {
@@ -178,7 +178,7 @@ exports.searchComments = async (req, res) => {
 
       // Get the users favorite comments
       const user = await User.findById(req.userId).select("favorites.comments")
-      const favoritedComments = user.favorites.comments
+      const favoritedComments = user?.favorites?.comments
 
       // Add a property to see is the video is in the users favorites array
       if (favoritedComments) {
@@ -262,7 +262,7 @@ exports.searchVideos = async (req, res) => {
 
     // Get the users favorite videos
     const user = await User.findById(req.userId).select("favorites.videos")
-    const favoritedVideos = user.favorites.videos || []
+    const favoritedVideos = user?.favorites?.videos || []
 
     // Add a property to see is the video is in the users favorites array
     if (favoritedVideos) {
@@ -294,7 +294,7 @@ exports.searchVideos = async (req, res) => {
       }
     })
   } catch (error) {
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to search for videos",
       errorMessage: error.message,
@@ -351,7 +351,7 @@ exports.searchImages = async (req, res) => {
 
       // Get the users favorite images
       const user = await User.findById(req.userId).select("favorites.images")
-      const favoritedImages = user.favorites.images || []
+      const favoritedImages = user?.favorites?.images || []
 
       // Add a property to see is the video is in the users favorites array
       if (favoritedImages) {
@@ -378,7 +378,7 @@ exports.searchImages = async (req, res) => {
       }
     })
   } catch (error) {
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to search for images",
       errorMessage: error.message,
@@ -435,7 +435,7 @@ exports.searchAudios = async (req, res) => {
 
       // Get the users favorite audios
       const user = await User.findById(req.userId).select("favorites.audios")
-      const favoritedAudios = user.favorites.audios || []
+      const favoritedAudios = user?.favorites?.audios || []
 
       // Add a property to see is the video is in the users favorites array
       if (favoritedAudios) {
@@ -462,7 +462,7 @@ exports.searchAudios = async (req, res) => {
       }
     })
   } catch (error) {
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to search for audios",
       errorMessage: error.message,

@@ -999,6 +999,10 @@ video {
   place-items: center;
 }
 
+.content-start {
+  align-content: flex-start;
+}
+
 .content-end {
   align-content: flex-end;
 }
@@ -1217,16 +1221,16 @@ video {
   padding: 0.5rem;
 }
 
+.p-4 {
+  padding: 1rem;
+}
+
 .p-6 {
   padding: 1.5rem;
 }
 
 .p-8 {
   padding: 2rem;
-}
-
-.p-4 {
-  padding: 1rem;
 }
 
 .px-1 {
@@ -1277,6 +1281,10 @@ video {
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.pb-0 {
+  padding-bottom: 0px;
 }
 
 .pb-2 {
