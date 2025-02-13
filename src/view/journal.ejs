@@ -5,16 +5,87 @@
     <textarea textarea class="appearance-none block w-full bg-white text-gray-900 border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d] flex-grow" type="text" name="entry" placeholder="Tell us about your day" ></textarea>
     <button type="submit" class="mt-4 w-full bg-royal-purple transition-all text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-blaze">Submit</button>
   </form>
-  <div class="w-1/2">
-    <!-- TODO: Add journal entries -->
+  <div class="w-1/2 py-4 max-h-72 overflow-scroll">
+    <h2 class="text-xl pt-8 flex justify-center">Journal Entries for <span class="ml-1 font-bold"><%= new Date().toLocaleDateString() %></span></h2>
+    <!-- Display journal entries -->
+     <!-- TODO: Make this list sortable by date -->
+    <div class="p-4 scroll-m-0">
+      <hr class="my-2 border border-gray-400">
+      <% for (let i = 0; i < entries.length; i++) { %>
+        <b class="text-lg text-sky-500"><%= entries[i].time %></b>
+        <p><%= entries[i].entry %></p>
+        <hr class="my-2 border border-gray-400">
+      <% } %>
+     </div>
   </div>
 </div>
-  
+
 <script>
+  // Temporary function to make it easy to create a pool if you don't have one yet.
+  async function createPool(poolData) {
+    const request = await fetch(`/pool/create`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: `Journal Pool for ${new Date().toLocaleDateString()}`,
+        description: `Automatically created pool for recording journal entries`,
+        privacy: poolData.privacy
+      })
+    })
+
+    const response = await request.json()
+
+    const pool = response.data.pool
+
+    // Return only the _id of the pool so you can add a journal entry to it
+    return pool._id
+  }
+
+  // I love EJS.
+  let poolId = "<%= poolId %>"
+
   async function addJournalEntry(event) {
     event.preventDefault();
 
     const entry = event.target.entry.value
+
+    const hours = new Date().getHours().toString().padStart(2, '0')
+    const minutes = new Date().getMinutes().toString().padStart(2, '0')
+
+    // Sent the time to the server to record it for the journal
+    const time = `${hours}:${minutes}`    
+
+    // Ask the user if they want to create a pool
+    if (poolId == "") {
+      // Allow the user to specify some basic metadata about the pool, I will add to it later
+      let poolData = {
+        privacy: "Public"
+      }
+
+      const shouldCreatePool = confirm("A pool for today is required to create a journal entry.\n" + 
+                                       "No pool currently exists,\n" +
+                                       "press OK to create one.\n" + 
+                                       "Press CANCEL to not create a pool.")
+
+      if (shouldCreatePool) {
+        const isPrivate = confirm("Should this pool private and only viewable by you?\n" +
+                                  "Click OK to make it private, or CANCEL to make it public.")
+
+        if (isPrivate) {
+          poolData.privacy = "Private"
+        }
+
+        poolId = await createPool(poolData)
+
+        alert("Pool successfully created, you can now add a journal entry to it")
+      }
+
+      // Return to prevent the user from submitting the form until the pool is created
+      return
+    }
 
     const request = await fetch(`/pool/journal/add`, {
       method: 'POST',
@@ -22,9 +93,14 @@
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ entry })
+      body: JSON.stringify({ entry, time, poolId })
     })
 
-    console.log(event.target.entry.value);
+    const response = await request.json()
+
+    if (response.success) {
+      alert('Journal entry added')
+      window.location.reload()
+    }
   }
 </script>

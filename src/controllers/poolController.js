@@ -122,34 +122,16 @@ exports.editPool = async (req, res) => {
 
 exports.addJournal = async (req, res) => {
   try {
-    const date = new Date()
-    const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
-    const today = date.toLocaleDateString('en-US', options).replace(/\//g, '-');
-
-    const findPool = await fetch(`${API_URL}/search/pools?startDate=${today}&endDate=${today}&userId=${req.userId}&limit=1`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'x-access-token': getCookies(req, "media_authentication"),
-        'Content-Type': 'application/json'
-      },
-    })
-    
-    const poolResponse = await findPool.json()
-
-    const pool = poolResponse.data.searchResults[0]
-    
-    // Format the date to 24 hours and only time
-    const formattedTime = date.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit', hour12: false })
+    const { entry, time, poolId } = req.body
 
     const updatedPool = await Pool.findOneAndUpdate({ 
       "user.userId": req.userId,
-      _id: pool._id,
+      _id: poolId,
     },{
       $push: {
         journal: {
-          time: formattedTime,
-          entry: req.body.entry
+          time: time,
+          entry: entry
         }
       }
     },{ 

@@ -94,7 +94,28 @@ app.get("/upload", userLoggedIn, async (req, res) => {
 /* -------------------------- Form to upload files -------------------------- */
 
 app.get("/journal", userLoggedIn, async (req, res) => {
-  res.render("journal.ejs")
+  const date = new Date()
+  const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
+  const today = date.toLocaleDateString('en-US', options).replace(/\//g, '-');
+
+  const request = await fetch(`${API_URL}/search/pools?startDate=${today}&endDate=${today}&userId=${req.userId}&limit=1`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'x-access-token': getCookies(req, "media_authentication"),
+      'Content-Type': 'application/json'
+    },
+  })
+
+  const response = await request.json()
+  console.log(response.data.searchResults)
+  
+  // Send the entries to the frontend to render for the user
+  let entries = response.data?.searchResults[0]?.journal || []
+
+  const poolId = response.data?.searchResults[0]?._id || ""
+
+  res.render("journal.ejs", { entries, poolId })
 })
 
 /* ------------------------------- Create pool ------------------------------ */
