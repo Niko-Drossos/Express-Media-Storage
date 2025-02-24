@@ -28,12 +28,12 @@ const audioSchema = new Schema({
   filename: {
     type: String,
     required: true,
-    unique: true
+    // unique: true
   },
   fileId: {
     type: String,
     required: true,
-    unique: true
+    // unique: true
   },
   status: Status,
   transcription: {

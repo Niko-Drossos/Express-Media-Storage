@@ -59,6 +59,8 @@ Find a way to make the add journal entry form only return the journal entries fo
 Create separate routes to start a transcription, and a function for actually generate one.
 Then return to the frontend with the message saying that it is in the queue while it transcribes in the background when it gets a chance.
 
+Make pools searchable to let users search for journals
+FIX time issues for server, it collides with having different server timezones
 
 Add support for changing color themes
 

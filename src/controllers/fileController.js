@@ -71,13 +71,13 @@ exports.startChunkUpload = async (req, res) => {
     try {
       switch (mimeType) {
         case "image":
-          document = Image.create(documentBody).catch(err => new Error("Error creating image document"))
+          document = await Image.create(documentBody).catch(err => new Error("Error creating image document"))
           break;
         case "video":
-          document = Video.create(documentBody).catch(err => new Error("Error creating video document"))
+          document = await Video.create(documentBody).catch(err => new Error("Error creating video document"))
           break;
         case "audio":
-          document = Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
+          document = await Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
           break;
       }
     } catch (error) {
@@ -89,7 +89,7 @@ exports.startChunkUpload = async (req, res) => {
         error
       })
     }
-            
+
     res.status(200).json({
       success: true,
       message: "Initialized chunked upload",

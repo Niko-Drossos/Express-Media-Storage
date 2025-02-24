@@ -32,7 +32,7 @@ const videoSchema = new Schema({
   fileId: {
     type: String,
     required: true,
-    unique: true
+    // unique: trues
   },
   status: Status,
   transcription: {
