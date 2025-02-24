@@ -196,7 +196,7 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
       })
     }
 
-    res.render("search.ejs", {
+    res.render("search-media.ejs", {
       searchType: "media",
       query,
       response: response.data,
@@ -204,7 +204,7 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
     })
   } else { 
     // Render the page without searching for anything
-    res.render("search.ejs", {
+    res.render("search-media.ejs", {
       searchType: "media",
       query,
       // Default response to prevent throwing "undefined" errors
@@ -222,6 +222,8 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
   }
 })
 
+/* ---------------------------- Search for users ---------------------------- */
+
 // TODO: Add support for these routes later
 /* app.get("/search-users", (req, res) => {
   res.render("404.ejs", {
@@ -229,6 +231,8 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
   })
 })
 */
+
+/* ---------------------------- Search pools form --------------------------- */
 
 app.get("/search-pools", userLoggedIn, async (req, res) => {
   const query = req.query
@@ -249,7 +253,7 @@ app.get("/search-pools", userLoggedIn, async (req, res) => {
     const response = await request.json()
     
     if (response.error) {
-      res.render("search.ejs", {
+      res.render("search-pools.ejs", {
         searchType: "media",
         query,
         response: [],
@@ -258,14 +262,14 @@ app.get("/search-pools", userLoggedIn, async (req, res) => {
       return
     }
 
-    res.render("search.ejs", {
+    res.render("search-pools.ejs", {
       searchType: "media",
       query,
       response: response.data.searchResults || []
     })
   } else { 
     // Render the page without searching for anything
-    res.render("search.ejs", {
+    res.render("search-pools.ejs", {
       searchType: "pools",
       query,
       response: []
