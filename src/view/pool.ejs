@@ -1,4 +1,132 @@
-<div class="flex flex-col items-center justify-center">
-  <h1 class="p-2">Create pool</h1>
-  <%- include("./partials/form/createPoolForm.ejs") %>
+<div class="container mx-auto p-6">
+  <!-- Pool Info -->
+  <div class="bg-lavender-haze text-white p-4 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold"><%= pool.title %></h1>
+    <p class="text-gray-200"><%= pool.description %></p>
+    <p class="text-sm">Uploaded by 
+      <a class="font-bold" href="/profile/<%= pool.user.userId %>"><%= pool.user.username %></a>
+      on
+      <b><%= new Date(pool.date).toLocaleDateString() %></b>
+    </p>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="mt-6">
+    <ul class="flex space-x-4 border-b-2 pb-2">
+      <li class="cursor-pointer p-2 text-white bg-gray-700 rounded" id="imageSelect" onclick="switchTab('images')">Images</li>
+      <li class="cursor-pointer p-2 text-white bg-gray-700 rounded" id="videoSelect" onclick="switchTab('videos')">Videos</li>
+      <li class="cursor-pointer p-2 text-white bg-gray-700 rounded" id="audioSelect" onclick="switchTab('audios')">Audios</li>
+      <li class="cursor-pointer p-2 text-white bg-gray-700 rounded" id="journalSelect" onclick="switchTab('journals')">Journal</li>
+    </ul>
+  </div>
+
+  <!-- Images Section -->
+  <div id="images" class="tab-content mt-4">
+    <h2 class="text-xl font-bold text-white mb-8">Images</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <% pool.images.forEach(image => { %>
+        <%- include('./partials/mediaCard.ejs', { ...image, query: { mediaType: 'image' }, thumbnail: null }) %>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Videos Section -->
+  <div id="videos" class="tab-content mt-4 hidden">
+      <h2 class="text-xl font-bold text-white mb-">Videos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <% pool.videos.forEach(video => { %>
+          <%- include('./partials/mediaCard.ejs', { ...video, query: { mediaType: 'video' }, thumbnail: null }) %>
+        <% }) %>
+      </div>
+  </div>
+
+  <!-- Audio Section -->
+  <div id="audios" class="tab-content mt-4 hidden">
+      <h2 class="text-xl font-bold text-white mb-8">Audios</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <% pool.audios.forEach(audio => { %>
+          <%- include('./partials/mediaCard.ejs', { ...audio, query: { mediaType: 'audio' }, thumbnail: null }) %>
+        <% }) %>
+      </div>
+  </div>
+
+  <!-- Journal Section -->
+   <% if (pool?.journal.length > 0) { %>
+    <div id="journals" class="tab-content mt-4 hidden">
+        <h2 class="text-xl font-bold mb-4">Journal Entries</h2>
+        <div class="space-y-4">
+          <!-- TODO: Add sorting to journal -->
+          <% pool.journal.sort((a, b) => new Date(a.time) - new Date(b.time)) %>
+          <% pool.journal.forEach(entry => { %>
+            <div class="bg-royal-purple text-white p-4 rounded-lg">
+                <h3 class="text-lg font-bold"><%= entry.time %></h3>
+                <p class="text-gray-300 text-lg"><%= entry.entry %></p>
+            </div>
+          <% }) %>
+        </div>
+    </div>
+  <% } %>
 </div>
+
+<script>
+  function disableTabs() {
+    const imageSelect = document.getElementById('imageSelect')
+    const videoSelect = document.getElementById('videoSelect')
+    const audioSelect = document.getElementById('audioSelect')
+    const journalSelect = document.getElementById('journalSelect')
+
+    const imagesLength = '<%= pool.images.length %>'
+    const videosLength = '<%= pool.videos.length %>'
+    const audiosLength = '<%= pool.audios.length %>'
+    const journalsLength = '<%= pool.journal.length %>'
+    
+    const disabled = ["opacity-50", "cursor-not-allowed"]
+
+    // Disable tabs if there is nothing to render
+    if (imagesLength == 0) {
+      imageSelect.classList.add(...disabled);
+      imageSelect.classList.remove("cursor-pointer");
+      imageSelect.removeAttribute("onclick"); // Prevent clicking
+    }
+    if (videosLength == 0) {
+      videoSelect.classList.add(...disabled);
+      videoSelect.classList.remove("cursor-pointer");
+      videoSelect.removeAttribute("onclick");
+    }
+    if (audiosLength == 0) {
+      audioSelect.classList.add(...disabled);
+      audioSelect.classList.remove("cursor-pointer");
+      audioSelect.removeAttribute("onclick");
+    }
+    if (journalsLength == 0) {
+      journalSelect.classList.add(...disabled);
+      journalSelect.classList.remove("cursor-pointer");
+      journalSelect.removeAttribute("onclick");
+    }
+
+    // Switch to the first available tab
+    const tabs = [
+      { id: 'images', length: imagesLength, element: imageSelect },
+      { id: 'videos', length: videosLength, element: videoSelect },
+      { id: 'audios', length: audiosLength, element: audioSelect },
+      { id: 'journals', length: journalsLength, element: journalSelect }
+    ];
+
+    // Find the first available tab and activate it
+    const firstAvailableTab = tabs.find(tab => tab.length > 0);
+    if (firstAvailableTab) {
+        switchTab(firstAvailableTab.id);
+    }
+  }
+
+  disableTabs()
+
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.add('hidden')
+    })
+    
+    document.getElementById(tabId).classList.remove('hidden')
+  }
+</script>

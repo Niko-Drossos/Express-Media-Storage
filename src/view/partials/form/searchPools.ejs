@@ -1,14 +1,87 @@
+<form class="flex flex-col items-center justify-center" id="searchForm" onsubmit="search(event)">
+  <div class="lg:w-1/2 md:3/4 bg-white shadow-md rounded px-8 pt-6 pb-4 mb-4 flex flex-col my-2 gap-4">
+      <div class="-mx-3 md:flex">
+          <div class="md:w-1/2 px-3 mb-3 md:mb-0">
+              <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="title">
+                  Title
+              </label>
+              <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="title" type="text" value="<%= query.title %>" name="title" placeholder="Xodus festival">
+          </div>
+          
+          <div class="md:w-1/2 px-3">
+              <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="favorites">
+                  Favorites
+              </label>
+              <div class="relative">
+                  <select class="block appearance-none w-full bg-grey-lighter border border-grey-lighter text-grey-darker py-3 px-4 pr-8 rounded" id="favorites" name="favorites">
+                      <option value="any">Any</option>
+                      <option value="include">Only Favorites</option>
+                      <option value="exclude">Exclude Favorites</option>
+                  </select>
+              </div>
+          </div>
+      </div>
+      
+      <div class="-mx-3 md:flex">
+          <div class="md:w-full px-3">
+              <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="content">
+                  Description
+              </label>
+              <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="content" type="text" value="<%= query.content %>" name="content" placeholder="hello my name is...">
+          </div>
+      </div>
+      
+      <div class="-mx-3 md:flex">
+          <div class="md:w-1/2 px-3 mb-6 md:mb-0">
+              <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="startDate">
+                  Start Date
+              </label>
+              <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-red rounded py-3 px-4" id="startDate" type="date" value="<%= query.startDate %>" name="startDate" placeholder="YYYY-MM-DD">
+          </div>
+          <div class="md:w-1/2 px-3">
+              <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="endDate">
+                  End Date
+              </label>
+              <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4" id="endDate" type="date" value="<%= query.endDate %>" name="endDate" placeholder="YYYY-MM-DD">
+          </div>
+      </div>
 
-
-<div class="md:w-1/2 px-3 mb-3">
-  <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="pool">
-    Pool
-  </label>
-  <div class="relative">
-    <select class="block appearance-none w-full bg-grey-lighter border border-grey-lighter text-grey-darker py-3 px-4 pr-8 rounded" id="pool" name="pool">
-      <option value="any">Any</option>
-      <option value="public">Public</option>
-      <option value="private">Private</option>
-    </select>
+      <div class="flex-row flex justify-between">
+          <%- include('./usernameSelector.ejs', query) %>
+          <span class="block mx-3"></span>
+          <%- include('./tagSelector.ejs', query) %>
+      </div>
+      
+      <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded" type="submit">Search</button>
   </div>
-</div>
+</form>
+
+<script>
+  
+  function search(event) {
+      event.preventDefault()
+
+      // Get the location of the current window
+      const url = new URL(window.location.href)
+      const urlPath = `${url.origin}${url.pathname}`
+      
+      // Get the query parameters for the URL
+      const form = document.getElementById('searchForm')
+      
+      // Create a new set of query params
+      const formFields = Array.from(form.elements)
+
+      const params = formFields
+          .map((field) => {
+              // Don't add the media type to the URL or the tags and users input boxes or if its empty
+              if (field.name === "" || field.value === "") return
+
+              return `${field.name}=${field.value}`
+          })
+          // Remove undefined values from the array
+          .filter((param) => param !== undefined)
+          
+      // Redirect to the same page with the new query parameters
+      document.location = `${urlPath}?${params.join('&')}`
+  }
+</script>

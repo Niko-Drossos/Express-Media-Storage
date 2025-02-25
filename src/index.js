@@ -155,6 +155,11 @@ app.get("/create-pool", userLoggedIn, async (req, res) => {
   })
 })
 
+
+/* -------------------------------------------------------------------------- */
+/*                              Searching routes                              */
+/* -------------------------------------------------------------------------- */
+
 /* ----------------------- Navigate to the search page ---------------------- */
 
 app.get("/search-media", userLoggedIn, async (req, res) => {
@@ -236,46 +241,40 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
 
 app.get("/search-pools", userLoggedIn, async (req, res) => {
   const query = req.query
+  
+  // Construct the search URL
+  const searchURL = `${API_URL}/search/pools?${new URLSearchParams(query)}`
 
-  if (query.mediaType) {   
-    // Construct the search URL
-    const searchURL = `${API_URL}/search/${query.mediaType}?${new URLSearchParams(query)}`
+  const request = await fetch(searchURL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": getCookies(req, "media_authentication")
+    },
+    credentials: "include"
+  })
 
-    const request = await fetch(searchURL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": getCookies(req, "media_authentication")
-      },
-      credentials: "include"
-    })
-
-    const response = await request.json()
-    
-    if (response.error) {
-      res.render("search-pools.ejs", {
-        searchType: "media",
-        query,
-        response: [],
-        error: response.error
-      })
-      return
-    }
-
-    res.render("search-pools.ejs", {
-      searchType: "media",
+  const response = await request.json()
+  
+  if (response.error) {
+    res.render("error.ejs", {
       query,
-      response: response.data.searchResults || []
+      response: {},
+      error: response.error
     })
-  } else { 
-    // Render the page without searching for anything
-    res.render("search-pools.ejs", {
-      searchType: "pools",
-      query,
-      response: []
-    })
+    return
   }
+
+  res.render("search-pools.ejs", {
+    query,
+    response: response.data,
+    searchResults: response.data.searchResults || []
+  })
 }) 
+
+/* -------------------------------------------------------------------------- */
+/*                               Viewing routes                               */
+/* -------------------------------------------------------------------------- */
 
 /* ---------------------- View a file with document id ---------------------- */
 
@@ -305,6 +304,27 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
     mediaType,
     media: response.data.searchResults[0],
     uploader: response.data.searchResults[0].user
+  })
+})
+
+/* ------------------------------- View a pool ------------------------------ */
+
+app.get("/pools/:id", userLoggedIn, async (req, res) => {
+  const { id } = req.params
+
+  const request = await fetch(`${API_URL}/search/pools?id=${id}&limit=1&comments=true&populate=true`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": getCookies(req, "media_authentication")
+    },
+    credentials: "include"
+  })
+
+  const response = await request.json()
+  console.log(response.data.searchResults[0])
+  res.render("pool.ejs", {
+    pool: response.data.searchResults[0]
   })
 })
 
@@ -354,6 +374,10 @@ app.get("/profile/:id", userLoggedIn, async (req, res) => {
 
   res.render("profile.ejs", response.data.user)
 })
+
+/* -------------------------------------------------------------------------- */
+/*                              Server functions                              */
+/* -------------------------------------------------------------------------- */
 
 /* --------------------- Temporary global error handler --------------------- */
 

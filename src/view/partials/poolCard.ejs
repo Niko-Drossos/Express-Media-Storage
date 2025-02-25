@@ -1,0 +1,71 @@
+<div class="w-full flex flex-col bg-white rounded">
+  <!-- Main section for picture -->
+  <a href="/pools/<%= id %>">
+    <img class="rounded-t" src="../icons/image-placeholder.png" alt="">
+  </a>
+
+  <!-- Selection list -->
+  <ul class="w-full flex flex-row justify-between border-solid border-b-2 text-xl" id="selectionList-<%= id %>">
+    <li class="flex-grow text-center cursor-pointer p-2" onclick="switchTab(event, 'images', '<%= id %>')">Images</li>
+    <li class="flex-grow text-center border-solid border-x-2 cursor-pointer p-2" onclick="switchTab(event, 'videos', '<%= id %>')">Videos</li>
+    <li class="flex-grow text-center cursor-pointer p-2" onclick="switchTab(event, 'audios', '<%= id %>')">Audios</li>
+  </ul>
+
+  <!-- Media container -->
+  <div class="w-full m-2" id="tab-<%= id %>">
+
+    <div class="block" id="images">
+      Images
+    </div>
+    
+    <div class="tab-<%= id %> hidden" id="videos">
+      Videos
+    </div>
+    
+    <div class="tab-<%= id %> hidden" id="audios">
+      Audios
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(event, tab, id) {
+    const selectionList = document.querySelector(`#selectionList-${id}`)
+
+    // Goofy ahh class adding logic
+    const selectedClasses = ['bg-zinc-100']
+
+    // Remove active state from all tabs
+    const allItems = selectionList.querySelectorAll('li')
+    allItems.forEach(element => {
+      element.classList.remove(selectedClasses)
+      element.classList.add('bg-white')
+    })
+    console.log(event.target)
+
+    event.target.classList.add(selectedClasses)
+    event.target.classList.remove('bg-white')
+
+
+    // Stupid logic, but it works
+    const tabs = document.querySelector(`#tab-${id}`)
+    
+    const imageTab = tabs.querySelector('#images')
+    const videoTab = tabs.querySelector('#videos')
+    const audioTab = tabs.querySelector('#audios')
+
+    const allTabs = [imageTab, videoTab, audioTab]
+
+    allTabs.forEach(element => {
+      element.style.display = "none"
+    });
+
+    if (tab == "images") {
+      imageTab.style.display = "block"
+    } else if (tab == "videos") {
+      videoTab.style.display = "block"
+    } else if (tab == "audios") {
+      audioTab.style.display = "block"
+    }
+  }
+</script>

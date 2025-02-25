@@ -1,3 +1,15 @@
-<h1>Pool Search</h1>
+<h1 class="flex justify-center py-2">Search Pools</h1>
 
 <%- include('./partials/form/searchPools.ejs') %>
+
+<hr class="my-4 border">
+
+ <%- include('./partials/form/pagination.ejs', { response }) %>
+ <hr class="my-4 border">
+
+
+<div class="mx-8 grid grid-cols-2 gap-4">
+  <% searchResults.forEach(pool => { %>
+    <%- include('./partials/poolCard.ejs', { id: pool._id }) %>
+  <% }) %>
+</div>

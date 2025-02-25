@@ -96,9 +96,14 @@ exports.editPool = async (req, res) => {
 
     // Make sure that the person updating the pool is the one who created it
     const updatedPool = await Pool.findOneAndUpdate(
-      { _id: req.params.poolId, "user.userId": req.userId }, 
+      { 
+        _id: req.params.poolId,
+        "user.userId": req.userId
+      }, 
       updatedInformation,
-      { new: true }
+      { 
+        new: true
+      }
     )
 
     res.status(200).json({

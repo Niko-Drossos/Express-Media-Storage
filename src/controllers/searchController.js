@@ -67,7 +67,7 @@ exports.searchPools = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { userId, usernames, tags, startDate, endDate, title, description, transcription, id, comments=false, page=1, limit=12 } = query
+    const { userId, usernames, tags, startDate, endDate, title, description, transcription, id, comments=false, populate=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -95,11 +95,23 @@ exports.searchPools = async (req, res) => {
 
     const totalPages = Math.ceil(totalDocuments / limit);
 
+    const populatedFields = []
+
+    if (populate) {
+      populatedFields.push('images')
+      populatedFields.push('videos')
+      populatedFields.push('audios')
+    }
+
+    if (comments) {
+      populatedFields.push('comments')
+    }
+
     const searchResults = await Pool.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit ? limit : 16)
       .skip((page - 1) * (limit ? limit : 16))
-      .populate(comments ? 'comments' : '')
+      .populate(populatedFields)
       .lean()
 
       // Get the users favorite pools
