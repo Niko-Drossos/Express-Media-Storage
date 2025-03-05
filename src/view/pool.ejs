@@ -22,30 +22,30 @@
 
   <!-- Images Section -->
   <div id="images" class="tab-content mt-4">
-    <h2 class="text-xl font-bold text-white mb-8">Images</h2>
+    <h2 class="text-xl font-bold mb-8">Images</h2>
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <% pool.images.forEach(image => { %>
-        <%- include('./partials/mediaCard.ejs', { ...image, query: { mediaType: 'image' }, thumbnail: null }) %>
+        <%- include('./partials/cards/mediaCard.ejs', { ...image, query: { mediaType: 'image' }, thumbnail: null }) %>
       <% }) %>
     </div>
   </div>
 
   <!-- Videos Section -->
   <div id="videos" class="tab-content mt-4 hidden">
-      <h2 class="text-xl font-bold text-white mb-">Videos</h2>
+      <h2 class="text-xl font-bold mb-">Videos</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <% pool.videos.forEach(video => { %>
-          <%- include('./partials/mediaCard.ejs', { ...video, query: { mediaType: 'video' }, thumbnail: null }) %>
+          <%- include('./partials/cards/mediaCard.ejs', { ...video, query: { mediaType: 'video' }, thumbnail: null }) %>
         <% }) %>
       </div>
   </div>
 
   <!-- Audio Section -->
   <div id="audios" class="tab-content mt-4 hidden">
-      <h2 class="text-xl font-bold text-white mb-8">Audios</h2>
+      <h2 class="text-xl font-bold mb-8">Audios</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <% pool.audios.forEach(audio => { %>
-          <%- include('./partials/mediaCard.ejs', { ...audio, query: { mediaType: 'audio' }, thumbnail: null }) %>
+          <%- include('./partials/cards/mediaCard.ejs', { ...audio, query: { mediaType: 'audio' }, thumbnail: null }) %>
         <% }) %>
       </div>
   </div>
@@ -69,6 +69,16 @@
 </div>
 
 <script>
+  function disableTab(element, length) {
+    const disabled = ["opacity-50", "cursor-not-allowed"]
+    // If there is nothing to show, then disable the tab
+    if (length == 0) { 
+      element.classList.add(...disabled);
+      element.classList.remove("cursor-pointer");
+      element.removeAttribute("onclick"); // Prevent clicking
+    }
+  }
+
   function disableTabs() {
     const imageSelect = document.getElementById('imageSelect')
     const videoSelect = document.getElementById('videoSelect')
@@ -80,29 +90,12 @@
     const audiosLength = '<%= pool.audios.length %>'
     const journalsLength = '<%= pool.journal.length %>'
     
-    const disabled = ["opacity-50", "cursor-not-allowed"]
 
     // Disable tabs if there is nothing to render
-    if (imagesLength == 0) {
-      imageSelect.classList.add(...disabled);
-      imageSelect.classList.remove("cursor-pointer");
-      imageSelect.removeAttribute("onclick"); // Prevent clicking
-    }
-    if (videosLength == 0) {
-      videoSelect.classList.add(...disabled);
-      videoSelect.classList.remove("cursor-pointer");
-      videoSelect.removeAttribute("onclick");
-    }
-    if (audiosLength == 0) {
-      audioSelect.classList.add(...disabled);
-      audioSelect.classList.remove("cursor-pointer");
-      audioSelect.removeAttribute("onclick");
-    }
-    if (journalsLength == 0) {
-      journalSelect.classList.add(...disabled);
-      journalSelect.classList.remove("cursor-pointer");
-      journalSelect.removeAttribute("onclick");
-    }
+    disableTab(imageSelect, imagesLength)
+    disableTab(videoSelect, videosLength)
+    disableTab(audioSelect, audiosLength)
+    disableTab(journalSelect, journalsLength)
 
     // Switch to the first available tab
     const tabs = [

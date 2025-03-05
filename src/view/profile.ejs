@@ -1,3 +1,19 @@
 <h1>User id is: <%= _id %></h1>
 <h1>Email is: <%= email %></h1>
 <h1>Username is: <%= username %></h1>
+<button onclick={logout()}>Logout</button>
+<script>
+  async function logout() {
+    const request = await fetch('/auth/logout', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+
+    const response = await request.json()
+
+    console.log(response)
+  }
+</script>

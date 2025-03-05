@@ -13,7 +13,7 @@
         <% if (searchResults.length) { %>
             <% searchResults.map(data => { %>
                 <div class="mb-8">                                                    <!--! Finish thumbnail display -->
-                    <%- include('./partials/mediaCard.ejs', { ...data, query, thumbnail: null }) %>
+                    <%- include('./partials/cards/mediaCard.ejs', { ...data, query, thumbnail: null }) %>
                 </div>
             <% }) %>
         <% } %>

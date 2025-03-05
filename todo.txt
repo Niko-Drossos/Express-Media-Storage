@@ -62,6 +62,9 @@ Then return to the frontend with the message saying that it is in the queue whil
 Make pools searchable to let users search for journals
 FIX time issues for server, it collides with having different server timezones
 
+Next feature to add is deleting
+
+
 Add support for changing color themes
 
 Color palette:
