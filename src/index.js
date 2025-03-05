@@ -322,7 +322,13 @@ app.get("/pools/:id", userLoggedIn, async (req, res) => {
   })
 
   const response = await request.json()
-  console.log(response.data.searchResults[0])
+
+  if (response.error) {
+    res.render('error.ejs', { status: request.status, message: response.message, action: { name: "Home", url: "/" } })
+    console.log(response.error)
+    return
+  }
+
   res.render("pool.ejs", {
     pool: response.data.searchResults[0]
   })
@@ -341,7 +347,6 @@ app.get("/profile", userLoggedIn, async (req, res) => {
   })
 
   const response = await request.json()
-  console.log(response)
 
   if (response.error) {
     res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)

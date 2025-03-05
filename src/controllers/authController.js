@@ -138,4 +138,21 @@ exports.loginUser = async (req, res) => {
   }
 }
 
+/* ------------------------------- Logout user ------------------------------ */
 
+exports.logoutUser = async (req, res) => {
+  try {
+    res.clearCookie("media_authentication")
+    res.status(200).json({
+      success: true,
+      message: "Successfully logged out"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to logout",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
