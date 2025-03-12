@@ -1,57 +1,340 @@
-<div>
-  <label for="searchMedia" class="flex items-center">
-    <span class="text-2xl">Search</span>
-    <input type="text" id="searchMedia" placeholder="title" class="rounded bg-white mx-2 px-1">
-    <button>
-      <img src="../../icons/magnifying-glass.svg" alt="">
-    </button>
-  </label>
-</div>
-<div class="w-full lg:w-2/3 bg-white shadow-lg text-lg rounded-sm border border-gray-200">
-  <div class="overflow-x-auto rounded-lg">
-      <table class="table-auto w-full border-collapse">
-          <thead class="text-sm font-semibold uppercase text-gray-800 bg-gray-50 mx-auto">
-              <tr class="flex flex-row justify-between ">
-                  <th></th>
-                  <th><svg xmlns="http://www.w3.org/2000/svg" class="fill-current w-5 h-5 mx-auto"><path d="M6 22h12a2 2 0 0 0 2-2V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zm7-18 5 5h-5V4zm-4.5 7a1.5 1.5 0 1 1-.001 3.001A1.5 1.5 0 0 1 8.5 11zm.5 5 1.597 1.363L13 13l4 6H7l2-3z"></path></svg></th>
-                  <th class="p-2">
-                      <div class="font-semibold">Title</div>
-                  </th>
-                  <th class="p-2">
-                      <div class="font-semibold text-left">Description</div>
-                  </th>
-                  <th class="p-2">
-                      <div class="font-semibold text-center">Action</div>
-                  </th>
-              </tr>
-              <tr class="flex justify-between">
-                <!-- Add the media data here -->
-                  <td>
-                    <input type="checkbox" name="media-select" value="" id="">
-                  </td>
-                  <td><img src="https://images.pexels.com/photos/25652584/pexels-photo-25652584/free-photo-of-elegant-man-wearing-navy-suit.jpeg?auto=compress&cs=tinysrgb&w=400" class="h-8 w-8 mx-auto" /></td>
-                  <td>Sample Name</td>
-                  <td>Sample Description</td>
-                  <td class="p-2">
-                      <div class="flex justify-center">
-                      <a href="#" class="rounded-md hover:bg-green-100 text-green-600 p-2 flex justify-between items-center">
-                          <span>
-                            <FaEdit class="w-4 h-4 mr-1"/>
-                          </span> Edit
-                      </a>
-                      <button class="rounded-md hover:bg-red-100 text-red-600 p-2 flex justify-between items-center">
-                          <span><FaTrash class="w-4 h-4 mr-1" /></span> Delete
-                      </button>
-                      </div>
-                  </td>
-              </tr>
-          </thead>
-      </table>
+<div class="w-10/12 bg-white p-6 shadow-md rounded-lg">
+  <div class="flex items-center mb-4">
+      <input type="text" id="search" placeholder="Search..." 
+          class="w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <select class="ml-2 p-2 border rounded-md shadow-sm bg-gray-100 hover:bg-gray-200" id="mediaType">
+        <option value="images" selected>Images</option>
+        <option value="videos">Videos</option>
+        <option value="audios">Audios</option>
+      </select>
+      <button class="ml-2 p-2 border rounded-md shadow-sm bg-gray-100 hover:bg-gray-200" onclick="filterMedia()">
+        Filter
+      </button>
+  </div>
+
+  <table class="w-full table-fixed border-collapse border border-gray-200">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2 border w-10"><input type="button" id="selectAll" onclick="selectAllCheckboxes()" value="All"/></th>
+        <th class="p-2 border w-48 whitespace-nowrap">Title</th>
+        <th class="p-2 border w-64 whitespace-nowrap">Description</th>
+        <th class="p-2 border w-24 whitespace-nowrap">Length</th>
+        <th class="p-2 border w-24 whitespace-nowrap">Action</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <!-- <hr class="my-4 border"> -->
+
+  <div class="mt-4 flex justify-between items-center">
+    <div>
+        <span id="pageInfo" class="text-gray-600">Page 1 of X</span>
+    </div>
+    <div>
+        <button id="prevPage" class="bg-gray-300 text-black px-3 py-1 rounded-md shadow-md hover:bg-gray-400" onclick="pagination(false)">Prev</button>
+        <button id="nextPage" class="bg-gray-300 text-black px-3 py-1 rounded-md shadow-md hover:bg-gray-400" onclick="pagination(true)">Next</button>
+    </div>
+  </div>
+
+  <hr class="my-4 border">
+
+  <ul class="mt-4 flex justify-between items-center list-none">
+    <li id="imageList">Images</li>
+    <li id="audioList">Audios</li>
+    <li id="videoList">Videos</li>
+  </ul>
+
+  <hr class="my-4 border">
+
+  <!-- Form Section -->
+  <div class="mt-4 p-4 bg-gray-100 rounded-md">
+    <h3 class="text-lg font-semibold mb-2">Pool details</h3>
+    <form id="entryForm" onsubmit="createPool(event)">
+      <div class="mb-2">
+        <label for="title" class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">Title</label>
+        <input type="text" id="title" name="title" class="w-full px-3 py-2 border rounded-md">
+      </div>
+      <div class="mb-2">
+        <label for="description" class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">Description</label>
+        <textarea id="description" name="description" class="w-full px-3 py-2 border rounded-md"></textarea>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="mb-2 w-1/2">
+          <%- include('./tagSelector.ejs') %>
+        </div>
+        
+        <div class="mb-2 w-1/2">
+          <label for="privacy" class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">Privacy</label>
+          <select id="privacy" name="privacy" class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10">
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+            <option value="unlisted">Unlisted</option>
+          </select>
+        </div>  
+      </div>
+
+      <div class="mt-4 flex justify-center">
+        <input type="submit" value="Create pool" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"></input>
+      </div>
+    </form>
   </div>
 </div>
 
+<style>
+  .truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+</style>
+
 <script>
-  async function searchMedia() {
+  let rowsPerPage = 15
+  let currentPage = 1
+
+  // Initialize the global variable to store the currently rendered data 
+  let renderedData = []
+  let selectedCheckboxes = {
+    images: [],
+    videos: [],
+    audios: []
+  }
+
+  // Ask the user before the page reloads to avoid losing the selections and reset cache on page reload to prevent stale data
+  // UNCOMMENT
+  /* window.addEventListener("beforeunload", function (event) {
+    event.preventDefault()
+    event.returnValue = "Are you sure you want to leave this page?"
+    sessionStorage.clear()
+  }) */
+ 
+  // <!-- ------------------------- START OF FUNCTIONS -------------------------- -->
+
+  function renderTable(data) {
+    const tbody = document.getElementById("tableBody")
+
+    // Display message if there is no media to display
+    if (!data.length) {
+      tbody.innerHTML = `
+        <tr class="bg-white hover:bg-gray-100 cursor-pointer">
+          <label for="noMedia">
+            <td class="p-2 border text-center">
+                <input type="checkbox" class="rowCheckbox" disabled>
+            </td>
+            <td class="p-2 border"></td>
+            <td class="p-2 border text-center">Sorry, no media matches your query</td>
+            <td class="p-2 border"></td>
+            <td class="p-2 border"></td>
+          </label>
+        </tr>`
+      return
+    }
+
+    // Reset the table
+    tbody.innerHTML = ""
+
+    const start = (currentPage - 1) * rowsPerPage
+    const end = start + rowsPerPage
+    const paginatedItems = data.slice(start, end)
+    paginatedItems.forEach((item, index) => {
+      // Bruh... I should find a better way to do this...
+      const mediaArray = selectedCheckboxes[item.mediaType]
+      const itemInList = !!mediaArray.find(doc => doc.id === item.id)
+
+      let row = `
+      <tr class="bg-white hover:bg-gray-100 cursor-pointer">
+        <label for="${item.id}">
+          <td class="p-2 border text-center">
+              <input type="checkbox" class="rowCheckbox" id="${item.id}" onclick="selectCheckbox(this)" data-mediaType=${item.mediaType} ${itemInList ? "checked" : ""}>
+          </td>
+          <td class="p-2 border truncate max-w-xs" title="${item.title}">${item.title}</td>
+          <td class="p-2 border truncate max-w-sm relative group" title="${item.description}">
+              ${item.description}
+          </td>
+          <td class="p-2 border">${item.length}</td>
+          <td class="p-2 border text-center">
+            <a href="edit/${item.mediaType.split(0, -1)}/${item.id}" target="_blank" class="bg-green-500 text-white px-3 py-1 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-400 " disabled>Edit</a>
+            <a href="${item.mediaType}?id=${item.id}" target="_blank" class="bg-blue-500 text-white px-3 py-1 rounded-md shadow-md hover:bg-blue-600">Open</a>
+          </td>
+        </label>
+      </tr>
+      `
+      
+      // TODO: Add edit and delete routes and pages
+      tbody.insertAdjacentHTML("beforeend", row)
+    })
+
+    document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${Math.ceil(data.length / rowsPerPage)} (${data.length} Results)`
+  }
+
+  // Filter out 
+  async function filterMedia() {
+    const mediaSelect = document.getElementById("mediaType")
+
+    renderedData = await search(mediaSelect.value, { title: document.getElementById("search").value.toLowerCase() })
+
+    renderTable(renderedData)
+  }
+
+  // <!-- ------------------------- Call the search API ------------------------- -->
+
+  async function search(mediaType, query) {
+    // Construct query
+    const queryParams = new URLSearchParams()
+
+    for (const [key, value] of Object.entries(query)) {
+      queryParams.append(key, value)
+    }
+
+    const request = await fetch(`/search/${mediaType}?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include"
+    }) 
+
+    const response = await request.json()
+
+    // Initialize the variable to update with response
+    let updatedData
+
+    if (response.success) {
+      // Render an empty table if no data is returned
+      if (response.data.searchResults.length === 0) {
+        updatedData = []
+      }
+      
+      // Convert the data to the table format and update the cache
+      updatedData = response.data.searchResults.map((doc) => tableInformation(doc, mediaType))
+      
+      // updateCache(query.mediaType, renderedData)
+    } else {
+      console.error(response)
+      updatedData = []
+    }
+
+    return updatedData
+  }
+
+  // This just is a way to trim the data to fit the table to avoid wasting memory
+  function tableInformation(doc, mediaType) {
+    return {
+      id: doc._id,
+      title: doc.title,
+      description: doc.description || "(No description)",
+      length: 'N/A', // TODO: Remove placeholder
+      mediaType: mediaType
+    }
+  }
+
+  async function createPool(event) {
+    event.preventDefault()
+
+    // Return only the document _id's
+    const audios = selectedCheckboxes.audios.map(doc => doc.id).join(',')
+    const images = selectedCheckboxes.images.map(doc => doc.id).join(',')
+    const videos = selectedCheckboxes.videos.map(doc => doc.id).join(',')
+
+    // TODO: REMOVE WHEN READY
+    return
+    const request = await fetch('/pool/create', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ title, description, privacy, tags, audios, images, videos })
+    })
+
+    const response = await request.json()
+
+    console.log(response)
+  }
+
+  // Allow the switching of pages
+  function pagination(nextPage) {
+    if (!nextPage && currentPage > 1) {
+      currentPage--;
+      renderTable(renderedData);
+    }
+
+    if (nextPage && currentPage < Math.ceil(renderedData.length / rowsPerPage)) {
+      currentPage++;
+      renderTable(renderedData);
+    }
+  }
+
+  // <!-- ----------------------- Checkbox functionality ------------------------ -->
+
+  // Select checkboxes to add to the pool
+  function selectCheckbox(checkbox) {
+    const mediaType = checkbox.dataset.mediatype
+
+    const document = renderedData.find(doc => doc.id === checkbox.id)
     
+    if (checkbox.checked === true) {
+      selectedCheckboxes[mediaType].push(document)
+    } else {
+      selectedCheckboxes[mediaType] = selectedCheckboxes[mediaType].filter(doc => doc.id !== checkbox.id)
+    }
+
+    updateMediaList()
+    console.log(selectedCheckboxes)
+  }
+
+  function selectAllCheckboxes() {
+    const selectAll = document.getElementById('selectAll')
+    const tbody = document.getElementById('tableBody')
+    const mediaType = document.getElementById("mediaType").value
+
+    const allChildren = tbody.querySelectorAll('input')
+    
+    // Click each checkbox
+    allChildren.forEach(checkbox => checkbox.click())
+
+    console.log(allChildren)
+  }
+
+  // <!-- ----------------------------- Update DOM ------------------------------ -->
+
+  // TODO: FINISH IMPLEMENTING
+  function updateMediaList() {
+    const imageList = document.getElementById('imageList')
+    const audioList = document.getElementById('audioList')
+    const videoList = document.getElementById('videoList')
+
+    // Slightly abstract the dom rendering 
+    function renderBoxes(documents) {
+      let returnedHTML = ''
+      const docTitles = documents.map(doc => doc.title)
+      // Make "returnedHTML" a list of the document titles
+      docTitles.forEach(title => returnedHTML += `<li>${title}</li>`)
+      return returnedHTML
+    }
+
+    // Use the selected checkboxes to update the lists with the new documents.
+    imageList.innerHTML = `
+      <h3 class='border-b-2'>Images (${selectedCheckboxes.images.length})</h3>
+      <ul>
+        ${renderBoxes(selectedCheckboxes.images)}
+      </ul>
+    `
+
+    audioList.innerHTML = `
+      <h3 class='border-b-2'>Audios (${selectedCheckboxes.audios.length})</h3>
+      <ul>
+        ${renderBoxes(selectedCheckboxes.audios)}
+      </ul>
+    `
+
+    videoList.innerHTML = `
+      <h3 class='border-b-2'>Videos (${selectedCheckboxes.videos.length})</h3>
+      <ul>
+        ${renderBoxes(selectedCheckboxes.videos)}
+      </ul>
+    `
   }
 </script>

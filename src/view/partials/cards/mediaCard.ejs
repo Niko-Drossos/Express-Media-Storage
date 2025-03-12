@@ -14,11 +14,14 @@
             <%= description || "(No Description)" %>
         </p>
     </div>
-    <div class="p-6 pt-0 flex">
+    <div class="p-6 pt-0 flex justify-between">
         <% const { mediaType } = query %>
-        <% const docType = mediaType.slice(0, -1) %>
-        <a class="cursor-pointer justify-end select-none rounded-lg bg-royal-purple hover:bg-violet-blaze py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" href="media/<%= docType %>?id=<%= _id %>">
+        <a class="cursor-pointer justify-end select-none rounded-lg bg-royal-purple hover:bg-violet-blaze py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none flex items-center" href="media/<%= mediaType %>?id=<%= _id %>">
             Read More
         </a>
+        <div>
+            <a href="/profile/<%= user.userId %>" class="font-bold"><%= user.username %></a>
+            <p class="flex justify-end"><%= new Date(date).toLocaleDateString() %></p>
+        </div>
     </div>
 </div>

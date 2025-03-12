@@ -3,7 +3,7 @@
   <div class="bg-lavender-haze text-white p-4 rounded-lg shadow-lg">
     <h1 class="text-2xl font-bold"><%= pool.title %></h1>
     <p class="text-gray-200"><%= pool.description %></p>
-    <p class="text-sm">Uploaded by 
+    <p class="text-sm">Created by 
       <a class="font-bold" href="/profile/<%= pool.user.userId %>"><%= pool.user.username %></a>
       on
       <b><%= new Date(pool.date).toLocaleDateString() %></b>
@@ -32,8 +32,8 @@
 
   <!-- Videos Section -->
   <div id="videos" class="tab-content mt-4 hidden">
-      <h2 class="text-xl font-bold mb-">Videos</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <h2 class="text-xl font-bold mb-8">Videos</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <% pool.videos.forEach(video => { %>
           <%- include('./partials/cards/mediaCard.ejs', { ...video, query: { mediaType: 'video' }, thumbnail: null }) %>
         <% }) %>

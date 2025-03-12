@@ -18,7 +18,7 @@ exports.searchUsers = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { username, tags, id, comments=false, page=1, limit=12 } = query
+    const { username, tags, id, comments=false, page=1, limit=16 } = query
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
@@ -31,8 +31,8 @@ exports.searchUsers = async (req, res) => {
 
     const searchResults = await User.find(searchQuery)
       .sort({ createdAt: -1 })
-      .limit(limit ? limit : 16)
-      .skip((page - 1) * (limit ? limit : 16))
+      .limit(limit)
+      .skip((page - 1) * limit)
       .populate(comments ? 'comments' : '')
 
     res.status(200).json({
@@ -67,7 +67,7 @@ exports.searchPools = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { userId, usernames, tags, startDate, endDate, title, description, transcription, id, comments=false, populate=false, page=1, limit=12 } = query
+    const { userId, usernames, tags, startDate, endDate, title, description, transcription, id, comments=false, populate=false, page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -109,8 +109,8 @@ exports.searchPools = async (req, res) => {
 
     const searchResults = await Pool.find(searchQuery)
       .sort({ createdAt: -1 })
-      .limit(limit ? limit : 16)
-      .skip((page - 1) * (limit ? limit : 16))
+      .limit(limit)
+      .skip((page - 1) * limit)
       .populate(populatedFields)
       .lean()
 
@@ -184,7 +184,7 @@ exports.searchComments = async (req, res) => {
     const searchResults = await Comment.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit)
-      .skip((page - 1) * (limit ? limit : 16))
+      .skip((page - 1) * limit)
       .populate(comments ? 'comments' : '')
       .lean()
 
@@ -235,7 +235,7 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, content, tags, id, comments=false,page=1, limit=12 } = query
+    const { userId, usernames, title, startDate, endDate, content, tags, id, comments=false,page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -268,7 +268,7 @@ exports.searchVideos = async (req, res) => {
     const searchResults = await Video.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit)
-      .skip((page - 1) * (limit ? limit : 16))
+      .skip((page - 1) * limit)
       .populate(comments ? 'comments' : '')
       .lean()
 
@@ -325,7 +325,7 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=12 } = query
+    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -336,7 +336,7 @@ exports.searchImages = async (req, res) => {
     // Add the search query's properties to the searchQuery object
     if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
-    if (title) searchQuery.title = { $re: new RegExp(title, 'i') }
+    if (title) searchQuery.title = new RegExp(title, 'i')
     if (id) searchQuery._id = id
     if (tags) searchQuery.tags = { $all: tags.split(",") }
 
@@ -357,7 +357,7 @@ exports.searchImages = async (req, res) => {
     const searchResults = await Image.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit)
-      .skip((page - 1) * (limit ? limit : 16))
+      .skip((page - 1) * limit)
       .populate(comments ? 'comments' : '')
       .lean()
 
@@ -408,7 +408,7 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=12 } = query
+    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -441,7 +441,7 @@ exports.searchAudios = async (req, res) => {
     const searchResults = await Audio.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit)
-      .skip((page - 1) * (limit ? limit : 16))
+      .skip((page - 1) * limit)
       .populate(comments ? 'comments' : '')
       .lean()
 

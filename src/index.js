@@ -54,6 +54,7 @@ app.use("/daat", require("./routes/daat.routes"))
 app.use("/favorite", require("./routes/favorite.routes"))
 app.use("/suggest", require("./routes/suggest.routes"))
 app.use("/transcription", require("./routes/transcription.routes"))
+app.use("/manage", require("./routes/manage.routes"))
 
 /* -------------------------------- Homepage -------------------------------- */
 
@@ -108,7 +109,6 @@ app.get("/journal", userLoggedIn, async (req, res) => {
   })
 
   const response = await request.json()
-  console.log(response.data.searchResults)
   
   // Send the entries to the frontend to render for the user
   let entries = response.data?.searchResults[0]?.journal || []
@@ -144,7 +144,7 @@ app.get("/create-pool", userLoggedIn, async (req, res) => {
 
   const { images, videos, audios } = response.data
 
-  res.render("pool.ejs", {
+  res.render("create-pool.ejs", {
     query,
     response: response.data,
     results: {
@@ -279,32 +279,38 @@ app.get("/search-pools", userLoggedIn, async (req, res) => {
 /* ---------------------- View a file with document id ---------------------- */
 
 app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
-  const { mediaType } = req.params
-  const { id } = req.query
+  try {
 
-  /* if (mediaType !== ("image" || "video" || "audio")) {
-    const redirectUrl = req.headers.referer || `http://${req.headers.host}`
-    res.redirect(307, redirectUrl)
-    return
-  } */
+    const { mediaType } = req.params
+    const { id } = req.query
 
-  const request = await fetch(`${API_URL}/search/${mediaType}s?id=${id}&comments=true`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    credentials: "include"
-  })
+    /* if (mediaType !== ("image" || "video" || "audio")) {
+      const redirectUrl = req.headers.referer || `http://${req.headers.host}`
+      res.redirect(307, redirectUrl)
+      return
+    } */
 
-  const response = await request.json()
-
-  res.render("media.ejs", {
-    // Send information for the file request on the client side
-    mediaType,
-    media: response.data.searchResults[0],
-    uploader: response.data.searchResults[0].user
-  })
+    const request = await fetch(`${API_URL}/search/${mediaType}?id=${id}&comments=true`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
+    
+    const response = await request.json()
+    
+    res.render("media.ejs", {
+      // Send information for the file request on the client side
+      mediaType,
+      media: response.data.searchResults[0],
+      uploader: response.data.searchResults[0].user
+    })
+  } catch (error) {
+    console.log(error)
+    res.render('error.ejs', { status: 500, message: "Something went wrong", action: { name: "Home", url: "/" } })
+  }
 })
 
 /* ------------------------------- View a pool ------------------------------ */
@@ -379,6 +385,31 @@ app.get("/profile/:id", userLoggedIn, async (req, res) => {
 
   res.render("profile.ejs", response.data.user)
 })
+
+/* ---------------------------- Manage user media --------------------------- */
+// TODO: Implement managing page
+app.get("/manage?", userLoggedIn, async (req, res) => {
+  // const id = req.params.id
+
+  /* const request = await fetch(`${API_URL}/user/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": getCookies(req, "media_authentication")
+    },
+    credentials: "include"
+  }) */
+
+  // const response = await request.json()
+
+  // if (response.error) {
+  //   res.redirect(307, req.headers.referer)
+  //   return
+  // }
+
+  res.render("manage.ejs", response.data.user)
+})
+
 
 /* -------------------------------------------------------------------------- */
 /*                              Server functions                              */

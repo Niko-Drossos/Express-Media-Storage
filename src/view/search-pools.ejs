@@ -4,12 +4,13 @@
 
 <hr class="my-4 border">
 
- <%- include('./partials/form/pagination.ejs', { response }) %>
- <hr class="my-4 border">
+<%- include('./partials/form/pagination.ejs', { response }) %>
+
+<hr class="my-4 border">
 
 
 <div class="mx-8 grid grid-cols-2 gap-4">
   <% searchResults.forEach(pool => { %>
-    <%- include('./partials/cards/poolCard.ejs', { id: pool._id }) %>
+    <%- include('./partials/cards/poolCard.ejs', pool) %>
   <% }) %>
 </div>

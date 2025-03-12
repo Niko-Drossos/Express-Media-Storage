@@ -21,6 +21,13 @@ exports.registerUser = async (req, res) => {
       })
     }
 
+    const containsIllegalChars = Array.from(username).includes(",", ".", "\"", "'") 
+
+    if (containsIllegalChars) {
+      console.log("Cant register")
+      throw new Error("Username cannot contain any of these characters [, . \" ']")
+    }
+
     // 1 uppercase, 1 lowercase, 1 number, 1 special character and at least 8 characters
     const isStrongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
 
@@ -57,6 +64,15 @@ exports.registerUser = async (req, res) => {
       }
     })
   } catch (error) {
+    console.log(error)
+    if (error.code == 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to register user",
+        errorMessage: `Email already in use`,
+        error
+      })
+    }
     res.status(500).json({
       success: false,
       message: "Failed to register user",

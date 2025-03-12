@@ -24,7 +24,7 @@ Add ability to download files (low priority)
 
 Add reaction routes for likes
 
-slogan: ©Where your story becomes His-Story
+slogan: ©Where your story can become His-Story for eternity
 
 pipe data from video compression to GridFs
 Make files store original file date before running it through middleware

@@ -1,5 +1,5 @@
-<div class="container mx-auto bg-lavender-haze h-20 flex w-full">
-  <div class="flex items-center justify-between w-full">
+<div class="container mx-auto bg-lavender-haze h-20 flex w-full relative">
+  <div class="flex md:flex-col items-center justify-between w-full relative">
     <a href="/" class="flex items-center">
       <!-- TODO: add logo -->
       <!-- <span href="/" class="mr-2">
@@ -19,8 +19,8 @@
       </svg>
     </div>
     <!-- TODO: fix mobile menu to be a dropdown -->
-    <div class="hidden md:flex-col lg:flex " id="mobile-menu">
-      <ul class="flex items-center" id="item-list">
+    <div class="hidden md:flex md:flex-col lg:flex absolute mr-0 lg:relative" id="mobile-menu">
+      <ul class="lg:flex lg:flex-row md:flex-col items-center" id="item-list">
         
         <li class="group relative mr-6 mb-1">
           <a href="/" class="relative z-30 block px-2 font-body text-lg font-bold text-white">Home</a>
