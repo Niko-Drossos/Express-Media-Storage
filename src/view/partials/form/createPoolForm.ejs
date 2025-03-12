@@ -103,12 +103,11 @@
   }
 
   // Ask the user before the page reloads to avoid losing the selections and reset cache on page reload to prevent stale data
-  // UNCOMMENT
-  /* window.addEventListener("beforeunload", function (event) {
+  window.addEventListener("beforeunload", function (event) {
     event.preventDefault()
     event.returnValue = "Are you sure you want to leave this page?"
     sessionStorage.clear()
-  }) */
+  })
  
   // <!-- ------------------------- START OF FUNCTIONS -------------------------- -->
 
@@ -238,8 +237,11 @@
     const images = selectedCheckboxes.images.map(doc => doc.id).join(',')
     const videos = selectedCheckboxes.videos.map(doc => doc.id).join(',')
 
-    // TODO: REMOVE WHEN READY
-    return
+    const title = document.getElementById("title").value
+    const description = document.getElementById("description").value
+    const privacy = document.getElementById("privacy").value
+    const tags = document.getElementById("tags").value
+    
     const request = await fetch('/pool/create', {
       method: 'POST',
       headers: {

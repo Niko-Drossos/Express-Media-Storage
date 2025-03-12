@@ -82,3 +82,15 @@ Light-theme:
 #c9a3df
 #ebe1f2
 #ffe078
+
+Components to use:
+  Profile customization: https://tailwindcss.com/plus/ui-blocks/preview#component-1c3f9860d66ce5cd9fb35ba7fde6721a
+  Dropdown menu: https://tailwindcss.com/plus/ui-blocks/preview#component-f8a14da22f26a67757b19f2fe3ca00ed
+  Dropdown menu with dividers: https://tailwindcss.com/plus/ui-blocks/preview#component-1f10562f6266c9b3ef15ff792edd508e
+  Modal dialog: https://tailwindcss.com/plus/ui-blocks/preview#component-b6812b6c13fff16861f2645c4100ae5b
+  Newsletter footer: https://tailwindcss.com/plus/ui-blocks/preview#component-82fc139db99143307df48bb9fe6152c5
+  Page not found: https://tailwindcss.com/plus/ui-blocks/preview#component-ebef3404d06e7b5f42e85b7b2ca4a2a5
+  Centered form: https://tailwindcss.com/plus/ui-blocks/preview#component-986addbc8678313fba5b0dd59c778e9b
+  Banner with button: https://tailwindcss.com/plus/ui-blocks/preview#component-8904b9d9a9fbb9a2313df3975112f9d7
+  Stacked flyout menu: https://tailwindcss.com/plus/ui-blocks/preview#component-27e5f71ced91b88e3f6b59ca69033a83
+  
