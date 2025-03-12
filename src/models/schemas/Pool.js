@@ -27,6 +27,10 @@ const poolSchema = new Schema({
     default: '',
     required: false
   },
+  date: {
+    type: Date,
+    default: Date.now
+  },
   privacy: Privacy,
   edited: {
     type: {

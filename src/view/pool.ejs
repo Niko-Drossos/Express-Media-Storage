@@ -23,7 +23,7 @@
   <!-- Images Section -->
   <div id="images" class="tab-content mt-4">
     <h2 class="text-xl font-bold mb-8">Images</h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10">
       <% pool.images.forEach(image => { %>
         <%- include('./partials/cards/mediaCard.ejs', { ...image, query: { mediaType: 'images' }, thumbnail: null }) %>
       <% }) %>
@@ -33,7 +33,7 @@
   <!-- Videos Section -->
   <div id="videos" class="tab-content mt-4 hidden">
       <h2 class="text-xl font-bold mb-8">Videos</h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10">
         <% pool.videos.forEach(video => { %>
           <%- include('./partials/cards/mediaCard.ejs', { ...video, query: { mediaType: 'videos' }, thumbnail: null }) %>
         <% }) %>
@@ -43,7 +43,7 @@
   <!-- Audio Section -->
   <div id="audios" class="tab-content mt-4 hidden">
       <h2 class="text-xl font-bold mb-8">Audios</h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10">
         <% pool.audios.forEach(audio => { %>
           <%- include('./partials/cards/mediaCard.ejs', { ...audio, query: { mediaType: 'audios' }, thumbnail: null }) %>
         <% }) %>
