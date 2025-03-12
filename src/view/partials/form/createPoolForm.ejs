@@ -68,15 +68,15 @@
         <div class="mb-2 w-1/2">
           <label for="privacy" class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">Privacy</label>
           <select id="privacy" name="privacy" class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10">
-            <option value="private">Private</option>
-            <option value="public">Public</option>
-            <option value="unlisted">Unlisted</option>
+            <option value="Private">Private</option>
+            <option value="Public">Public</option>
+            <option value="Unlisted">Unlisted</option>
           </select>
         </div>  
       </div>
 
       <div class="mt-4 flex justify-center">
-        <input type="submit" value="Create pool" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"></input>
+        <input type="submit" value="Create pool" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"></input>
       </div>
     </form>
   </div>
@@ -241,7 +241,7 @@
     const description = document.getElementById("description").value
     const privacy = document.getElementById("privacy").value
     const tags = document.getElementById("tags").value
-    
+
     const request = await fetch('/pool/create', {
       method: 'POST',
       headers: {
@@ -253,7 +253,12 @@
 
     const response = await request.json()
 
-    console.log(response)
+    if (response.success) {
+      alert(`Pool successfully created!`)
+      window.location.reload()
+    } else {
+      alert(`Pool creation failed!\nError: ${response.errorMessage}`)
+    }
   }
 
   // Allow the switching of pages
