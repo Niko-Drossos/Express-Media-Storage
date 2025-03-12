@@ -16,7 +16,7 @@
     </div>
     <div class="p-6 pt-0 flex justify-between">
         <% const { mediaType } = query %>
-        <a class="cursor-pointer justify-end select-none rounded-lg bg-royal-purple hover:bg-violet-blaze py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none flex items-center" href="media/<%= mediaType %>?id=<%= _id %>">
+        <a class="cursor-pointer justify-end select-none rounded-lg bg-royal-purple hover:bg-violet-blaze py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none flex items-center" href="/media/<%= mediaType.slice(0, -1) %>?id=<%= _id %>">
             Read More
         </a>
         <div>

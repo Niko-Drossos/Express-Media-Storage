@@ -290,7 +290,7 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
       return
     } */
 
-    const request = await fetch(`${API_URL}/search/${mediaType}?id=${id}&comments=true`, {
+    const request = await fetch(`${API_URL}/search/${mediaType}s?id=${id}&comments=true`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
