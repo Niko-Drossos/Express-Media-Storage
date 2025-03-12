@@ -18,12 +18,13 @@ const poolSchema = new Schema({
   },
   title: {
     type: String,
-    required: false,
-    default: new Date().toLocaleString()
+    default: new Date().toLocaleString(),
+    required: false
   },
   description: {
     // This is stored as a markdown string
     type: String,
+    default: '',
     required: false
   },
   privacy: Privacy,
