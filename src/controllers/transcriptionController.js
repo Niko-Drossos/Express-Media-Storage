@@ -15,6 +15,8 @@ const Image = require("../models/schemas/Image")
 const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
 const Transcription = require("../models/schemas/Transcription")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
 const { createTempFile } = require("../helpers/gridFsMethods")
 const convertTo16BitWav = require("../helpers/convertTo16BitWav")
@@ -98,7 +100,7 @@ async function createTranscription(document, transcriptionDocument, mimetype) {
     fs.unlinkSync(tempFile)
     fs.unlinkSync(wavFilePath)
   } catch (error) {
-    console.error('An error occurred:', error);
+    await logError(req, error)
 
     /* console.log(transcriptionDocument)
     // Delete the temporary files if it failed to do so
@@ -164,6 +166,7 @@ generate = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to generate transcription",
@@ -189,6 +192,7 @@ getById = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: error.message
@@ -217,6 +221,7 @@ getSubtitles = async (req, res) => {
 
     res.status(200).send(vtt)
   } catch (error) {
+    await logError(req, error)
     res.status(500).send(error.message)
   }
 }

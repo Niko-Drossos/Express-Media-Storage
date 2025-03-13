@@ -13,6 +13,7 @@ const { uploadStreams } = require('./helpers/gridFsMethods')
 const userLoggedIn = require("./models/middleware/userLoggedIn")
 const getCookies = require('./models/middleware/getCookies')
 const { acceptUploads } = require('./models/middleware/allowUploads')
+const logError = require('./models/middleware/logging/logError')
 /* -------------------------------------------------------------------------- */
 dotenv.config()
 
@@ -163,67 +164,82 @@ app.get("/create-pool", userLoggedIn, async (req, res) => {
 /* ----------------------- Navigate to the search page ---------------------- */
 
 app.get("/search-media", userLoggedIn, async (req, res) => {
-  const query = req.query
+  try {
 
-  if (query.mediaType) {   
-    // Construct the search URL
-    const searchURL = `${API_URL}/search/${query.mediaType}?${new URLSearchParams(query)}`
+    const query = req.query
 
-    const request = await fetch(searchURL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": getCookies(req, "media_authentication")
-      },
-      credentials: "include"
-    })
+    if (query.mediaType) {   
+      // Construct the search URL
+      const searchURL = `${API_URL}/search/${query.mediaType}?${new URLSearchParams(query)}`
 
-    const response = await request.json()
+      const request = await fetch(searchURL, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": getCookies(req, "media_authentication")
+        },
+        credentials: "include"
+      })
 
-    // Handle error cases
-    if (!response.success) {
-      let action = {
-        name: "Home",
-        url: "/"
-      }
-      
-      if (request.status === 401) {
-        action = {
-          name: "Login",
-          url: `/auth/login?redirect=${req.headers.referer}`
+      const response = await request.json()
+
+      // Handle error cases
+      if (!response.success) {
+        await logError(req, response.error)
+
+        let action = {
+          name: "Home",
+          url: "/"
         }
+        
+        if (request.status === 401) {
+          action = {
+            name: "Login",
+            url: `/auth/login?redirect=${req.headers.referer}`
+          }
+        }
+
+        return res.render("error.ejs", {
+          status: request.status,
+          message: response.message,
+          action: action
+        })
       }
 
-      return res.render("error.ejs", {
-        status: request.status,
-        message: response.message,
-        action: action
+      res.render("search-media.ejs", {
+        searchType: "media",
+        query,
+        response: response.data,
+        searchResults: response.data.searchResults
+      })
+    } else { 
+      // Render the page without searching for anything
+      res.render("search-media.ejs", {
+        searchType: "media",
+        query,
+        // Default response to prevent throwing "undefined" errors
+        response: {
+          resultCount: 0,
+          totalDocuments: 0,
+          page: 1,
+          pageCount: 1,
+          limit: 12,
+          query: {},
+          searchResults: []
+        },
+        searchResults: []
       })
     }
-
-    res.render("search-media.ejs", {
-      searchType: "media",
-      query,
-      response: response.data,
-      searchResults: response.data.searchResults
-    })
-  } else { 
-    // Render the page without searching for anything
-    res.render("search-media.ejs", {
-      searchType: "media",
-      query,
-      // Default response to prevent throwing "undefined" errors
-      response: {
-        resultCount: 0,
-        totalDocuments: 0,
-        page: 1,
-        pageCount: 1,
-        limit: 12,
-        query: {},
-        searchResults: []
-      },
-      searchResults: []
-    })
+  } catch (error) {
+   await logError(req, error)
+   res.render("error.ejs", {
+    status: 500,
+    message: "Something went wrong",
+    action: {
+      name: "Home",
+      url: "/"
+    }
+   })
   }
 })
 
@@ -240,36 +256,48 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
 /* ---------------------------- Search pools form --------------------------- */
 
 app.get("/search-pools", userLoggedIn, async (req, res) => {
-  const query = req.query
-  
-  // Construct the search URL
-  const searchURL = `${API_URL}/search/pools?${new URLSearchParams(query)}`
+  try {
+    const query = req.query
+    
+    // Construct the search URL
+    const searchURL = `${API_URL}/search/pools?${new URLSearchParams(query)}`
 
-  const request = await fetch(searchURL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    credentials: "include"
-  })
-
-  const response = await request.json()
-  
-  if (response.error) {
-    res.render("error.ejs", {
-      query,
-      response: {},
-      error: response.error
+    const request = await fetch(searchURL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
     })
-    return
-  }
 
-  res.render("search-pools.ejs", {
-    query,
-    response: response.data,
-    searchResults: response.data.searchResults || []
-  })
+    const response = await request.json()
+    
+    if (response.error) {
+      res.render("error.ejs", {
+        query,
+        response: {},
+        error: response.error
+      })
+      return
+    }
+
+    res.render("search-pools.ejs", {
+      query,
+      response: response.data,
+      searchResults: response.data.searchResults || []
+    })
+  } catch (error) {
+    await logError(req, error)
+    res.render("error.ejs", {
+    status: 500,
+    message: "Something went wrong",
+    action: {
+      name: "Home",
+      url: "/"
+    }
+    })
+  }
 }) 
 
 /* -------------------------------------------------------------------------- */
@@ -280,7 +308,6 @@ app.get("/search-pools", userLoggedIn, async (req, res) => {
 
 app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
   try {
-
     const { mediaType } = req.params
     const { id } = req.query
 
@@ -308,7 +335,7 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
       uploader: response.data.searchResults[0].user
     })
   } catch (error) {
-    console.log(error)
+    await logError(req, error)
     res.render('error.ejs', { status: 500, message: "Something went wrong", action: { name: "Home", url: "/" } })
   }
 })
@@ -316,98 +343,147 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
 /* ------------------------------- View a pool ------------------------------ */
 
 app.get("/pools/:id", userLoggedIn, async (req, res) => {
-  const { id } = req.params
+  try {
+    const { id } = req.params
 
-  const request = await fetch(`${API_URL}/search/pools?id=${id}&limit=1&comments=true&populate=true`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    credentials: "include"
-  })
+    const request = await fetch(`${API_URL}/search/pools?id=${id}&limit=1&comments=true&populate=true`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
 
-  const response = await request.json()
+    const response = await request.json()
 
-  if (response.error) {
-    res.render('error.ejs', { status: request.status, message: response.message, action: { name: "Home", url: "/" } })
-    console.log(response.error)
-    return
+    if (response.error) {
+      res.render('error.ejs', { status: request.status, message: response.message, action: { name: "Home", url: "/" } })
+      console.log(response.error)
+      return
+    }
+
+    res.render("pool.ejs", {
+      pool: response.data.searchResults[0]
+    })
+  } catch (error) {
+    await logError(req, error)
+    res.render('error.ejs', {
+      status: 500,
+      message: "Something went wrong",
+      action: {
+        name: "Home",
+        url: "/"
+      } 
+    })
   }
-
-  res.render("pool.ejs", {
-    pool: response.data.searchResults[0]
-  })
 })
 
 /* ------------------------ Get the users own profile ----------------------- */
 
 app.get("/profile", userLoggedIn, async (req, res) => {
-  const request = await fetch(`${API_URL}/user/${req.userId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    credentials: "include"
-  })
+  try {  
+    const request = await fetch(`${API_URL}/user/${req.userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
 
-  const response = await request.json()
+    const response = await request.json()
 
-  if (response.error) {
-    res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
-    console.log(response.error)
-    return
+    if (response.error) {
+      res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
+      console.log(response.error)
+      return
+    }
+
+    res.render("profile.ejs", response.data.user)
+  } catch (error) {
+    await logError(req, error)
+    res.render('error.ejs', {
+      status: 500,
+      message: "Something went wrong",
+      action: {
+        name: "Home",
+        url: "/"
+      } 
+    })
   }
-
-  res.render("profile.ejs", response.data.user)
 })
 
 /* -------------------- Get a profile with a specific id -------------------- */
 app.get("/profile/:id", userLoggedIn, async (req, res) => {
-  const id = req.params.id
+  try {
+    const id = req.params.id
 
-  const request = await fetch(`${API_URL}/user/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    credentials: "include"
-  })
+    const request = await fetch(`${API_URL}/user/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
 
-  const response = await request.json()
+    const response = await request.json()
 
-  if (response.error) {
-    res.redirect(307, req.headers.referer)
-    return
+    if (response.error) {
+      res.redirect(307, req.headers.referer)
+      return
+    }
+
+    res.render("profile.ejs", response.data.user)
+  } catch (error) {
+    await logError(req, error)
+    res.render('error.ejs', {
+      status: 500,
+      message: "Something went wrong",
+      action: {
+        name: "Home",
+        url: "/"
+      } 
+    })
   }
-
-  res.render("profile.ejs", response.data.user)
 })
 
 /* ---------------------------- Manage user media --------------------------- */
 // TODO: Implement managing page
 app.get("/manage?", userLoggedIn, async (req, res) => {
-  // const id = req.params.id
+  try {
 
-  /* const request = await fetch(`${API_URL}/user/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-access-token": getCookies(req, "media_authentication")
-    },
-    credentials: "include"
-  }) */
+    // const id = req.params.id
+    
+    /* const request = await fetch(`${API_URL}/user/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    }) */
 
-  // const response = await request.json()
+    // const response = await request.json()
 
-  // if (response.error) {
-  //   res.redirect(307, req.headers.referer)
-  //   return
-  // }
+    // if (response.error) {
+    //   res.redirect(307, req.headers.referer)
+    //   return
+    // }
 
-  res.render("manage.ejs", response.data.user)
+    res.render("manage.ejs", response.data.user)
+  } catch (error) {
+    await logError(req, error)
+    res.render('error.ejs', {
+      status: 500,
+      message: "Something went wrong",
+      action: {
+        name: "Home",
+        url: "/"
+      } 
+    })
+  }
 })
 
 
@@ -434,13 +510,13 @@ process.on('unhandledRejection', (reason, promise) => {
 const server = app.listen(port, host, async () => { 
   console.log(`server started at http://localhost:${port}`)
   await connectDB() // Connect to MongoDB
-  rl.prompt();
+  // rl.prompt();
 })
 
 /* ----------------------- Allow for graceful shutdown ---------------------- */
 
 // Graceful shutdown mechanism
-const shutdownServer = async (reason) => {
+/* const shutdownServer = async (reason) => {
   console.log('Stopping new file uploads...');
   
   acceptUploads.allow = false; // Stop accepting new requests
@@ -459,9 +535,9 @@ const shutdownServer = async (reason) => {
     process.exit(0); // Exit the process
   });
 };
-
+ */
 // Command input handling
-const rl = readline.createInterface({
+/* const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   prompt: 'COMMAND> '
@@ -476,4 +552,4 @@ rl.on('line', (line) => {
     console.log(`Unknown command: ${line.trim()}`);
   }
   rl.prompt();
-});
+}); */

@@ -1,4 +1,7 @@
 const bcrypt = require('bcrypt');
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
+/* -------------------------------------------------------------------------- */
 
 async function hash(input) {
   try {
@@ -10,6 +13,7 @@ async function hash(input) {
 
     return hashedOutput;
   } catch (error) {
+    await logError(req, error)
     throw error;
   }
 }

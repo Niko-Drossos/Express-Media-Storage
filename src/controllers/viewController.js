@@ -1,3 +1,5 @@
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
 const { streamFile } = require("../helpers/gridFsMethods")
 /* -------------------------------------------------------------------------- */
@@ -10,6 +12,7 @@ exports.viewVideo = async (req, res) => {
   try {
     streamFile(req, res, req.params.fileId, 'video')
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view video",
@@ -25,6 +28,7 @@ exports.viewImage = async (req, res) => {
   try {
     streamFile(req, res, req.params.fileId, 'image')
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view image",
@@ -40,6 +44,7 @@ exports.viewAudio = async (req, res) => {
   try {
     streamFile(req, res, req.params.fileId, 'audio')
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view audio",

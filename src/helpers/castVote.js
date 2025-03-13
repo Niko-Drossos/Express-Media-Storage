@@ -1,3 +1,7 @@
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
+/* -------------------------------------------------------------------------- */
+
 // doc is the document being updated, you need to select the votes with ".select('votes')"
 // This is not how mongoose would normally have you update elements in an array but this works better and is easier to read
 const castVote = async (doc, newVote) => {
@@ -25,7 +29,7 @@ const castVote = async (doc, newVote) => {
 
     return updated
   } catch (error) {
-    console.log(error)
+    await logError(req, error)
     return error
   }
 }

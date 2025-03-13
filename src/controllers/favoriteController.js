@@ -5,6 +5,8 @@ const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* -------------------------------------------------------------------------- */
 
 /* ---------------------------- Favorite a video ---------------------------- */
@@ -57,6 +59,7 @@ exports.favoriteVideo = async (req, res) => {
     })
 
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view video",
@@ -116,6 +119,7 @@ exports.favoriteImage = async (req, res) => {
     })
 
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view image",
@@ -175,6 +179,7 @@ exports.favoriteAudio = async (req, res) => {
     })
 
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view audio",
@@ -234,6 +239,7 @@ exports.favoriteComment = async (req, res) => {
     })
 
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view comment",
@@ -293,6 +299,7 @@ exports.favoritePool = async (req, res) => {
     })
 
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to view pool",

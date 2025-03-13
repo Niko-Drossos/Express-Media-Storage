@@ -4,6 +4,7 @@ const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------ Middle wares ------------------------------ */
+const logError = require("../models/middleware/logging/logError");
 /* --------------------------------- Helpers -------------------------------- */
 const getFileDetails = require('../helpers/getFileDetails')
 const getFileExt = require('../helpers/getFileExt')
@@ -81,7 +82,7 @@ exports.startChunkUpload = async (req, res) => {
           break;
       }
     } catch (error) {
-      console.log(error)
+      await logError(req, error)
       return res.status(500).json({
         success: false,
         message: "Failed to create document for file",
@@ -99,6 +100,7 @@ exports.startChunkUpload = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to start chunked upload",
@@ -115,6 +117,7 @@ exports.chunkedUpload = async (req, res) => {
     const message = await uploadChunk(req, res)
     return message
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to chunked upload",
@@ -145,6 +148,7 @@ exports.deleteFiles = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to delete file",

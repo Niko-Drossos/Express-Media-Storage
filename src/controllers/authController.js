@@ -4,7 +4,8 @@ const User = require("../models/schemas/User")
 const generateJWT = require("../helpers/generateJWT")
 const compareHash = require("../helpers/compareHash")
 const hash = require("../helpers/hash")
-/* -------------------------------------------------------------------------- */
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 
 /* ---------------------- Register user and return JWT ---------------------- */
 
@@ -64,7 +65,7 @@ exports.registerUser = async (req, res) => {
       }
     })
   } catch (error) {
-    console.log(error)
+    await logError(req, error)
     if (error.code == 11000) {
       return res.status(400).json({
         success: false,
@@ -145,6 +146,7 @@ exports.loginUser = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to login",
@@ -164,6 +166,7 @@ exports.logoutUser = async (req, res) => {
       message: "Successfully logged out"
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to logout",

@@ -5,6 +5,8 @@ const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
 const castVote = require("../helpers/castVote")
 /* -------------------------------------------------------------------------- */
@@ -36,6 +38,7 @@ exports.voteOnPool = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to vote on pool",
@@ -74,6 +77,7 @@ exports.voteOnComment = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to vote on comment",
@@ -112,6 +116,7 @@ exports.voteOnUser = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to vote on user",
@@ -150,6 +155,7 @@ exports.voteOnVideo = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to vote on video",
@@ -188,6 +194,7 @@ exports.voteOnImage = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to vote on image",
@@ -226,6 +233,7 @@ exports.voteOnAudio = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to vote on audio",

@@ -5,6 +5,8 @@ const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
 const searchDateRange = require("../helpers/searchDateRange")
 /* -------------------------------------------------------------------------- */
@@ -49,6 +51,7 @@ exports.searchUsers = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to search for users",
@@ -143,6 +146,7 @@ exports.searchPools = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({ 
       success: false,
       message: "Failed to search for pools",
@@ -217,6 +221,7 @@ exports.searchComments = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({ 
       success: false,
       message: "Failed to search for comments",
@@ -306,6 +311,7 @@ exports.searchVideos = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to search for videos",
@@ -390,6 +396,7 @@ exports.searchImages = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to search for images",
@@ -474,6 +481,7 @@ exports.searchAudios = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to search for audios",

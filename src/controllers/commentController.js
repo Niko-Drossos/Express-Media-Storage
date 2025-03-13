@@ -5,6 +5,8 @@ const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* -------------------------------------------------------------------------- */
 
 exports.getComments = async (req, res) => {
@@ -19,6 +21,7 @@ exports.getComments = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to fetch comments",
@@ -57,6 +60,7 @@ exports.commentOnPool = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to comment on pool",
@@ -95,6 +99,7 @@ exports.commentOnComment = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to comment on comment",
@@ -133,6 +138,7 @@ exports.commentOnUser = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to comment on user",
@@ -171,6 +177,7 @@ exports.commentOnVideo = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to comment on video",
@@ -209,6 +216,7 @@ exports.commentOnImage = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to comment on image",
@@ -247,6 +255,7 @@ exports.commentOnAudio = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to comment on audio",
@@ -287,6 +296,7 @@ exports.deleteComment = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to delete comment",
@@ -325,6 +335,7 @@ exports.updateComment = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to update comment",

@@ -5,6 +5,8 @@ const Comment = require('./schemas/Comment')
 const Video = require('./schemas/Video')
 const Image = require('./schemas/Image')
 const Audio = require('./schemas/Audio')
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require('./middleware/logging/logError')
 /* -------------------------------------------------------------------------- */
 
 const mongoose = require('mongoose')
@@ -27,8 +29,7 @@ const connectDB = async () => {
     await Image.syncIndexes()
     await Audio.syncIndexes()
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error)
-    
+    await logError(req, error)
   }
 }
 

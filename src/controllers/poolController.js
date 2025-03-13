@@ -6,6 +6,8 @@ const Pool = require("../models/schemas/Pool")
 const Video = require("../models/schemas/Video")
 const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
 const { deleteFiles } = require("../helpers/gridFsMethods")
 const getCookies = require("../models/middleware/getCookies")
@@ -23,6 +25,7 @@ exports.getPool = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to get pool",
@@ -68,6 +71,7 @@ exports.createPool = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({ 
       success: false,
       message: "Failed to create pool",
@@ -114,6 +118,7 @@ exports.editPool = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({ 
       success: false,
       message: "Failed to update pool",
@@ -153,6 +158,7 @@ exports.addJournal = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({ 
       success: false,
       message: "Failed to update pool",
@@ -198,6 +204,7 @@ exports.deletePool = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({ 
       success: false,
       message: "Failed to delete pool",

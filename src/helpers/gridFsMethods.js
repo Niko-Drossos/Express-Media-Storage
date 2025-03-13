@@ -1,8 +1,3 @@
-/* --------------------------------- Schemas -------------------------------- */
-const Image = require("../models/schemas/Image")
-const Video = require("../models/schemas/Video")
-const Audio = require("../models/schemas/Audio")
-/* -------------------------------------------------------------------------- */
 const { MongoClient, GridFSBucket, ObjectId } = require("mongodb")
 const mongoose = require("mongoose")
 
@@ -16,7 +11,12 @@ const dotenv = require("dotenv")
 dotenv.config()
 
 const spawn = require('child_process').spawn
-
+/* --------------------------------- Schemas -------------------------------- */
+const Image = require("../models/schemas/Image")
+const Video = require("../models/schemas/Video")
+const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
 const getFileExt = require('./getFileExt')
 /* -------------------------------------------------------------------------- */
@@ -160,6 +160,7 @@ const streamFile = async function (req, res, fileId, mimeType) {
     }
 
   } catch (error) {
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: 'Failed to fetch file',
@@ -214,6 +215,7 @@ const deleteFiles = async function(req, res, query) {
 
     return deletedResults 
   } catch (error) { 
+    await logError(req, error)
     throw error
   }
 }
@@ -487,7 +489,7 @@ const createTempFile = async (fileId, mimeType) => {
       });
     });
   } catch (error) {
-    console.error('Error:', error);
+    await logError(req, error)
     throw error;
   }
 }

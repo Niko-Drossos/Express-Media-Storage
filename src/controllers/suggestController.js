@@ -3,6 +3,8 @@ const User = require("../models/schemas/User")
 const Image = require("../models/schemas/Image")
 const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
 /* -------------------------------------------------------------------------- */
 
 /* -------------------- Search usernames for autocomplete ------------------- */
@@ -26,7 +28,7 @@ exports.usernames = async (req, res) => {
     })
 
   } catch (error) {
-    console.log(error)
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to search for usernames",
@@ -80,7 +82,7 @@ exports.tags = async (req, res) => {
     })
 
   } catch (error) {
-    console.log(error)
+    await logError(req, error)
     res.status(500).json({
       success: false,
       message: "Failed to search for tags",

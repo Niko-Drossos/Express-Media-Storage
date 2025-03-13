@@ -4,6 +4,9 @@ const User = require("../models/schemas/User")
 const Image = require("../models/schemas/Image")
 const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
+/* ------------------------------- Middleware ------------------------------- */
+const logError = require("../models/middleware/logging/logError")
+/* -------------------------------------------------------------------------- */
 
 /* ---------------------- Get one user for profile page --------------------- */
 
@@ -21,6 +24,7 @@ exports.getUser = async (req, res) => {
       }
     })
   } catch (error) {
+    await logError(req, error)
     if (error.name === "CastError") {
       return res.status(404).json({
         success: false,
@@ -66,7 +70,7 @@ exports.getMyFiles = async (req, res) => {
       { $project: includedFields }
     ])
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Fetched users files",
       data: {
@@ -76,7 +80,8 @@ exports.getMyFiles = async (req, res) => {
       }
     })
   } catch (error) {
-    return res.status(500).json({
+    await logError(req, error)
+    res.status(500).json({
       success: false,
       message: "Failed to get user files",
       errorMessage: error.message,
@@ -103,7 +108,7 @@ exports.mediaTitles = async (req, res) => {
       }))
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Fetched users media titles",
       data: {
@@ -114,7 +119,8 @@ exports.mediaTitles = async (req, res) => {
     })
 
   } catch (error) {
-    return res.status(500).json({
+    await logError(req, error)
+    res.status(500).json({
       success: false,
       message: "Failed to get users media titles",
       errorMessage: error.message,
@@ -143,7 +149,7 @@ exports.follow = async (req, res) => {
       new: true
     })
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: `${followingUser.username} followed ${followedUser.username}`,
       data: {
@@ -158,7 +164,8 @@ exports.follow = async (req, res) => {
       }
     })
   } catch (error) {
-    return res.status(500).json({
+    await logError(req, error)
+    res.status(500).json({
       success: false,
       message: "Failed to follow user",
       errorMessage: error.message,
@@ -187,7 +194,7 @@ exports.unfollow = async (req, res) => {
       new: true
     })
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: `${unfollowingUser.username} unfollowed ${unfollowedUser.username}`,
       data: {
@@ -202,7 +209,8 @@ exports.unfollow = async (req, res) => {
       }
     })
   } catch (error) {
-    return res.status(500).json({
+    await logError(req, error)
+    res.status(500).json({
       success: false,
       message: "Failed to unfollow user",
       errorMessage: error.message,
