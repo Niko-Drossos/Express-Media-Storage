@@ -346,7 +346,7 @@ app.get("/pools/:id", userLoggedIn, async (req, res) => {
   try {
     const { id } = req.params
 
-    const request = await fetch(`${API_URL}/search/pools?id=${id}&limit=1&comments=true&populate=true`, {
+    const request = await fetch(`${API_URL}/pool/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -364,7 +364,7 @@ app.get("/pools/:id", userLoggedIn, async (req, res) => {
     }
 
     res.render("pool.ejs", {
-      pool: response.data.searchResults[0]
+      pool: response.data.pool
     })
   } catch (error) {
     await logError(req, error)

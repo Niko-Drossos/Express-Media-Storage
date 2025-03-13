@@ -64,6 +64,8 @@ FIX time issues for server, it collides with having different server timezones
 
 Next feature to add is deleting
 
+Change journal routes to ask what pool you would like to update
+
 
 Add support for changing color themes
 

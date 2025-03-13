@@ -117,20 +117,20 @@ exports.searchPools = async (req, res) => {
       .populate(populatedFields)
       .lean()
 
-      // Get the users favorite pools
-      const user = await User.findById(req.userId).select("favorites.pools")
-      const favoritedPools = user?.favorites?.pools
+    // Get the users favorite pools
+    const user = await User.findById(req.userId).select("favorites.pools")
+    const favoritedPools = user?.favorites?.pools
 
-      // Add a property to see is the video is in the users favorites array
-      if (favoritedPools) {
-        searchResults.forEach((doc) => {
-          doc.favorited = favoritedPools.includes(doc._id.toString());
-        });
-      } else {
-        searchResults.forEach((doc) => {
-          doc.favorited = false;
-        });
-      }
+    // Add a property to see is the video is in the users favorites array
+    if (favoritedPools) {
+      searchResults.forEach((doc) => {
+        doc.favorited = favoritedPools.includes(doc._id.toString());
+      });
+    } else {
+      searchResults.forEach((doc) => {
+        doc.favorited = false;
+      });
+    }
     
     res.status(200).json({ 
       success: true, 

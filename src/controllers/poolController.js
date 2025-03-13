@@ -17,6 +17,17 @@ exports.getPool = async (req, res) => {
   try {
     const foundPool = await Pool.findById(req.params.poolId).populate(['comments', 'videos', 'images', 'audios'])
 
+    // Filter out any media documents that are not public and not posted by the user.
+    // This is for when you are viewing a single pool, as that's the only real use case when pools are populated.
+    function onlyPublic(doc) {
+      if (doc.privacy != 'Public' && doc.user.userId != req.userId) return false
+      return true
+    }
+    
+    foundPool.images = foundPool.images.filter(onlyPublic)
+    foundPool.videos = foundPool.videos.filter(onlyPublic)
+    foundPool.audios = foundPool.audios.filter(onlyPublic)
+
     res.status(200).json({
       success: true,
       message: "Successfully fetched pool",
@@ -197,10 +208,7 @@ exports.deletePool = async (req, res) => {
       success: true,
       message: "Successfully deleted pool",
       data: {
-        deletedPool,
-        // deletedImages,
-        // deletedVideos,
-        // deletedAudios
+        deletedPool
       }
     })
   } catch (error) {
