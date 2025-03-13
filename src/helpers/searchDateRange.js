@@ -1,15 +1,17 @@
 // Uses start and end date to add a condition for the query object for Mongoose
 // This is one of the worst functions I have ever created, use with caution.
-// ONLY pass in dates in the form of MM-DD-YY otherwise it breaks.
 module.exports = searchDateRange = (query, startDate, endDate) => {
-  const setMidnight = (dateString) => {
+  // Although this function is depreciated, I am keeping it here for proof of my stupidity.
+  // The pain I went through to create such a pointless function baffles me, and I want to baffle others as well. 
+  /*const setMidnight = (dateString) => {
     const [month, day, year] = dateString.split('-').map(Number) // Split the string and convert to numbers
-    const dateObject = new Date(year + 2000, month - 1, day)
+    const dateObject = new Date(year, month - 1, day)
 
     return dateObject
-  }
+  } */
+ // if (startDate) var midnightStartDate = setMidnight(startDate)
 
-  if (startDate) var midnightStartDate = setMidnight(startDate)
+  if (startDate) var midnightStartDate = new Date(startDate)
 
   // Sets the end date to midnight of the next day so that it includes the entire day
   if (endDate) {
