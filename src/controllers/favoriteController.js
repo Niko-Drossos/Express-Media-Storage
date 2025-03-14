@@ -20,10 +20,14 @@ exports.favoriteVideo = async (req, res) => {
 
     // Return a 404 if the videoId is not in the database
     if (!video) {
-      return res.status(404).json({
-        success: false,
-        message: "Video not found"
-      })
+      res.status(404)
+      throw new Error('Video not found. Invalid videoId.')
+    }
+
+    // Don't let someone favorite a private video
+    if (video.user.userId != req.userId && video.privacy != 'Public') {
+      res.status(403)
+      throw new Error('This is a private video that you don\'t have access to.')
     }
 
     if (user.favorites.videos.includes(videoId)) {
@@ -78,12 +82,16 @@ exports.favoriteImage = async (req, res) => {
     const user = await User.findById(req.userId).select("favorites.images")
     const image = await Image.findById(imageId)
 
-    // Return a 404 if the imageId is not in the database
+    // Return a 404 if the audioId is not in the database
     if (!image) {
-      return res.status(404).json({
-        success: false,
-        message: "Image not found"
-      })
+      res.status(404)
+      throw new Error('Image not found. Invalid imageId.')
+    }
+
+    // Don't let someone favorite a private image
+    if (image.user.userId != req.userId && image.privacy != 'Public') {
+      res.status(403)
+      throw new Error('This is a private image that you don\'t have access to.')
     }
 
     if (user.favorites.images.includes(imageId)) {
@@ -140,10 +148,14 @@ exports.favoriteAudio = async (req, res) => {
 
     // Return a 404 if the audioId is not in the database
     if (!audio) {
-      return res.status(404).json({
-        success: false,
-        message: "Audio not found"
-      })
+      res.status(404)
+      throw new Error('Audio not found. Invalid audioId.')
+    }
+
+    // Don't let someone favorite a private audio
+    if (audio.user.userId != req.userId && audio.privacy != 'Public') {
+      res.status(403)
+      throw new Error('This is a private audio that you don\'t have access to.')
     }
 
     if (user.favorites.audios.includes(audioId)) {
@@ -200,10 +212,8 @@ exports.favoriteComment = async (req, res) => {
 
     // Return a 404 if the commentId is not in the database
     if (!comment) {
-      return res.status(404).json({
-        success: false,
-        message: "Comment not found"
-      })
+      res.status(404)
+      throw new Error('comment not found. Invalid commentId.')
     }
 
     if (user.favorites.comments.includes(commentId)) {
@@ -260,10 +270,14 @@ exports.favoritePool = async (req, res) => {
 
     // Return a 404 if the poolId is not in the database
     if (!pool) {
-      return res.status(404).json({
-        success: false,
-        message: "pool not found"
-      })
+      res.status(404)
+      throw new Error('pool not found. Invalid poolId.')
+    }
+
+    // Don't let someone favorite a private pool
+    if (pool.user.userId != req.userId && pool.privacy != 'Public') {
+      res.status(403)
+      throw new Error('This is a private pool that you don\'t have access to.')
     }
 
     if (user.favorites.pools.includes(poolId)) {

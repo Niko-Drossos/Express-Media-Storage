@@ -24,6 +24,7 @@
 
     if (usernameArray.length) {
         usernameArray.forEach(username => displayUsernames.innerHTML += usernamePill(username))
+        hiddenUsernames.value = usernameArray.join(',')
     }
 
     function addUser() {
@@ -37,7 +38,6 @@
         } else {
             displayUsernames.innerHTML += usernamePill(username)
             usernameArray.push(username)
-            console.log('Updated usernameArray:', usernameArray)
             hiddenUsernames.value = usernameArray.join(',')
             inputUsername.value = ''
         }
@@ -72,7 +72,7 @@
             option.value = suggestion
             // TODO: Make datalist display the reqex match in the string by making it bold
             // option.classList.add('font-xl')
-            option.innerHTML = 'H<b class="text-black">el</b>lo'
+            // option.innerHTML = 'H<b class="text-black">el</b>lo'
             datalist.appendChild(option)
         })
     }

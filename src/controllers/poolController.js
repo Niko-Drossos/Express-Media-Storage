@@ -3,6 +3,7 @@ const User = require("../models/schemas/User")
 const Pool = require("../models/schemas/Pool")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
+const addVotedAndFavorited = require("../models/middleware/mongoose/addVotedAndFavorited")
 /* --------------------------------- Helpers -------------------------------- */
 const getCookies = require("../models/middleware/getCookies")
 /* ------------------------------- Get a pool ------------------------------- */
@@ -11,6 +12,7 @@ exports.getPool = async (req, res) => {
   try {
     const { poolId } = req.params
 
+    const user = await User.findById(req.userId).select("favorites")
     const foundPool = await Pool.findById(poolId)
       .populate([
         'comments',
@@ -18,6 +20,7 @@ exports.getPool = async (req, res) => {
         'images',
         'audios'
       ])
+      .lean()
 
     // Throw error on invalid poolId
     if (!foundPool) {
@@ -42,11 +45,18 @@ exports.getPool = async (req, res) => {
     foundPool.videos = foundPool.videos.filter(onlyPublic)
     foundPool.audios = foundPool.audios.filter(onlyPublic)
 
+    foundPool.images.forEach(doc => addVotedAndFavorited(doc, user.favorites.images, req.userId))
+    foundPool.videos.forEach(doc => addVotedAndFavorited(doc, user.favorites.videos, req.userId))
+    foundPool.audios.forEach(doc => addVotedAndFavorited(doc, user.favorites.audios, req.userId))
+
+    // Update the document with the appropriate favorites
+    const updatedPool = addVotedAndFavorited(foundPool, user.favorites.pools, req.userId)
+
     res.status(200).json({
       success: true,
       message: "Successfully fetched pool",
       data: {
-        pool: foundPool
+        pool: updatedPool
       }
     })
   } catch (error) {
