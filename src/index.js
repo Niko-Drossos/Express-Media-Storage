@@ -49,7 +49,7 @@ app.use("/file", require("./routes/file.routes"))
 app.use("/search", require("./routes/search.routes"))
 app.use("/pool", require("./routes/pool.routes"))
 app.use("/comment", require("./routes/comment.routes"))
-app.use("/view", require("./routes/view.routes"))
+app.use("/stream", require("./routes/stream.routes"))
 app.use("/vote", require("./routes/vote.routes"))
 app.use("/daat", require("./routes/daat.routes"))
 app.use("/favorite", require("./routes/favorite.routes"))
@@ -275,9 +275,13 @@ app.get("/search-pools", userLoggedIn, async (req, res) => {
     
     if (response.error) {
       res.render("error.ejs", {
+        status: request.status,
         query,
-        response: {},
-        error: response.error
+        message: response.errorMessage,
+        action: { 
+          name: "Home",
+          url: "/"
+        }
       })
       return
     }
@@ -317,7 +321,7 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
       return
     } */
 
-    const request = await fetch(`${API_URL}/search/${mediaType}s?id=${id}&comments=true`, {
+    const request = await fetch(`${API_URL}/search/${mediaType}s?ids=${id}&comments=true`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -358,7 +362,14 @@ app.get("/pools/:id", userLoggedIn, async (req, res) => {
     const response = await request.json()
 
     if (response.error) {
-      res.render('error.ejs', { status: request.status, message: response.message, action: { name: "Home", url: "/" } })
+      res.render('error.ejs', { 
+        status: request.status,
+        message: response.errorMessage,
+        action: {
+          name: "Home",
+          url: "/"
+        }
+      })
       console.log(response.error)
       return
     }

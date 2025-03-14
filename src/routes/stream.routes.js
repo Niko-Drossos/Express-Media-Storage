@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 
 /* ------------------------------- Controllers ------------------------------ */
-const viewController = require("../controllers/viewController")
+const viewController = require("../controllers/streamController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 router.all("/*", authenticateUserJWT)

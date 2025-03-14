@@ -3,10 +3,10 @@
 
         <div class="col-span-2 w-full h-full flex justify-center items center">
             <% if (mediaType === 'image') { %>
-                <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/view/image/<%= media.fileId %>" alt="<%= media.title %>">
+                <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/stream/image/<%= media.fileId %>" alt="<%= media.title %>">
             <% } else if (mediaType === 'video') { %>
                 <video class="w-full max-h-[calc(100vh-8rem)] object-contain" id="mediaPlayer" controls> 
-                    <source src="/view/video/<%= media.fileId %>" type="video/mp4">
+                    <source src="/stream/video/<%= media.fileId %>" type="video/mp4">
                     <% if (media.transcription) { %>
                         <track src="/transcription/subtitles/<%= media.transcription %>" kind="subtitles" srclang="en" label="English">
                     <% } %>
@@ -14,7 +14,7 @@
             <% } else if (mediaType === 'audio') { %>
                 <!-- TODO: Fix subtitles for audio files -->
                 <audio class="w-full max-h-[calc(100vh-8rem)] object-contain" id="mediaPlayer" controls>
-                    <source src="/view/audio/<%= media.fileId %>" type="audio/mpeg">
+                    <source src="/stream/audio/<%= media.fileId %>" type="audio/mpeg">
                     <% if (media.transcription) { %>
                         <track src="/transcription/subtitles/<%= media.transcription %>" kind="subtitles" srclang="en" label="English">
                     <% } %>

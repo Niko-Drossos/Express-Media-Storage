@@ -7,6 +7,27 @@ const Image = require("../models/schemas/Image")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
+
+// This middleware adds 2 fields, voted, and favorited.
+// This runs every time a document is searched for.
+function addVotedAndFavorited(doc, favorited, userId) {
+  // Add a property to see is the video is in the users favorites array
+  doc.favorited = favorited.includes(doc._id.toString());
+
+  // Set a default case for voted if the user didn't vote at all
+  doc.voted = null
+  for (let i = 0; i < doc.votes.length; i++) {
+    const vote = doc.votes[i]
+    if (vote.user.userId == userId) {
+      doc.voted = vote.vote
+      break
+    }
+  }
+
+  // Remove the votes from the document to keep voting anonymous
+  delete doc.votes
+} 
+
 /* --------------------------------- Helpers -------------------------------- */
 const searchDateRange = require("../helpers/searchDateRange")
 /* -------------------------------------------------------------------------- */
@@ -70,7 +91,7 @@ exports.searchPools = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { userId, usernames, tags, startDate, endDate, title, description, transcription, id, comments=false, populate=false, page=1, limit=16 } = query
+    const { userId, usernames, tags, startDate, endDate, title, description, transcription, ids, comments=false, populate=false, page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -85,7 +106,7 @@ exports.searchPools = async (req, res) => {
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (description) searchQuery.description = new RegExp(description, 'i')
     if (transcription) searchQuery.transcription = new RegExp(transcription, 'i')
-    if (id) searchQuery._id = id
+    if (ids) searchQuery._id = { $in: ids.split(',') }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -121,16 +142,8 @@ exports.searchPools = async (req, res) => {
     const user = await User.findById(req.userId).select("favorites.pools")
     const favoritedPools = user?.favorites?.pools
 
-    // Add a property to see is the video is in the users favorites array
-    if (favoritedPools) {
-      searchResults.forEach((doc) => {
-        doc.favorited = favoritedPools.includes(doc._id.toString());
-      });
-    } else {
-      searchResults.forEach((doc) => {
-        doc.favorited = false;
-      });
-    }
+    // Middleware to add and remove document properties
+    searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedPools, req.userId))
     
     res.status(200).json({ 
       success: true, 
@@ -165,7 +178,7 @@ exports.searchComments = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, originId, startDate, endDate, content, id, comments=false, page=1, limit=12 } = query
+    const { userId, usernames, originId, startDate, endDate, content, ids, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -178,7 +191,7 @@ exports.searchComments = async (req, res) => {
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (content) searchQuery.content = new RegExp(content, 'i')
     if (originId) searchQuery.originId = originId
-    if (id) searchQuery._id = id
+    if (ids) searchQuery._id = { $in: ids.split(',') }
 
     // Get the total number of documents that match the search query
     const totalDocuments = await Comment.countDocuments(searchQuery);
@@ -192,20 +205,12 @@ exports.searchComments = async (req, res) => {
       .populate(comments ? 'comments' : '')
       .lean()
 
-      // Get the users favorite comments
-      const user = await User.findById(req.userId).select("favorites.comments")
-      const favoritedComments = user?.favorites?.comments
+    // Get the users favorite comments
+    const user = await User.findById(req.userId).select("favorites.comments")
+    const favoritedComments = user?.favorites?.comments
 
-      // Add a property to see is the video is in the users favorites array
-      if (favoritedComments) {
-        searchResults.forEach((doc) => {
-          doc.favorited = favoritedComments.includes(doc._id.toString());
-        });
-      } else {
-        searchResults.forEach((doc) => {
-          doc.favorited = false;
-        });
-      }
+    // Middleware to add and remove document properties
+    searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedComments, req.userId))
     
     res.status(200).json({
       success: true, 
@@ -240,7 +245,7 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, content, tags, id, comments=false,page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, content, tags, ids, comments=false,page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -253,8 +258,8 @@ exports.searchVideos = async (req, res) => {
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (content) searchQuery.transcription.text = new RegExp(content, 'i')
-    if (id) searchQuery._id = id
     if (tags) searchQuery.tags = { $all: tags.split(",") }
+    if (ids) searchQuery._id = { $in: ids.split(',') }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -281,21 +286,8 @@ exports.searchVideos = async (req, res) => {
     const user = await User.findById(req.userId).select("favorites.videos")
     const favoritedVideos = user?.favorites?.videos || []
 
-    // Add a property to see is the video is in the users favorites array
-    if (favoritedVideos) {
-      searchResults.forEach((doc) => {
-        doc.favorited = favoritedVideos.includes(doc._id.toString());
-      });
-    } else {
-      searchResults.forEach((doc) => {
-        doc.favorited = false;
-      });
-    }
-
-    // Add a property to see if the user voted and return the result
-    /* searchResults.forEach((doc) => {
-      doc.voted = user.votes.videos.includes(doc._id.toString());
-    }); */
+    // Middleware to add and remove document properties
+    searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedVideos, req.userId))
 
     res.status(200).json({
       success: true, 
@@ -331,7 +323,7 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -343,8 +335,8 @@ exports.searchImages = async (req, res) => {
     if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
-    if (id) searchQuery._id = id
     if (tags) searchQuery.tags = { $all: tags.split(",") }
+    if (ids) searchQuery._id = { $in: ids.split(',') }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -367,20 +359,12 @@ exports.searchImages = async (req, res) => {
       .populate(comments ? 'comments' : '')
       .lean()
 
-      // Get the users favorite images
-      const user = await User.findById(req.userId).select("favorites.images")
-      const favoritedImages = user?.favorites?.images || []
+    // Get the users favorite images
+    const user = await User.findById(req.userId).select("favorites.images")
+    const favoritedImages = user?.favorites?.images || []
 
-      // Add a property to see is the video is in the users favorites array
-      if (favoritedImages) {
-        searchResults.forEach((doc) => {
-          doc.favorited = favoritedImages.includes(doc._id.toString());
-        });
-      } else {
-        searchResults.forEach((doc) => {
-          doc.favorited = false;
-        });
-      }
+    // Middleware to add and remove document properties
+    searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedImages, req.userId))
     
     res.status(200).json({
       success: true, 
@@ -415,7 +399,7 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, tags, id, comments=false, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=16 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -428,8 +412,8 @@ exports.searchAudios = async (req, res) => {
     if (userId) searchQuery["user.userId"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
-    if (id) searchQuery._id = id
     if (tags) searchQuery.tags = { $all: tags.split(",") }
+    if (ids) searchQuery._id = { $in: ids.split(',') }
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
@@ -452,20 +436,12 @@ exports.searchAudios = async (req, res) => {
       .populate(comments ? 'comments' : '')
       .lean()
 
-      // Get the users favorite audios
-      const user = await User.findById(req.userId).select("favorites.audios")
-      const favoritedAudios = user?.favorites?.audios || []
+    // Get the users favorite audios
+    const user = await User.findById(req.userId).select("favorites.audios")
+    const favoritedAudios = user?.favorites?.audios || []
 
-      // Add a property to see is the video is in the users favorites array
-      if (favoritedAudios) {
-        searchResults.forEach((doc) => {
-          doc.favorited = favoritedAudios.includes(doc._id.toString());
-        });
-      } else {
-        searchResults.forEach((doc) => {
-          doc.favorited = false;
-        });
-      }
+      // Middleware to add and remove document properties
+    searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedAudios, req.userId))
     
     res.status(200).json({
       success: true, 

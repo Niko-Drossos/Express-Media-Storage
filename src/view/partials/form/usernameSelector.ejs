@@ -59,7 +59,7 @@
             </span>`
     }
 
-    <!-- ---------- Search for usernames and suggest them to the user ---------- -->
+    // <!-- ---------- Search for usernames and suggest them to the user ---------- -->
 
     const usernameQueryCache = {}
     
@@ -70,6 +70,9 @@
         suggestions.forEach((suggestion) => {
             const option = document.createElement('option')
             option.value = suggestion
+            // TODO: Make datalist display the reqex match in the string by making it bold
+            // option.classList.add('font-xl')
+            option.innerHTML = 'H<b class="text-black">el</b>lo'
             datalist.appendChild(option)
         })
     }
@@ -96,6 +99,6 @@
             const suggestions = response.data.suggestions
             usernameQueryCache[query] = suggestions // Cache the result
             updateUsernameDatalist(suggestions)
-        }, 500)
+        }, 250)
     }
 </script>

@@ -1,21 +1,35 @@
-const path = require("path")
-const API_URL = process.env.API_URL
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
 const Pool = require("../models/schemas/Pool")
-const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
-const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
-const { deleteFiles } = require("../helpers/gridFsMethods")
 const getCookies = require("../models/middleware/getCookies")
 /* ------------------------------- Get a pool ------------------------------- */
 
 exports.getPool = async (req, res) => {
   try {
-    const foundPool = await Pool.findById(req.params.poolId).populate(['comments', 'videos', 'images', 'audios'])
+    const { poolId } = req.params
+
+    const foundPool = await Pool.findById(poolId)
+      .populate([
+        'comments',
+        'videos',
+        'images',
+        'audios'
+      ])
+
+    // Throw error on invalid poolId
+    if (!foundPool) {
+      res.status(404)
+      throw new Error('Pool not found. Invalid poolId in URL.')
+    }
+
+    // Throw error on invalid access
+    if (foundPool.user.userId != req.userId && foundPool.privacy != 'Public') {
+      res.status(403)
+      throw new Error('This is a private pool that you don\'t have access to.')
+    }
 
     // Filter out any media documents that are not public and not posted by the user.
     // This is for when you are viewing a single pool, as that's the only real use case when pools are populated.
@@ -36,8 +50,9 @@ exports.getPool = async (req, res) => {
       }
     })
   } catch (error) {
+    console.log(error)
     await logError(req, error)
-    res.status(500).json({
+    res.json({
       success: false,
       message: "Failed to get pool",
       errorMessage: error.message,
@@ -68,6 +83,7 @@ exports.createPool = async (req, res) => {
       journal: journal || [],
     })
 
+    // TODO: Reconsider if storing the pools on the user document is necessary
     await User.findByIdAndUpdate(req.userId, {
       $push: {
         pools: createdPool._id
@@ -96,6 +112,7 @@ exports.createPool = async (req, res) => {
 
 exports.editPool = async (req, res) => {
   try {
+    const { poolId } = req.params
     const { title, description, privacy, images, videos, audios, tags } = req.body
 
     const updatedInformation = {
@@ -109,17 +126,28 @@ exports.editPool = async (req, res) => {
 
     if (privacy) updatedInformation.privacy = privacy
 
-    // Make sure that the person updating the pool is the one who created it
-    const updatedPool = await Pool.findOneAndUpdate(
-      { 
-        _id: req.params.poolId,
-        "user.userId": req.userId
+    const foundPool = await Pool.findById(poolId)
+
+    // Throw error on invalid poolId
+    if (!foundPool) {
+      res.status(404)
+      throw new Error('Pool not found. Invalid poolId in URL.')
+    }
+
+    // Throw error on invalid access
+    if (foundPool.user.userId != req.userId) {
+      res.status(403)
+      throw new Error('This pool is not used by this user and doe\'s not have edit access.')
+    }
+
+    const updatedPool = await Pool.findOneAndUpdate({
+      "user.userId": req.userId,
+        _id: poolId
       }, 
       updatedInformation,
       { 
         new: true
-      }
-    )
+      })
 
     res.status(200).json({
       success: true,
@@ -130,7 +158,7 @@ exports.editPool = async (req, res) => {
     })
   } catch (error) {
     await logError(req, error)
-    res.status(500).json({ 
+    res.json({ 
       success: false,
       message: "Failed to update pool",
       errorMessage: error.message,
@@ -145,7 +173,21 @@ exports.addJournal = async (req, res) => {
   try {
     const { entry, time, poolId } = req.body
 
-    const updatedPool = await Pool.findOneAndUpdate({ 
+    const foundPool = await Pool.findById(poolId)
+
+    // Throw error on invalid poolId
+    if (!foundPool) {
+      res.status(404)
+      throw new Error('Pool not found. Invalid poolId in URL.')
+    }
+
+    // Throw error on invalid access
+    if (foundPool.user.userId != req.userId && foundPool.privacy != 'Public') {
+      res.status(403)
+      throw new Error('This is a private pool that you don\'t have access to.')
+    }
+
+    const updatedPool = await Pool.updateOne({ 
       "user.userId": req.userId,
       _id: poolId,
     },{
@@ -157,20 +199,18 @@ exports.addJournal = async (req, res) => {
       }
     },{ 
       new: true 
-    })
-
-    if (!updatedPool) throw new Error("Pool not found or not owned by the user")
+    }) 
 
     res.status(200).json({
       success: true,
       message: "Successfully updated pool",
       data: {
-        newPool: updatedPool
+        updatedPool: updatedPool
       }
     })
   } catch (error) {
     await logError(req, error)
-    res.status(500).json({ 
+    res.json({ 
       success: false,
       message: "Failed to update pool",
       errorMessage: error.message,

@@ -11,6 +11,7 @@
 
 <div class="mx-8 grid grid-cols-2 gap-4">
   <% searchResults.forEach(pool => { %>
+    <% console.log(pool) %>
     <%- include('./partials/cards/poolCard.ejs', pool) %>
   <% }) %>
 </div>
