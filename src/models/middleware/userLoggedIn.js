@@ -9,7 +9,15 @@ const logError = require("../middleware/logging/logError")
 
 module.exports = userLoggedIn = async (req, res, next) => {
   try {
+    // Don't us the middleware if user is trying to sign in
+    if (req.path.startsWith('/auth')) return next()
+
     const authentication =  req.cookies.media_authentication || req.headers["x-access-token"];
+  
+    if (!authentication) {
+      return res.redirect(307, "/auth/login")
+    }
+
     const token = decryptJWT(authentication)
 
     // TODO: Make sure the token is not expired
@@ -21,6 +29,7 @@ module.exports = userLoggedIn = async (req, res, next) => {
 
     req.userId = token.payload.userId
     req.username = token.payload.username
+    req.email = token.payload.email
      
     next()
   } catch (error) {

@@ -57,10 +57,30 @@ app.use("/suggest", require("./routes/suggest.routes"))
 app.use("/transcription", require("./routes/transcription.routes"))
 app.use("/manage", require("./routes/manage.routes"))
 
+/* ------- Middleware to check if user is logged in and adds user data ------ */
+
+app.use(userLoggedIn, (req, res, next) => {
+  if (req.path.startsWith("/auth")) {
+    res.locals.user = { username: "Not Logged In", userId: "", email: "no-email@example.com" }
+    return next(); // Skip setting res.locals.user for /auth
+  }
+  
+  // This will be available in all EJS templates
+  res.locals.user = { 
+    username: req.username,
+    userId: req.userId,
+    email: req.email
+  }
+  
+  next();
+});
+
 /* -------------------------------- Homepage -------------------------------- */
 
 app.get("/", (req, res) => {
-  res.render("index.ejs")
+  // res.render("index.ejs")
+  res.render("COMPONENTS/hero.ejs")
+
 })
 
 /* ---------------------------- Login to an account ------------------------- */
@@ -89,13 +109,13 @@ app.get("/auth/register", (req, res) => {
 
 /* -------------------------- Form to upload files -------------------------- */
 
-app.get("/upload", userLoggedIn, async (req, res) => {
+app.get("/upload", async (req, res) => {
   res.render("upload.ejs")
 })
 
 /* -------------------------- Form to upload files -------------------------- */
 
-app.get("/journal", userLoggedIn, async (req, res) => {
+app.get("/journal", async (req, res) => {
   const date = new Date()
   const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
   const today = date.toLocaleDateString('en-US', options).replace(/\//g, '-');
@@ -121,7 +141,7 @@ app.get("/journal", userLoggedIn, async (req, res) => {
 
 /* ------------------------------- Create pool ------------------------------ */
 
-app.get("/create-pool", userLoggedIn, async (req, res) => {
+app.get("/create-pool", async (req, res) => {
   const query = req.query
 
   const request = await fetch(`${API_URL}/user/my-files?${new URLSearchParams(query)}`, {
@@ -163,7 +183,7 @@ app.get("/create-pool", userLoggedIn, async (req, res) => {
 
 /* ----------------------- Navigate to the search page ---------------------- */
 
-app.get("/search-media", userLoggedIn, async (req, res) => {
+app.get("/search-media", async (req, res) => {
   try {
 
     const query = req.query
@@ -255,7 +275,7 @@ app.get("/search-media", userLoggedIn, async (req, res) => {
 
 /* ---------------------------- Search pools form --------------------------- */
 
-app.get("/search-pools", userLoggedIn, async (req, res) => {
+app.get("/search-pools", async (req, res) => {
   try {
     const query = req.query
     
@@ -310,7 +330,7 @@ app.get("/search-pools", userLoggedIn, async (req, res) => {
 
 /* ---------------------- View a file with document id ---------------------- */
 
-app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
+app.get("/media/:mediaType", async (req, res) => {
   try {
     const { mediaType } = req.params
     const { id } = req.query
@@ -346,7 +366,7 @@ app.get("/media/:mediaType", userLoggedIn, async (req, res) => {
 
 /* ------------------------------- View a pool ------------------------------ */
 
-app.get("/pools/:id", userLoggedIn, async (req, res) => {
+app.get("/pools/:id", async (req, res) => {
   try {
     const { id } = req.params
 
@@ -392,7 +412,7 @@ app.get("/pools/:id", userLoggedIn, async (req, res) => {
 
 /* ------------------------ Get the users own profile ----------------------- */
 
-app.get("/profile", userLoggedIn, async (req, res) => {
+app.get("/profile", async (req, res) => {
   try {  
     const request = await fetch(`${API_URL}/user/${req.userId}`, {
       method: "GET",
@@ -426,7 +446,7 @@ app.get("/profile", userLoggedIn, async (req, res) => {
 })
 
 /* -------------------- Get a profile with a specific id -------------------- */
-app.get("/profile/:id", userLoggedIn, async (req, res) => {
+app.get("/profile/:id", async (req, res) => {
   try {
     const id = req.params.id
 
@@ -462,7 +482,7 @@ app.get("/profile/:id", userLoggedIn, async (req, res) => {
 
 /* ---------------------------- Manage user media --------------------------- */
 // TODO: Implement managing page
-app.get("/manage?", userLoggedIn, async (req, res) => {
+app.get("/manage?", async (req, res) => {
   try {
 
     // const id = req.params.id
