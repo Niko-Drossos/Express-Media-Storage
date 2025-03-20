@@ -1,27 +1,26 @@
 <h1 class="flex justify-center py-2">Search Media</h1> 
 
 <%- include('./partials/form/searchMedia.ejs') %>
+
 <div>
     <hr class="my-4 border">
     
-    <%- include('./partials/form/pagination.ejs', { response }) %>
+    <%- include('./form/pagination.ejs', { response }) %>
 
-    <hr class="my-4 border">
-    
     <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 p-8">
         <!-- Finish file display -->
         <% if (searchResults.length) { %>
-            <% searchResults.map(data => { %>
-                <div class="mb-8">                       
-                                                                 <!--! Finish thumbnail display -->
-                    <%- include('./partials/cards/mediaCard.ejs', { ...data, query, thumbnail: null }) %>
-                </div>
-            <% }) %>
+            <% searchResults.map((media, index) => { %>
+                <!-- Only show the first documents returned until the limit -->
+                <% if (index >= response.limit) return %>
+                <% let header = include('./partials/cards/cardHeader.ejs', { id: media._id, mediaType: query.mediaType, user: media.user, date: media.date, title: media.title, description: media.description }) %>
+                <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: media._id, mediaType: query.mediaType }) %>
+                <% let footer = include('./partials/cards/cardFooter.ejs', { id: media._id, mediaType: 'media', favorited: media.favorited, voteCount: media.voteCount }) %>
+                <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
+              <% }) %>
         <% } %>
     </div>
 </div>
-
-
     <!-- I might use this for something else at some point -->
 <!-- <div class='max-w-md mx-auto'>
     <div class="relative flex items-center w-full h-12 rounded-lg focus-within:shadow-lg bg-white overflow-hidden">

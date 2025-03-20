@@ -21,7 +21,7 @@ exports.searchUsers = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { username, tags, id, comments=false, page=1, limit=16 } = query
+    const { username, tags, id, comments=false, page=1, limit=12 } = query
 
     // Add the search query's properties to the searchQuery object
     if (username) searchQuery.username = new RegExp(username, 'i')
@@ -42,8 +42,11 @@ exports.searchUsers = async (req, res) => {
       success: true,
       message: "Successfully searched for users",
       data: {
-        resultCount: searchResults.length,
-        totalDocuments: totalDocuments,
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
         page: page, 
         pageCount: totalPages,
         limit: limit,
@@ -71,7 +74,7 @@ exports.searchPools = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
 
-    const { userId, usernames, tags, startDate, endDate, title, description, transcription, ids, comments=false, populate=false, page=1, limit=16 } = query
+    const { userId, usernames, tags, startDate, endDate, title, description, transcription, ids, comments=false, populate=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -129,8 +132,11 @@ exports.searchPools = async (req, res) => {
       success: true, 
       message: "Successfully searched for pools" ,
       data: {
-        resultCount: searchResults.length,
-        totalDocuments: totalDocuments,
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
         page: page,
         pageCount: totalPages,
         limit: limit,
@@ -196,8 +202,11 @@ exports.searchComments = async (req, res) => {
       success: true, 
       message: "Successfully searched for comments" ,
       data: {
-        resultCount: searchResults.length,
-        totalDocuments: totalDocuments,
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
         page: page,
         pageCount: totalPages,
         limit: limit,
@@ -225,7 +234,7 @@ exports.searchVideos = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, content, tags, ids, comments=false,page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, content, tags, ids, comments=false,page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -273,8 +282,11 @@ exports.searchVideos = async (req, res) => {
       success: true, 
       message: "Successfully searched for videos" ,
       data: {
-        resultCount: searchResults.length,
-        totalDocuments: totalDocuments,
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
         page: page,
         pageCount: totalPages,
         limit: limit,
@@ -303,7 +315,7 @@ exports.searchImages = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -350,8 +362,11 @@ exports.searchImages = async (req, res) => {
       success: true, 
       message: "Successfully searched for images" ,
       data: {
-        resultCount: searchResults.length,
-        totalDocuments: totalDocuments,
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
         page: page,
         pageCount: totalPages,
         limit: limit,
@@ -379,7 +394,7 @@ exports.searchAudios = async (req, res) => {
     // Object that will be searched for in the db
     const searchQuery = {}
     
-    const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=16 } = query
+    const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
     if (usernames) {
@@ -427,8 +442,11 @@ exports.searchAudios = async (req, res) => {
       success: true, 
       message: "Successfully searched for audios" ,
       data: {
-        resultCount: searchResults.length,
-        totalDocuments: totalDocuments,
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
         page: page,
         pageCount: totalPages,
         limit: limit,
