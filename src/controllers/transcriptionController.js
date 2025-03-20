@@ -58,7 +58,6 @@ function formatMilliseconds(ms) {
 
 async function createTranscription(document, transcriptionDocument, mimetype) {
   try {
-    console.log(document)
     // Create a temporary file for the data so you can transcribe it 
     const tempFile = await createTempFile(document.fileId, mimetype)
     console.log('Ready for transcription:', tempFile);

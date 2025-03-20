@@ -33,6 +33,6 @@ module.exports = searchDateRange = (query, startDate, endDate) => {
       $lte: midnightEndDate
     }
   }
-
+  console.log(query)
   return query
 }
