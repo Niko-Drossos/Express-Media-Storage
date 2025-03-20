@@ -46,7 +46,7 @@ exports.commentOnPool = async (req, res) => {
     })
 
     // Update the pool with the new comment
-    await Pool.findByIdAndUpdate({ 
+    await Pool.findOneAndUpdate({ 
       _id: req.params.poolId,
       $or: [
         { privacy: "Public" },
@@ -220,7 +220,7 @@ exports.commentOnImage = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Image.findByIdAndUpdate({ 
+    await Image.findOneAndUpdate({ 
       _id: req.params.imageId,
       $or: [
         { privacy: "Public" },
@@ -265,7 +265,7 @@ exports.commentOnAudio = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Audio.findByIdAndUpdate({ 
+    await Audio.findOneAndUpdate({ 
       _id: req.params.audioId,
       $or: [
         { privacy: "Public" },
