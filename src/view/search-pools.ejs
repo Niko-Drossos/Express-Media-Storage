@@ -8,10 +8,18 @@
 
 <hr class="my-4 border">
 
-
-<div class="mx-8 grid grid-cols-2 gap-4">
+<div class="mx-8 grid md:grid-cols-2 gap-4 grid-cols-1">
   <% searchResults.forEach(pool => { %>
-    <% console.log(pool) %>
-    <%- include('./partials/cards/poolCard.ejs', pool) %>
+    <% let header = include('./partials/cards/cardHeader.ejs', { id: pool._id, mediaType: 'pools', user: pool.user, date: pool.date, title: pool.title, description: pool.description }) %>
+    <% let content = include('./partials/cards/poolCardContent.ejs', { _id: pool._id }) %>
+    <% let footer = include('./partials/cards/poolCardFooter.ejs', { id: pool._id, mediaType: 'pool', favorited: pool.favorited, voteCount: pool.voteCount }) %>
+    <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
   <% }) %>
 </div>
+
+<!-- TODO: Change pagination -->
+<!-- <div class="py-8">
+  ./UNUSED COMPONENTS/pagination.ejs
+</div> -->
+
+<!-- <div class="pb-8"></div> -->

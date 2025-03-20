@@ -1,142 +1,149 @@
 <div class="flex flex-col items-center justify-center">
-    <% if (register) { %> 
-        <h1 class="py-2">Register</h1>
-        <form class="bg-white shadow-md rounded px-8 pt-6 pb-4 mb-4 flex flex-col" onsubmit="register(event)">
-          <div class="mb-4">
-            <label class="block text-grey-darker text-sm font-bold mb-2" for="email">
-              Email
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="email" type="email" placeholder="johndoe@example.com">
-          </div>
-          <div class="mb-4">
-            <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
-              Username
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="username" type="text" placeholder="Username">
-          </div>
-          <div class="mb-4">
-            <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
-                Password
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="password" type="password" placeholder="******************">
-          </div>
-          <div class="">
-            <label class="block text-grey-darker text-sm font-bold mb-2" for="confirm-password">
-              Confirm Password
-            </label>
-            <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="confirm-password" type="password" placeholder="******************">
-          </div>
-          <div class="flex items-center justify-between mb-4">
-            <pre>| </pre>
-            <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="/auth/login">
-              Already have an account?
-            </a>
-            <pre> |</pre>
-          </div>
-          <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded" type="submit">
-            Sign up
-          </button>
-        </form>
-    <% } else { %>
-        <h1 class="py-2">Login</h1>
-        <form class="bg-white shadow-md rounded px-8 py-4 mb-4 flex flex-col" onsubmit="login(event)">
-            <div class="mb-4">
-              <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
-                Username
-              </label>
-              <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="username" type="text" placeholder="Username">
-            </div>
-            <div class="">
-              <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
-                Password
-              </label>
-              <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="password" type="password" placeholder="******************">
-            </div>
-            <div class="flex items-center justify-between mb-4">
-              <pre>| </pre>
-              <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="#" onclick="forgotPassword()">
-                Forgot Password?
-              </a>
-              <pre> | </pre>
-              <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="/auth/register">
-                Create account
-              </a>
-              <pre> |</pre>
-            </div>
-            <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded" type="submit">
-              Sign In
-            </button>
-        </form>
-    <% } %>
+  <% if (register) { %> 
+    <h1 class="py-2">Register</h1>
+    <form class="bg-white shadow-md rounded px-8 pt-6 pb-4 mb-4 flex flex-col" onsubmit="register(event)">
+      <div class="mb-4">
+        <label class="block text-grey-darker text-sm font-bold mb-2" for="email">
+          Email
+        </label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="email" type="email" placeholder="johndoe@example.com">
+      </div>
+      <div class="mb-4">
+        <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
+          Username
+        </label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="username" type="text" placeholder="Username">
+      </div>
+      <div class="mb-4">
+        <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
+            Password
+        </label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="password" type="password" placeholder="******************">
+      </div>
+      <div class="">
+        <label class="block text-grey-darker text-sm font-bold mb-2" for="confirm-password">
+          Confirm Password
+        </label>
+        <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="confirm-password" type="password" placeholder="******************">
+      </div>
+      <div class="flex items-center justify-between mb-4">
+        <pre>| </pre>
+        <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="/auth/login">
+          Already have an account?
+        </a>
+        <pre> |</pre>
+      </div>
+      <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded flex relative" type="submit">
+        <%- include("./partials/loading-spinner.ejs", { id: 1 }) %>
+        <span class="w-full">Sign Up</span>
+      </button>
+    </form>
+    <%- include('./partials/alerts/error.ejs', { name: "register" }) %>
+  <% } else { %>
+    <h1 class="py-2">Login</h1>
+    <form class="bg-white shadow-md rounded px-8 py-4 mb-4 flex flex-col" onsubmit="login(event)">
+        <div class="mb-4">
+          <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
+            Username
+          </label>
+          <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="username" type="text" placeholder="Username">
+        </div>
+        <div class="">
+          <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
+            Password
+          </label>
+          <input class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3" id="password" type="password" placeholder="******************">
+        </div>
+        <div class="flex items-center justify-between mb-4">
+          <pre>| </pre>
+          <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="#" onclick="forgotPassword()">
+            Forgot Password?
+          </a>
+          <pre> | </pre>
+          <a class="inline-block align-baseline font-bold text-sm text-violet-blaze" href="/auth/register">
+            Create account
+          </a>
+          <pre> |</pre>
+        </div>
+        <button class="bg-royal-purple hover:bg-violet-blaze transition-all text-white font-bold py-2 px-4 rounded flex relative" type="submit">
+          <%- include("./partials/loading-spinner.ejs", { id: 1 }) %>
+          <span class="w-full">Sign In</span>
+        </button>
+      </form>
+      <%- include('./partials/alerts/error.ejs', { name: "login" }) %>
+  <% } %>
 </div>
 
 <script>    
-    async function login(event) {
-      event.preventDefault();
-      let username = document.getElementById("username").value;
-      let password = document.getElementById("password").value;
+  async function login(event) {
+    event.preventDefault();
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
-      const loginAttempt = await fetch("/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
-      })
-     
-      if (!loginAttempt.ok) {
-        alert(`Login failed: ${loginAttempt.status}`)
-        return
-      }
+    showSpinner(1)
 
-      let returnedData = await loginAttempt.json()
-
-      if (!returnedData.success) {
-        alert(`Login failed: ${returnedData.errorMessage}`)
-        return
-      }
-
-      alert("Login successful")
-      
-      document.location = `<%= redirectURL %>` || "/";
+    const loginAttempt = await fetch("/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    })
+        
+    if (!loginAttempt.ok) {
+      showAlert("login", `Error: ${loginAttempt.status}`, `Failed to log in, check your credentials`)
+      hideSpinner(1)
+      return
     }
 
-    async function register(event) {
-      event.preventDefault();
-      let username = document.getElementById("username").value;
-      let email = document.getElementById("email").value;
-      let password = document.getElementById("password").value;
-      let confirmPassword = document.getElementById("confirm-password").value;
+    let returnedData = await loginAttempt.json()
 
-      if (password !== confirmPassword) {
-        alert("Passwords do not match")
-        return
-      }
+    if (!returnedData.success) {
+      showAlert("login", title=returnedData.message ,message=returnedData.errorMessage)
+      hideSpinner(1)
+      return
+    }
+    
+    document.location = `<%= redirectURL %>` || "/";
+  }
 
-      const registerAttempt = await fetch("/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, email, password })
-      })
-      
-      let returnedData = await registerAttempt.json()
+  async function register(event) {
+    event.preventDefault();
+    let username = document.getElementById("username").value;
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirm-password").value;
 
-      if (!returnedData.success) {
-        alert(`Registration failed: ${returnedData.errorMessage}`)
-        return  
-      }
-
-      alert("Registration successful")
-      window.location = "/auth/login?redirect=/"
+    if (password !== confirmPassword) {
+      showAlert("register", "Account creation failed", "Passwords do not match")
+      return
     }
 
-    // Prompt the user if they want to send an email to support
-    function forgotPassword() {
-      const contactSupport = confirm("Automatic password reset not yet implemented.\nYou may contact support for help.\nWould you like to send an email to request a reset?")
-      if (contactSupport) {
-        window.location = "mailto:bethkavodinfo@gmail.com?cc=droniko777@gmail.com&subject=Password reset request"
-      }
+    showSpinner(1)
+
+    const registerAttempt = await fetch("/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, email, password })
+    })
+    
+    let returnedData = await registerAttempt.json()
+
+    if (!returnedData.success) {
+      showAlert("register", returnedData.message, returnedData.errorMessage)
+      return  
     }
+
+    window.location = "/auth/login?redirect=/"
+  }
+
+  // Prompt the user if they want to send an email to support
+  function forgotPassword() {
+    const contactSupport = confirm("Automatic password reset not yet implemented.\nYou may contact support for help.\nWould you like to send an email to request a reset?")
+    if (contactSupport) {
+      window.location = "mailto:bethkavodinfo@gmail.com?cc=droniko777@gmail.com&subject=Password reset request"
+    }
+  }
 </script>

@@ -1,16 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/output.css">
     <title>Story</title>
 </head>
-<body class="theme-dark">
+<body class="theme-dark container mx-auto sm:px-6 lg:px-8">
     <%- include('../partials/header.ejs') %>
-    <main class="container mx-auto bg-slate-200 border-x-2 border-slate-300 min-h-[calc(100vh-128px)] max-h-fit">
+    <main class="container bg-slate-200 min-h-[calc(100vh-128px)] h-full">
         <%- body %>
     </main>
     <%- include('../partials/footer.ejs') %>
 </body>
 </html>
+
+<script>
+  // <!-- ------------------------- Modal functionality ------------------------- -->
+  
+  function showModal(name, title="", message="") {
+    const modal = document.getElementById(`modal-${name}`)
+
+    if (title) {
+      const titleElement = document.getElementById(`modal-title-${name}`)
+      titleElement.innerHTML = title
+    }
+
+    if (message) {
+      const messageElement = document.getElementById(`modal-message-${name}`)
+      messageElement.innerHTML = message
+    }
+
+    modal.classList.remove('hidden')
+  }
+
+  function hideModal(name) {
+    const modal = document.getElementById(`modal-${name}`)
+    modal.classList.add('hidden')
+  }
+
+  function clickModal(name) {
+    hideModal(name)
+    return true
+  }
+
+  function cancelModal(name) {
+    hideModal(name)
+    return false
+  }
+
+  // <!-- ------------------------- Alert functionality ------------------------- -->
+
+  function showAlert(name, title="", message="") {
+    const alert = document.getElementById(`alert-${name}`)
+
+    if (title) {
+      const titleElement = document.getElementById(`alert-title-${name}`)
+      titleElement.innerHTML = title
+    }
+
+    if (message) {
+      const messageElement = document.getElementById(`alert-message-${name}`)
+      messageElement.innerHTML = message
+    }
+
+    alert.classList.remove('hidden')
+  }
+
+  function hideAlert(name) {
+    const alert = document.getElementById(`alert-${name}`)
+    alert.classList.add('hidden')
+  }
+
+  // <!-- ------------------------- Vote functionality ------------------------- -->
+
+  async function vote(vote, { id, mediaType }) {
+    const voteCounter = document.getElementById(`vote-count-${id}`)
+
+    // Vote on a document
+    const request = await fetch(`/vote/${mediaType}/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        vote
+      })
+    })
+
+    const response = await request.json()
+
+    if (response.error) {
+      alert(response.error)
+      return
+    }   
+
+    const voteCount = response.data.voteCount
+
+    // I am aware this looks, and probably preforms badly but its fine for now.
+    if (voteCount > 0) {
+      voteCounter.classList.remove("text-red-600")
+      voteCounter.classList.remove("text-gray-600")
+      voteCounter.classList.add("text-green-600")
+    } else if (voteCount === 0) {
+      voteCounter.classList.remove("text-green-600")
+      voteCounter.classList.remove("text-red-600")
+      voteCounter.classList.add("text-gray-600")
+    } else {
+      voteCounter.classList.remove("text-green-600")
+      voteCounter.classList.remove("text-gray-600")
+      voteCounter.classList.add("text-red-600")
+    }
+
+    voteCounter.innerText = voteCount
+  }
+
+  // <!-- ------------------------- Copy functionality ------------------------- -->
+
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("text copied to clipboard! 📋");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }
+
+  // <!-- ---------------------- Media card functionality ----------------------- -->
+
+  // Toggle dropdown menu for media cards
+  function toggleDropdownMenu(id) {
+    const dropdownMenu = document.getElementById(`dropdownMenu-${id}`); 
+    
+    dropdownMenu.classList.toggle("hidden");
+  }
+
+  // Search for pools when a user clicks the date under the username
+  function searchWithDate(date) {
+    const formattedDate = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+    window.location.href = `/search-pools?startDate=${formattedDate}&endDate=${formattedDate}`
+  }
+</script>

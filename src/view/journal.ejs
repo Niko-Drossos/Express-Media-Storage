@@ -5,6 +5,11 @@
     <textarea textarea class="appearance-none block w-full bg-white text-gray-900 border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d] flex-grow" type="text" name="entry" placeholder="Tell us about your day" ></textarea>
     <button type="submit" class="mt-4 w-full bg-royal-purple transition-all text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-blaze">Submit</button>
   </form>
+
+  <div class="w-96 mt-4">
+    <%- include('./partials/alerts/error.ejs', { name: "journal" }) %>
+  </div>
+
   <div class="w-1/2 py-4 max-h-72 overflow-scroll">
     <h2 class="text-xl pt-8 flex justify-center">Journal Entries for <span class="ml-1 font-bold"><%= new Date().toLocaleDateString() %></span>
       <% if (poolId != "") { %>
@@ -59,7 +64,7 @@
     const entry = event.target.entry.value
 
     if (entry == "") {
-      alert("Please enter an entry before submitting")
+      showAlert("journal", "Failed to add journal entry", "Please enter an entry before submitting")
       return
     }
 

@@ -124,7 +124,6 @@ exports.searchPools = async (req, res) => {
 
     // Middleware to add and remove document properties
     searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedPools, req.userId))
-    console.log(searchResults)
     
     res.status(200).json({ 
       success: true, 
@@ -269,7 +268,7 @@ exports.searchVideos = async (req, res) => {
 
     // Middleware to add and remove document properties
     searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedVideos, req.userId))
-    console.log(searchResults)
+
     res.status(200).json({
       success: true, 
       message: "Successfully searched for videos" ,

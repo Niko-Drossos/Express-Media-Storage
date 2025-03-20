@@ -1,6 +1,5 @@
 <div class="bg-white shadow-none flex flex-1 h-[calc(100vh-128px)]">
     <div class="lg:grid lg:grid-cols-3 min-w-full max-h-min">
-
         <div class="col-span-2 w-full h-full flex justify-center items center">
             <% if (mediaType === 'image') { %>
                 <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/stream/image/<%= media.fileId %>" alt="<%= media.title %>">
@@ -40,15 +39,19 @@
                 <p class="pb-4 max-h-36 overflow-y-auto"><%= media.description || "(No Description)"%></p>
             </header>
 
-            <!-- Switch between comment section and transcription -->
-            <div class="flex font-bold border-grey-400 border-y py-2">
-                <button class="flex justify-center w-1/2 bg-violet-blaze rounded-l-lg" id="commentSwitch" onclick="switchScreen('comment')">
-                    Comments
-                </button>
-                <button class="flex justify-center w-1/2 bg-lilac-mist rounded-r-lg" id="transcriptionSwitch" onclick="switchScreen('transcription', '<%= media.transcription %>')">
-                    Transcription
-                </button>
-            </div>
+            <!-- Switch between comment section and transcription ONLY for videos and audios -->
+             <% if (mediaType === 'video' || mediaType === 'audio') { %>
+                <div class="flex font-bold border-grey-400 border-y py-2">
+                    <button class="flex justify-center w-1/2 bg-violet-blaze rounded-l-lg" id="commentSwitch" onclick="switchScreen('comment')">
+                        Comments
+                    </button>
+                    <button class="flex justify-center w-1/2 bg-lilac-mist rounded-r-lg" id="transcriptionSwitch" onclick="switchScreen('transcription', '<%= media.transcription %>')">
+                        Transcription
+                    </button>
+                </div>
+            <% } else { %>
+                <hr />
+            <% } %>
 
             <!-- Comment section -->
             <div class="flex-grow content-end overflow-y-auto max-h-full" id="commentSection">
@@ -68,11 +71,13 @@
 
                 <div class="flex items-center justify-between mb-2 pt-4 pb-2">
                     <%- include('./partials/voteControls.ejs', { id: media._id, voteCount: media.voteCount, mediaType, favorited: media.favorited, voted: media.voted }) %>
+                    <%- include('./partials/favoriteButton.ejs', { id: media._id, favorited: media.favorited, mediaType }) %>
                 </div>
+                <hr>
 
-                <div class="pb-4">
+                <div class="py-2">
                     <div class="flex items-center">
-                        <textarea class="w-full resize-none outline-none appearance-none rounded-lg p-2 leading-tight focus:outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
+                        <textarea class="w-full resize-none appearance-none rounded-lg p-2 leading-tight outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
                         <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="postComment(event)">
                             <img src="../icons/arrows/right-arrow.svg" alt="Send">
                         </button>
@@ -102,7 +107,6 @@
             transcriptionButton.classList.remove("bg-violet-blaze")
             transcriptionSection.classList.add("hidden")
         } else if (mode === "transcription") {
-            console.log(transcriptionId)
             await fetchTranscription(transcriptionId)
 
             commentButton.classList.add("bg-lilac-mist")

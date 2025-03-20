@@ -2,7 +2,7 @@
     <a class="text-sm flex justify-between items-center w-full" href="/profile/<%= comment.user.userId %>">
         <div class="flex items-center">
             <p class="cursor-pointer flex items-center text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                <img class="h-8 w-8 rounded-full object-cover" src="https://images.pexels.com/photos/1450082/pexels-photo-1450082.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260" alt="<%= comment.user.username %>'s profile photo" />
+                <img class="h-8 w-8 rounded-full object-cover ring-1 ring-black" src="<%= comment.user.avatar || '../icons/defaultUser.svg'%>" alt="<%= comment.user.username %>'s profile photo" />
             </p>
             <p class="font-bold ml-2 cursor-pointer">
                 <%= comment.user.username %>

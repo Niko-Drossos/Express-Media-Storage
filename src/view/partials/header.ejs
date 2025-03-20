@@ -1,78 +1,209 @@
-<div class="container mx-auto bg-lavender-haze h-20 flex w-full relative">
-  <div class="flex md:flex-col items-center justify-between w-full relative">
-    <a href="/" class="flex items-center">
-      <!-- TODO: add logo -->
-      <!-- <span href="/" class="mr-2">
-        <img src="/assets/img/logo.svg" alt="add logo">
-      </span> -->
-      <p class="hidden font-body text-3xl font-bold text-primary dark:text-white lg:block ml-8">
-        Story
-      </p>
-    </a>
-    <div class="flex items-center lg:hidden sm:mr-4">
-      <svg width="24" height="15" xmlns="http://www.w3.org/2000/svg" onclick="toggleMobileMenu()" class="fill-current text-primary dark:text-white">
-        <g fill-rule="evenodd">
-          <rect width="24" height="3" rx="1.5"></rect>
-          <rect x="8" y="6" width="16" height="3" rx="1.5"></rect>
-          <rect x="4" y="12" width="20" height="3" rx="1.5"></rect>
-        </g>
-      </svg>
-    </div>
-    <!-- TODO: fix mobile menu to be a dropdown -->
-    <div class="hidden md:flex md:flex-col lg:flex absolute mr-0 lg:relative" id="mobile-menu">
-      <ul class="lg:flex lg:flex-row md:flex-col items-center" id="item-list">
-        
-        <li class="group relative mr-6 mb-1">
-          <a href="/" class="relative z-30 block px-2 font-body text-lg font-bold text-white">Home</a>
-        </li>
-        
-        <li class="group relative mr-6 mb-1">
-          <a href="/upload" class="relative z-30 block px-2 font-body text-lg font-bold text-white">Upload</a>
-        </li>
+<nav class="bg-gray-100 shadow-sm">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 justify-between">
+      <div class="flex">
+        <div class="mr-2 -ml-2 flex items-center md:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden focus:ring-inset" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu()">
+            <span class="absolute -inset-0.5"></span>
+            <span class="sr-only">Open main menu</span>
 
-        <li class="group relative mr-6 mb-1">
-          <a href="/journal" class="relative z-30 block px-2 font-body text-lg font-bold text-white">Journal</a>
-        </li>
-        
-        <li class="group relative mr-6 mb-1">
-          <a href="/search-media" class="relative z-30 block px-2 font-body text-lg font-bold text-white">Search-media</a>
-        </li>
+            <svg class="block size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
 
-        <li class="group relative mr-6 mb-1">
-          <a href="/search-pools" class="relative z-30 block px-2 font-body text-lg font-bold text-white">Search-pools</a>
-        </li>
-        
-        <% if (loggedIn) { %>
-        <li class="group relative mr-6 mb-1">
-          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-          <a href="/profile" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">
-            <!-- Make profile pic dynamic to user -->
-            <img class="h-8 w-8 rounded-full object-cover" src="../icons/defaultUser.svg" alt="">
+            <svg class="hidden size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <!-- Logo -->
+        <div class="flex shrink-0 items-center">
+          <a href="/" class="text-gray-900 text-3xl font-bold cursor-pointer">Story</a>
+        </div>
+        <div class="hidden md:ml-6 md:flex md:space-x-8">
+          <a href="/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium header-button">Home</a>
+          <a href="/about-us" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium header-button">About Us</a>
+          <a href="/journal" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium header-button">Journal</a>
+          <!-- TODO: Change the schema so you can have one search page -->
+          <a href="/search-media" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium header-button">Search Media</a>
+          <a href="/search-pools" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium header-button">Search Pools</a>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <div class="shrink-0">
+          <a type="button" href="/upload" class="relative inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+            <svg class="-ml-0.5 size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+              <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+            </svg>
+            Upload
           </a>
-        </li>
-        <% } else { %>
-        <li class="group relative mr-6 mb-1">
-          <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-          <a href="/auth/login" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">
-            Login
+          <a type="button" href="/create-pool" class="relative inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+            <svg class="-ml-0.5 size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+              <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+            </svg>
+            Create Pool
           </a>
-        </li>  
-        <% } %>
-      </ul>
+        </div>
+        <div class="hidden md:ml-4 md:flex md:shrink-0 md:items-center">
+          <!-- TODO: Add notifications later -->
+          <!-- <button type="button" class="relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden">
+            <span class="absolute -inset-1.5"></span>
+            <span class="sr-only">View notifications</span>
+            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+            </svg>
+          </button> -->
+
+          <!-- Profile dropdown -->
+          <div class="relative ml-3">
+            <div>
+              <button type="button"
+                class="relative flex rounded-full bg-white text-sm focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
+                id="user-menu-button"
+                aria-expanded="false"
+                aria-haspopup="true"
+                onclick="dropdownMenu()"
+                >
+                <span class="absolute -inset-1.5"></span>
+                <span class="sr-only">Open user menu</span>
+                <!-- TODO: add user profile images -->
+                <img class="size-8 rounded-full"
+                  src="../icons/defaultUser.svg"
+                  alt="">
+              </button>
+            </div>
+
+            <!-- Dropdown menu -->
+            <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden hidden" 
+              role="menu" 
+              aria-orientation="vertical" 
+              aria-labelledby="user-menu-button" 
+              tabindex="-1"
+              id="dropdown-menu"
+              >
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">Your Profile</a>
+              <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">Settings</a> -->
+              <button onclick="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left" role="menuitem" tabindex="-1">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Mobile menu, show/hide based on menu state. -->
+  <div class="md:hidden hidden" id="mobile-menu">
+    <div class="space-y-1 pt-2 pb-3">
+      <!-- Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" -->
+      <a href="/" class="block border-l-4 py-2 pr-4 pl-3 text-base font-medium sm:pr-6 sm:pl-5 mobile-header-button">Home</a>
+      <a href="/about-us" class="block border-l-4 py-2 pr-4 pl-3 text-base font-medium sm:pr-6 sm:pl-5 mobile-header-button">About Us</a>
+      <a href="/journal" class="block border-l-4 py-2 pr-4 pl-3 text-base font-medium sm:pr-6 sm:pl-5 mobile-header-button">Journal</a>
+      <a href="/search-media" class="block border-l-4 py-2 pr-4 pl-3 text-base font-medium sm:pr-6 sm:pl-5 mobile-header-button">Search-Media</a>
+      <a href="/search-pools" class="block border-l-4 py-2 pr-4 pl-3 text-base font-medium sm:pr-6 sm:pl-5 mobile-header-button">Search-Pools</a>
+    </div>
+    <div class="border-t border-gray-200 pt-4 pb-3">
+      <div class="flex items-center px-4 sm:px-6">
+        <div class="shrink-0">
+          <img class="size-10 rounded-full" src="../icons/defaultUser.svg" alt="">
+        </div>
+        <div class="ml-3">
+          <!-- TODO: Add username and email responsiveness -->
+          <div class="text-base font-medium text-gray-800"><%= user.username %></div>
+          <div class="text-sm font-medium text-gray-500"><%= user.email %></div>
+        </div>
+        <!-- TODO: Add notifications later -->
+        <!-- <button type="button" class="relative ml-auto shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden">
+          <span class="absolute -inset-1.5"></span>
+          <span class="sr-only">View notifications</span>
+          <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+          </svg>
+        </button> -->
+      </div>
+      <div class="mt-3 space-y-1">
+        <a href="/profile" class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">Your Profile</a>
+        <!-- TODO: Create settings page and routes -->
+        <!-- <a href="#" class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">Settings</a> -->
+        <button onclick="logout()" class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6 w-full text-left">Sign out</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<%- include('./modals/success.ejs', { name: "logout", cancelable: false }) %>
 
 <script>
+  function highlightButtons() {
+    // Add classes to the header buttons
+    const selectedClasses = ["border-indigo-500", "text-gray-900"]
+    const unselectedClasses = ["border-transparent", "text-gray-500", "hover:border-gray-300", "hover:text-gray-700"]
+    
+    // Mobile button classes
+    const mobileSelectedClasses = ["bg-indigo-50", "border-indigo-500", "text-indigo-700"]
+    const mobileUnselectedClasses = ["border-transparent", "text-gray-500", "hover:bg-gray-50", "hover:border-gray-300", "hover:text-gray-700"]
+
+    const headerButtons = document.querySelectorAll(".header-button")
+    const mobileHeaderButtons = document.querySelectorAll(".mobile-header-button")
+
+    const pathname = window.location.origin + window.location.pathname
+
+    // Loop through each header button to highlight the one on the current page
+    Array.from(headerButtons).forEach(element => {
+      if (element.href == pathname) {
+        element.classList.add(...selectedClasses)
+      } else {
+        element.classList.add(...unselectedClasses)
+      }
+    })
+
+    // Highlight mobile buttons 
+    Array.from(mobileHeaderButtons).forEach(element => {
+      if (element.href == pathname) {
+        element.classList.add(...mobileSelectedClasses)
+      } else {
+        element.classList.add(...mobileUnselectedClasses)
+      }
+    })
+  }
+
+  highlightButtons()
+
+  function dropdownMenu() {
+    const menuButton = document.getElementById("user-menu-button")
+    const dropdownMenu = document.getElementById("dropdown-menu")
+
+    dropdownMenu.classList.toggle("hidden");
+
+    // Close the dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+      if (!menuButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.add("hidden");
+      }
+    });
+  }
+
   function toggleMobileMenu() {
-    const mobileMenu = document.getElementById("mobile-menu");
-    const itemList = document.getElementById("item-list");
-    if (mobileMenu.classList.contains("hidden")) {
-      mobileMenu.classList.remove("hidden");
-      mobileMenu.classList.add("block");
-    } else {
-      mobileMenu.classList.remove("block");
-      mobileMenu.classList.add("hidden");
-    }
+    const mobileMenu = document.getElementById("mobile-menu")
+
+    mobileMenu.classList.toggle("hidden")
+    // mobileMenu.classList.toggle("fixed")
+  }
+
+
+  async function logout() {
+    const request = await fetch('/auth/logout', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+
+    const response = await request.json()
+
+    showModal("logout", "Logout", "You have successfully logged out.")
+
+    console.log(response)
   }
 </script>

@@ -108,13 +108,9 @@
         const fileName = file.name
         const displayFileName = document.getElementById('display-file-name')
         displayFileName.innerHTML = `Selected: ${fileName}`
-        if (displayFileName.classList.contains('hidden')) {
-            displayFileName.classList.remove('hidden')
-            displayFileName.classList.add('block')
-        } else {
-            displayFileName.classList.remove('block')
-            displayFileName.classList.add('hidden')
-        }
+
+        displayFileName.classList.toggle('hidden')
+        displayFileName.classList.toggle('block')
     }
     
     async function uploadFileForm(event) {
@@ -138,7 +134,7 @@
                 metadata: {
                     title: event.target['title'].value,
                     description: event.target['description'].value,
-                    date: event.target['date'].value,
+                    date: new Date(event.target['date'].valueAsNumber).setSeconds(1), // Add one second to make sure it is "bigger" then midnight
                     privacy: event.target['privacy'].value,
                     fileName: file.name,
                     tags: event.target['tags'].value
