@@ -243,8 +243,11 @@ app.get("/search-media", async (req, res) => {
         query,
         // Default response to prevent throwing "undefined" errors
         response: {
-          resultCount: 0,
-          totalDocuments: 0,
+          documents: {
+            start: 0,
+            end: 0,
+            count: 0
+          },
           page: 1,
           pageCount: 1,
           limit: 12,
