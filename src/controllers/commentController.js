@@ -46,7 +46,13 @@ exports.commentOnPool = async (req, res) => {
     })
 
     // Update the pool with the new comment
-    await Pool.findByIdAndUpdate(req.params.poolId, {
+    await Pool.findByIdAndUpdate({ 
+      _id: req.params.poolId,
+      $or: [
+        { privacy: "Public" },
+        { "user.userId": req.userId }
+      ]
+    }, {
       $push: {
         comments: pooledComment._id
       }
@@ -85,7 +91,13 @@ exports.commentOnComment = async (req, res) => {
     })
 
     // Update the comment with the new comment
-    await Comment.findByIdAndUpdate(req.params.commentId, {
+    await Comment.findOneAndUpdate({ 
+      _id: req.params.commentId,
+      $or: {
+        privacy: "Public",
+        "user.userId": req.userId
+      }
+    }, {
       $push: {
         comments: pooledComment._id
       }
@@ -163,7 +175,13 @@ exports.commentOnVideo = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Video.findByIdAndUpdate(req.params.videoId, {
+    await Video.findOneAndUpdate({ 
+      _id: req.params.videoId,
+      $or: [
+        { privacy: "Public" },
+        { "user.userId": req.userId }
+      ]
+    }, {
       $push: {
         comments: pooledComment._id
       }
@@ -202,7 +220,13 @@ exports.commentOnImage = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Image.findByIdAndUpdate(req.params.imageId, {
+    await Image.findByIdAndUpdate({ 
+      _id: req.params.imageId,
+      $or: [
+        { privacy: "Public" },
+        { "user.userId": req.userId }
+      ]
+    }, {
       $push: {
         comments: pooledComment._id
       }
@@ -241,7 +265,13 @@ exports.commentOnAudio = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Audio.findByIdAndUpdate(req.params.audioId, {
+    await Audio.findByIdAndUpdate({ 
+      _id: req.params.audioId,
+      $or: [
+        { privacy: "Public" },
+        { "user.userId": req.userId }
+      ]
+    }, {
       $push: {
         comments: pooledComment._id
       }

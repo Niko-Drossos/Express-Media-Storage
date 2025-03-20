@@ -56,6 +56,7 @@ Change journal routes to ask what pool you would like to update
 Add fullcalendar support with calendar page.
 It should allow you to search your media by selecting a day, or let you see what someone else was up to at the time.
  
+create thumbnail routes
 
 Add support for changing color themes
 
