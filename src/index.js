@@ -78,16 +78,14 @@ app.use(userLoggedIn, (req, res, next) => {
 /* -------------------------------- Homepage -------------------------------- */
 
 app.get("/", (req, res) => {
-  // res.render("index.ejs")
-  res.render("COMPONENTS/hero.ejs")
-
+  res.render("index.ejs")
 })
 
 /* ---------------------------- Login to an account ------------------------- */
 
 app.get("/auth/login", (req, res) => {
   // Allow for a redirect url after login
-  const redirectURL = req.query.redirect || req.headers.referer
+  const redirectURL = req.query.redirect || "/"
 
   res.render("auth.ejs", {
     register: false,
@@ -105,6 +103,12 @@ app.get("/auth/register", (req, res) => {
     register: true,
     redirectURL
   })
+})
+
+/* ------------------------------ About us page ----------------------------- */
+
+app.get("/about-us", async (req, res) => {
+  res.render("about-us.ejs")
 })
 
 /* -------------------------- Form to upload files -------------------------- */
@@ -517,6 +521,19 @@ app.get("/manage?", async (req, res) => {
   }
 })
 
+/* ------- Catch every request that doesn't get handled by the router ------- */
+
+app.use((req, res) => {
+  res.status(404).render("error.ejs", {
+    status: 404,
+    title: "Page not found",
+    message: "We're sorry we couldn't find the page you requested, please check the URL and try again.",
+    action: {
+      name: "Go back home",
+      url: "/"
+    }
+  });
+});
 
 /* -------------------------------------------------------------------------- */
 /*                              Server functions                              */
