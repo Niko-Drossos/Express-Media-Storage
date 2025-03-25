@@ -10,7 +10,6 @@ const multer = require('multer')
 const dotenv = require("dotenv")
 dotenv.config()
 
-const spawn = require('child_process').spawn
 /* --------------------------------- Schemas -------------------------------- */
 const Image = require("../models/schemas/Image")
 const Video = require("../models/schemas/Video")
@@ -62,7 +61,7 @@ async function initializeGridFS() {
 const uploadStreams = new Map()
 
 // Create a map to store the timers for file uploads
-// Upload streams will be destroyed if the client doesn't send any data for 5 minutes
+// Upload streams will be destroyed if the client doesn't send any data for 1 minute
 const fileTimers = new Map()
 
 /* ------------------------------ Retrieve file ----------------------------- */
@@ -262,7 +261,7 @@ const startChunkedUpload = async (req, res) => {
   // This is to prevent having to send the document _id back to the client ad a lot of other things
   const documentId = new mongoose.Types.ObjectId()
 
-  uploadStreams.set(fileId, { uploadStream, mimeType, documentId })
+  uploadStreams.set(fileId, { uploadStream, mimeType, documentId, uploadStartedAt: Date.now() })
 
   return  { uploadStream, fileId, documentId }
 }
@@ -331,12 +330,12 @@ const uploadChunk = async (req, res) => {
       // Remove partial file from GridFS
       await cleanupDeletedChunks(mimeType, fileId)
       console.log(`Timed-out file ${fileId} deleted successfully.`)
-    } catch (err) {
-      console.error(`Failed to delete timed-out file ${fileId}:`, err)
+    } catch (error) {
+      console.error(`Failed to delete timed-out file ${fileId}:`, error)
+    } finally {
+      await logError(req, error)
     }
-  }, 10000)
-  // }, 5 * 60 * 1000) // Set a timeout of 5 minutes
-
+  }, 60 * 1000) // 60 seconds
 
   fileTimers.set(fileId, timer) // Save the new timer
 

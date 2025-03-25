@@ -70,6 +70,7 @@
         </form>
     </div>
 </div>
+<%- include('../modals/error.ejs', { name: 'file' }) %>
 
 <script>
     function disableForm() {
@@ -152,7 +153,8 @@
                 await uploadFile(file, uploadResponse.data.ext, uploadResponse.data.fileId)
             }, 500)
         } else {
-            alert(uploadResponse.message)
+            // alert(uploadResponse.message)
+            showModal('file', uploadResponse.errorMessage, uploadResponse.message)
             return
         }
     }
