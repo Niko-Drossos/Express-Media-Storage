@@ -25,7 +25,6 @@ exports.registerUser = async (req, res) => {
     const containsIllegalChars = Array.from(username).includes(",", ".", "\"", "'") 
 
     if (containsIllegalChars) {
-      console.log("Cant register")
       throw new Error("Username cannot contain any of these characters [, . \" ']")
     }
 
@@ -51,7 +50,9 @@ exports.registerUser = async (req, res) => {
     const payload = {
       userId: newUser._id,
       username,
-      email
+      email,
+      roles: newUser.roles,
+      groups: newUser.groups
     }
 
     const loginToken = generateJWT(payload)
@@ -100,16 +101,8 @@ exports.loginUser = async (req, res) => {
     }
 
     // Find the user in the database and throw an error if none found
-    const foundUser = await User.findOne({ username }, { password: 1 })
+    const foundUser = await User.findOne({ username }, { password: 1, roles: 1, groups: 1 })
 
-    // TODO: Depreciate error message as it decreases security
-    /* if (!foundUser || foundUser == undefined) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      })
-    }
- */
     // Check if password is a match 
     const passwordMatch = await compareHash(password, foundUser.password)
     if (!passwordMatch) {
@@ -121,14 +114,16 @@ exports.loginUser = async (req, res) => {
       })
     }
 
-    const { _id, email } = foundUser
+    const { _id, email, roles, groups } = foundUser
 
     const payload = {
       userId: _id,
       username,
-      email
+      email,
+      roles,
+      groups
     }
-    
+
     // Generate the login token for a user
     const loginToken = generateJWT(payload)
 

@@ -9,8 +9,8 @@ const allowUploads = (req, res, next) => {
   if (!acceptUploads.allow) {
     return res.status(403).json({ 
       success: false,
-      message: `Uploads are currently disabled. Reason: ${acceptUploads.reason}.\nPlease try again later`,
-      errorMessage: 'Uploads are currently disabled.',
+      message: `Uploads are currently disabled`,
+      errorMessage: acceptUploads.reason,
       error: acceptUploads
     });
   }

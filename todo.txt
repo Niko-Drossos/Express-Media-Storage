@@ -60,6 +60,19 @@ create thumbnail routes
 
 Add support for changing color themes
 
+Add "admin" routes to manage the stopping of uploads to prevent server restarts from deleting peoples uploads
+
+
+TODO:
+New routes for doing server operations
+Role/group based authentication for seeing peoples uploads
+
+
+
+
+
+
+
 Color palette:
 
 Dark-theme:

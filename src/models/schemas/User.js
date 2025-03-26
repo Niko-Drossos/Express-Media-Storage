@@ -101,7 +101,18 @@ const userSchema = new Schema({
       },
       // TODO: Add more settings
     }
-  }
+  },
+  roles: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Role',
+    default: []
+  },
+  // TODO: Next update
+  /* groups: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Group',
+    default: []
+  } */
 }, {
   timestamps: true,
   collection: 'users'
