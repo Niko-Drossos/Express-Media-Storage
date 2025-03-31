@@ -333,7 +333,7 @@ const uploadChunk = async (req, res) => {
     } catch (error) {
       console.error(`Failed to delete timed-out file ${fileId}:`, error)
     } finally {
-      await logError(req, error)
+      await logError(req, error = { message: `Timed-out file ${fileId} deleted successfully.` })
     }
   }, 60 * 1000) // 60 seconds
 
