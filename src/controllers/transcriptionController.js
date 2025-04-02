@@ -56,7 +56,7 @@ function formatMilliseconds(ms) {
 
 /* ---------------- Actually create a transcription document ---------------- */
 
-async function createTranscription(document, transcriptionDocument, mimetype) {
+async function createTranscription(req, document, transcriptionDocument, mimetype) {
   try {
     // Create a temporary file for the data so you can transcribe it 
     const tempFile = await createTempFile(document.fileId, mimetype)
@@ -150,7 +150,7 @@ generate = async (req, res) => {
     const transcriptionDocument = await Transcription.create({ status: "queued" })    
     
     // Create the transcription in the background after the API returns
-    createTranscription(document, transcriptionDocument, mimetype)
+    createTranscription(req, document, transcriptionDocument, mimetype)
 
     // Add the transcription _id to the document BEFORE the transcription occurs so it can be updated later.
     document.transcription = transcriptionDocument._id

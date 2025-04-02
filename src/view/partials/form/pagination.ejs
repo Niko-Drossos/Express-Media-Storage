@@ -40,7 +40,7 @@
   function pagination(page, currentPage, totalPages) {
       // Prevent string addition
       currentPage = parseInt(currentPage)
-      console.log(page, currentPage, totalPages)
+
       const oldQuery = new URLSearchParams(window.location.search)
 
       // Prevent going out of bounds
@@ -93,7 +93,7 @@
 
   function renderPagination(currentPage, totalPages) {
     const paginationContainer = document.querySelector("#pagination-container")
-    console.log(paginationContainer)
+
     paginationContainer.innerHTML = "" // Clear existing pagination
     const pages = generatePagination(currentPage, totalPages)
 
@@ -111,7 +111,7 @@
 
       return element
     })
-    console.log(pages)
+
     paginationContainer.innerHTML = pageElements.join("")
   }
 

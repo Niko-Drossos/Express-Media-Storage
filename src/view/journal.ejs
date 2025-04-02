@@ -1,17 +1,26 @@
 <h1 class="flex justify-center py-2">Journal</h1>
 <div class="flex justify-center items-center flex-col">
-  <form action="" class="flex flex-col items-center w-1/2" onsubmit={addJournalEntry(event)}>
+  <form action="" class="flex flex-col items-center md:w-1/2 w-full px-4" onsubmit={addJournalEntry(event)}>
     <label class="block uppercas tracking-wide text-gray-700 text-sm font-bold mb-2" for="entry">Entry</label>
     <textarea textarea class="appearance-none block w-full bg-white text-gray-900 border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d] flex-grow" type="text" name="entry" placeholder="Tell us about your day" ></textarea>
-    <button type="submit" class="mt-4 w-full bg-royal-purple transition-all text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-blaze">Submit</button>
+    <button type="submit" class="mt-4 w-full bg-royal-purple transition-all text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-blaze
+    <% if (poolId == "") { %>
+      cursor-not-allowed hover:bg-lilac-mist !bg-lilac-mist
+    <% } %>
+    "
+      <% if (poolId == "") { %>
+        disabled
+        title="Please create a pool for today first"
+      <% } %>
+    >Submit</button>
   </form>
 
   <div class="w-96 mt-4">
     <%- include('./partials/alerts/error.ejs', { name: "journal" }) %>
   </div>
 
-  <div class="w-1/2 py-4 max-h-72 overflow-scroll">
-    <h2 class="text-xl pt-8 flex justify-center">Journal Entries for <span class="ml-1 font-bold"><%= new Date().toLocaleDateString() %></span>
+  <div class="md:w-1/2 w-full py-4 max-h-72">
+    <h2 class="text-xl pt-8 flex justify-center flex-wrap">Journal Entries for <span class="ml-1 font-bold"><%= new Date().toLocaleDateString() %></span>
       <% if (poolId != "") { %>
         <a class="ml-2 text-blue-600" href="/pools/<%= poolId %>">[Go to pool]</a>
       <% } else { %>

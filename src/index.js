@@ -109,6 +109,12 @@ app.get("/about-us", async (req, res) => {
   res.render("about-us.ejs")
 })
 
+/* ---------------------------- Instructions page --------------------------- */
+
+app.get("/instructions", async (req, res) => {
+  res.render("instructions.ejs")
+})
+
 /* -------------------------- Form to upload files -------------------------- */
 
 app.get("/upload", async (req, res) => {
