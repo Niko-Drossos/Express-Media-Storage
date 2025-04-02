@@ -1,5 +1,5 @@
-<div class="bg-white shadow-none flex flex-1 h-[calc(100vh-128px)]">
-    <div class="lg:grid lg:grid-cols-3 min-w-full max-h-min">
+<div class="bg-white shadow-none flex flex-1 lg:h-[calc(100vh-128px)]">
+    <div class="flex flex-col pb-8 lg:grid lg:grid-cols-3 min-w-full max-h-min">
         <div class="col-span-2 w-full h-full flex justify-center items center">
             <% if (mediaType === 'image') { %>
                 <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/stream/image/<%= media.fileId %>" alt="<%= media.title %>">
@@ -21,9 +21,10 @@
             <% } %>
         </div>
 
-        <div class="col-span-1 relative pl-4 flex flex-col max-h-[calc(100vh-8rem)]">
+        <div class="md:col-span-1 relative pl-4 flex flex-col md:max-h-[calc(100vh-8rem)]">
             <header class="flex-none">
                 <!-- TODO: Add border to top of user when in mobile view -->
+                <hr class="md:hidden">
                 <div class="flex justify-between items-center sm:border-white">
                     <a href="/profile/<%= uploader.userId %>" class="cursor-pointer py-2 flex items-center text-sm outline-none focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
                         <img class="h-12 w-12 rounded-full object-cover" src="<%= uploader.profilePhoto || '../icons/defaultUser.svg'%>" alt="user photo" />
@@ -54,7 +55,7 @@
             <% } %>
 
             <!-- Comment section -->
-            <div class="flex-grow content-end overflow-y-auto max-h-full" id="commentSection">
+            <div class="flex-grow content-end overflow-y-scroll lg:max-h-full h-60" id="commentSection">
                 <% media.comments.forEach(comment => { %>
                     <hr>
                     <%- include('./partials/comment.ejs', { comment, uploader }) %>
@@ -62,7 +63,7 @@
             </div>
 
             <!-- Transcription section -->
-            <div class="flex-grow content-start overflow-y-auto max-h-full hidden" id="transcriptionSection">
+            <div class="flex-grow content-start overflow-y-scroll lg:max-h-full hidden h-60" id="transcriptionSection">
                 <p class="text-center p-4">No transcription available</p>
             </div>
 
