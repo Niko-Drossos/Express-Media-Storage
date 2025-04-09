@@ -55,12 +55,52 @@ app.use("/manage", require("./routes/manage.routes"))
 app.use("/system", require("./routes/system.routes"))
 app.use("/role", require("./routes/role.routes"))
 
+/* -------------------------------- Homepage -------------------------------- */
+
+app.get("/", (req, res) => {
+  res.locals.user = { 
+    username: req.username,
+    userId: req.userId,
+    email: req.email
+  }
+  
+  res.render("index.ejs")
+})
+
+/* ------------------------------ About us page ----------------------------- */
+
+app.get("/about-us", async (req, res) => {
+  res.locals.user = { 
+    username: req.username,
+    userId: req.userId,
+    email: req.email
+  }
+
+  res.render("about-us.ejs")
+})
+
+/* ---------------------------- Instructions page --------------------------- */
+
+app.get("/instructions", async (req, res) => {
+  res.locals.user = { 
+    username: req.username,
+    userId: req.userId,
+    email: req.email
+  }
+  
+  res.render("instructions.ejs")
+})
+
 /* ------- Middleware to check if user is logged in and adds user data ------ */
 
+// This is defined after the routes that are publicly accessible
+// Everything below this middleware will check if the user is logged in
 app.use(userLoggedIn, (req, res, next) => {
   if (req.path.startsWith("/auth")) {
     res.locals.user = { username: "Not Logged In", userId: "", email: "no-email@example.com" }
     return next(); // Skip setting res.locals.user for /auth
+  } else if (req.userId === "") {
+    return res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
   }
   
   // This will be available in all EJS templates
@@ -70,13 +110,7 @@ app.use(userLoggedIn, (req, res, next) => {
     email: req.email
   }
   
-  next();
-});
-
-/* -------------------------------- Homepage -------------------------------- */
-
-app.get("/", (req, res) => {
-  res.render("index.ejs")
+  next()
 })
 
 /* ---------------------------- Login to an account ------------------------- */
@@ -101,18 +135,6 @@ app.get("/auth/register", (req, res) => {
     register: true,
     redirectURL
   })
-})
-
-/* ------------------------------ About us page ----------------------------- */
-
-app.get("/about-us", async (req, res) => {
-  res.render("about-us.ejs")
-})
-
-/* ---------------------------- Instructions page --------------------------- */
-
-app.get("/instructions", async (req, res) => {
-  res.render("instructions.ejs")
 })
 
 /* -------------------------- Form to upload files -------------------------- */
