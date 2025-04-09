@@ -40,13 +40,19 @@
     modal.classList.add('hidden')
   }
 
-  function clickModal(name) {
+  function clickModal(name, redirect = null) {
     hideModal(name)
+    if (redirect) {
+      document.location = redirect
+    }
     return true
   }
 
-  function cancelModal(name) {
+  function cancelModal(name, redirect = null) {
     hideModal(name)
+    if (redirect) {
+      document.location = redirect
+    }
     return false
   }
 

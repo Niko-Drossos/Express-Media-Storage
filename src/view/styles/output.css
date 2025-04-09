@@ -1030,16 +1030,16 @@ video {
   height: 1.5rem;
 }
 
+.h-60 {
+  height: 15rem;
+}
+
 .h-8 {
   height: 2rem;
 }
 
 .h-80 {
   height: 20rem;
-}
-
-.h-96 {
-  height: 24rem;
 }
 
 .h-auto {
@@ -1054,8 +1054,8 @@ video {
   height: 1px;
 }
 
-.h-60 {
-  height: 15rem;
+.h-screen {
+  height: 100vh;
 }
 
 .max-h-12 {
@@ -1074,10 +1074,6 @@ video {
   max-height: calc(100vh - 8rem);
 }
 
-.max-h-full {
-  max-height: 100%;
-}
-
 .max-h-min {
   max-height: -moz-min-content;
   max-height: min-content;
@@ -1089,10 +1085,6 @@ video {
 
 .min-h-full {
   min-height: 100%;
-}
-
-.min-h-60 {
-  min-height: 15rem;
 }
 
 .w-0 {
