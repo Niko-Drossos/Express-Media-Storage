@@ -1,3 +1,13 @@
-<a class="w-full flex flex-col bg-[#E4E4E4] rounded-xl" href="/media/<%= mediaType.slice(0, -1) %>?id=<%= _id %>">
-  <img class="rounded-t" src="../icons/image-placeholder.png" alt="">
+<a class="w-full flex flex-col bg-[#E4E4E4] rounded-xl relative" href="/media/<%= mediaType.slice(0, -1) %>?id=<%= _id %>">
+  <img 
+    class="rounded lazy-thumb"
+    src="../../icons/image-placeholder.png"
+    data-src="/stream/<%= mediaType.slice(0, -1) %>/<%= fileId %>?thumbnail=true"
+    data-spinnerId="<%= _id %>"
+    alt=""
+  >
+
+  <div class="absolute flex items-center justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+    <%- include('../loading-spinner.ejs', { id: _id, size: 12 }) %>
+  </div>
 </a>

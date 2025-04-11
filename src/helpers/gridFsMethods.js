@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const path = require('path');
 const os = require('os');
 const fs = require('fs-extra');
+const sharp = require('sharp');
 
 const multer = require('multer')
 
@@ -91,7 +92,7 @@ const retrieveFiles = async function(req, res, query) {
 
 /* ------------------------------- Stream file ------------------------------ */
 
-const streamFile = async function (req, res, fileId, mimeType) {
+const streamFile = async function (req, res, fileId, mimeType, thumbnail = false) {
   try {
     let bucket
     // Select the bucket based on the MIME type
@@ -130,6 +131,17 @@ const streamFile = async function (req, res, fileId, mimeType) {
 
     // Create a header for the Content-Type
     const contentType = `${mimeType}/${getFileExt(file.filename)}`
+
+    if (mimeType === 'image' && thumbnail) {
+      const sharp = require('sharp') // ensure you’ve installed it via npm
+      res.writeHead(200, {
+        'Content-Type': 'image/jpeg'
+      })
+      return bucket
+        .openDownloadStream(searchId)
+        .pipe(sharp().resize({ width: 300, height: 200 }).jpeg())
+        .pipe(res)
+    }
 
     const fileSize = file.length
     const range = req.headers.range

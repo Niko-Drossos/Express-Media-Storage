@@ -14,7 +14,7 @@
                 <!-- Only show the first documents returned until the limit -->
                 <% if (index >= response.limit) return %>
                 <% let header = include('./partials/cards/cardHeader.ejs', { id: media._id, mediaType: query.mediaType, user: media.user, date: media.date, title: media.title, description: media.description }) %>
-                <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: media._id, mediaType: query.mediaType }) %>
+                <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: media._id, mediaType: query.mediaType, fileId: media.fileId }) %>
                 <% let footer = include('./partials/cards/cardFooter.ejs', { id: media._id, mediaType: query.mediaType.slice(0, -1), favorited: media.favorited, voteCount: media.voteCount }) %>
                 <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
               <% }) %>
@@ -37,3 +37,31 @@
         </div>
     </div>
 </div> -->
+
+<script>
+    // Start each spinner on load
+    document.querySelectorAll('.spinner').forEach(spinner => {
+        showSpinner(spinner.id.split('-').pop())
+    })
+
+    function replaceSkeleton(card) {
+        const img = card.querySelector('.lazy-thumb');
+        const spinner = card.querySelector('.spinner');
+        const actualSrc = img.dataset.src;
+
+        // Replace the src with the actual image    
+        const preloader = new Image();
+        preloader.onload = () => {
+            img.src = actualSrc;
+            if (spinner) hideSpinner(img.dataset.spinnerId)
+        };
+
+        preloader.src = actualSrc;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.card').forEach(card => {
+        replaceSkeleton(card);
+        });
+    });
+</script>

@@ -12,6 +12,15 @@ module.exports = {
         'lilac-mist': 'var(--lilac-mist)',
         'golden-glow': 'var(--golden-glow)'
       },
+      animation: {
+        'spin-smooth': 'spin 1s linear infinite',
+      },
+      keyframes: {
+        spin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      },
     },
   },
   plugins: [

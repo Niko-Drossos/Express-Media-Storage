@@ -21,10 +21,10 @@
             <% } %>
         </div>
 
-        <div class="md:col-span-1 relative pl-4 flex flex-col md:max-h-[calc(100vh-8rem)]">
+        <div class="md:col-span-1 relative px-4 lg:pr-0 flex flex-col md:max-h-[calc(100vh-8rem)]">
             <header class="flex-none">
                 <!-- TODO: Add border to top of user when in mobile view -->
-                <hr class="md:hidden">
+                <!-- <hr class="md:hidden border-4"> -->
                 <div class="flex justify-between items-center sm:border-white">
                     <a href="/profile/<%= uploader.userId %>" class="cursor-pointer py-2 flex items-center text-sm outline-none focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
                         <img class="h-12 w-12 rounded-full object-cover" src="<%= uploader.profilePhoto || '../icons/defaultUser.svg'%>" alt="user photo" />
@@ -56,10 +56,14 @@
 
             <!-- Comment section -->
             <div class="flex-grow content-end overflow-y-scroll lg:max-h-full h-60" id="commentSection">
-                <% media.comments.forEach(comment => { %>
-                    <hr>
+                <% if (media.comments.length) { %>
+                    <% media.comments.forEach(comment => { %>
+                        <hr>
                     <%- include('./partials/comment.ejs', { comment, uploader }) %>
-                <% }) %>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-center p-4 h-full">No comments posted yet</p>
+                <% } %>
             </div>
 
             <!-- Transcription section -->

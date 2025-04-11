@@ -1,4 +1,4 @@
-<div class="bg-white p-4 sm:px-6 w-full">
+<div class="bg-white p-4 sm:px-6 w-full h-32">
   <div class="flex space-x-3">
     <div class="shrink-0">
       <!-- TODO: Add user avatars -->
@@ -17,7 +17,7 @@
           <%= title %>
         </p>
         <p class="text-sm text-gray-600 line-clamp-2 overflow-hidden">
-          <%= description %>
+          <%= description || "(No Description)"%>
         </p>
       </div>
     </div>
