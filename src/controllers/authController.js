@@ -49,8 +49,8 @@ exports.registerUser = async (req, res) => {
 
     const payload = {
       userId: newUser._id,
-      username,
-      email,
+      username: newUser.username,
+      email: newUser.email,
       roles: newUser.roles,
       groups: newUser.groups
     }
@@ -101,7 +101,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Find the user in the database and throw an error if none found
-    const foundUser = await User.findOne({ username }, { password: 1, roles: 1, groups: 1 })
+    const foundUser = await User.findOne({ username }, { password: 1, roles: 1, groups: 1, username: 1, email: 1, avatarId: 1 })
 
     // Check if password is a match 
     const passwordMatch = await compareHash(password, foundUser.password)

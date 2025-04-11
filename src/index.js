@@ -54,15 +54,43 @@ app.use("/transcription", require("./routes/transcription.routes"))
 app.use("/manage", require("./routes/manage.routes"))
 app.use("/system", require("./routes/system.routes"))
 app.use("/role", require("./routes/role.routes"))
+/* ------- Middleware to check if user is logged in and adds user data ------ */
 
-/* -------------------------------- Homepage -------------------------------- */
+// This is defined after the routes that are publicly accessible
+// Everything below this middleware will check if the user is logged in
+app.use(userLoggedIn, (req, res, next) => {
+  // This is a list of URL's that DON'T need authentication to access
+  const publicURLs = [
+    "/",
+    "/about-us",
+    "/instructions",
+    "/auth/login",
+    "/auth/register",
+  ]
 
-app.get("/", (req, res) => {
+  if (!publicURLs.includes(req.path) && req.userId === undefined) {
+    return res.redirect(307, `/auth/login?redirect=${req.path}`)
+  }
+  
+  // This will be available in all EJS templates
   res.locals.user = { 
     username: req.username,
     userId: req.userId,
-    email: req.email
+    email: req.email,
+    roles: req.roles,
+    avatarId: req.avatarId
   }
+  
+  next()
+})
+/* -------------------------------- Homepage -------------------------------- */
+
+app.get("/", (req, res) => {
+  /* res.locals.user = { 
+    username: req.username,
+    userId: req.userId,
+    email: req.email
+  } */
   
   res.render("index.ejs")
 })
@@ -70,11 +98,11 @@ app.get("/", (req, res) => {
 /* ------------------------------ About us page ----------------------------- */
 
 app.get("/about-us", async (req, res) => {
-  res.locals.user = { 
+  /* res.locals.user = { 
     username: req.username,
     userId: req.userId,
     email: req.email
-  }
+  } */
 
   res.render("about-us.ejs")
 })
@@ -82,35 +110,13 @@ app.get("/about-us", async (req, res) => {
 /* ---------------------------- Instructions page --------------------------- */
 
 app.get("/instructions", async (req, res) => {
-  res.locals.user = { 
+  /* res.locals.user = { 
     username: req.username,
     userId: req.userId,
     email: req.email
-  }
+  } */
   
   res.render("instructions.ejs")
-})
-
-/* ------- Middleware to check if user is logged in and adds user data ------ */
-
-// This is defined after the routes that are publicly accessible
-// Everything below this middleware will check if the user is logged in
-app.use(userLoggedIn, (req, res, next) => {
-  if (req.path.startsWith("/auth")) {
-    res.locals.user = { username: "Not Logged In", userId: "", email: "no-email@example.com" }
-    return next(); // Skip setting res.locals.user for /auth
-  } else if (req.userId === "") {
-    return res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
-  }
-  
-  // This will be available in all EJS templates
-  res.locals.user = { 
-    username: req.username,
-    userId: req.userId,
-    email: req.email
-  }
-  
-  next()
 })
 
 /* ---------------------------- Login to an account ------------------------- */

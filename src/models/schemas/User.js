@@ -24,7 +24,7 @@ const userSchema = new Schema({
     unique: true
   },
   // TODO: Not yet in use
-  profilePhoto: {
+  avatarId: {
     type: Schema.Types.ObjectId,
     required: false
   },

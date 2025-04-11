@@ -30,8 +30,6 @@ Add "manage" routes for editing file data
 Fix the username and tag fields to update with user input.  I don't know why they won't
 Fix the spacing on the usernameSelector plus icon
 
-Add thumbnail support
-
 Add support for deleting files
 
 make a command that cleans the database.  
@@ -69,7 +67,10 @@ Role/group based authentication for seeing peoples uploads
 Make calendar page with fullcalendar
 Change color scheme to align with the purple colors
 
+Add a "Details" menu that pops up in the middle of the screen as an overlay
+with information about the file.
 
+Make routes to upload avatar with 200 by 200
 
 
 Color palette:
