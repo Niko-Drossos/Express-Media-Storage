@@ -87,7 +87,7 @@
                 <span class="sr-only">Open user menu</span>
                 <!-- TODO: add user profile images -->
                 <img class="size-8 rounded-full"
-                  src="<% user.avatarId ? `/stream/image/${user.avatarId}` : '../icons/defaultUser.svg' %>"
+                  src="<%= user.avatarId ? `/stream/image/${user.avatarId}` : '../icons/defaultUser.svg' %>"
                   alt="">
               </button>
             </div>
@@ -130,7 +130,7 @@
       <% if (user.userId) { %>
         <div class="flex items-center px-4 sm:px-6">
           <div class="shrink-0">
-            <img class="size-10 rounded-full" src="../icons/defaultUser.svg" alt="">
+            <img class="size-10 rounded-full" src="<%= user.avatarId ? `/stream/image/${user.avatarId}` : '../icons/defaultUser.svg' %>" alt="User avatar">
           </div>
           <div class="ml-3">
             <div class="text-base font-medium text-gray-800"><%= user.username %></div>
