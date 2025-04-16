@@ -52,7 +52,8 @@ exports.registerUser = async (req, res) => {
       username: newUser.username,
       email: newUser.email,
       roles: newUser.roles,
-      groups: newUser.groups
+      groups: newUser.groups,
+      avatarId: newUser.avatarId
     }
 
     const loginToken = generateJWT(payload)
@@ -101,7 +102,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Find the user in the database and throw an error if none found
-    const foundUser = await User.findOne({ username }, { password: 1, roles: 1, groups: 1, username: 1, email: 1, avatarId: 1 })
+    const foundUser = await User.findOne({ username }, { password: 1, roles: 1, groups: 1, username: 1, email: 1, avatarId: 1, avatarId: 1 })
 
     // Check if password is a match 
     const passwordMatch = await compareHash(password, foundUser.password)
@@ -114,14 +115,15 @@ exports.loginUser = async (req, res) => {
       })
     }
 
-    const { _id, email, roles, groups } = foundUser
+    const { _id, email, roles, groups, avatarId } = foundUser
 
     const payload = {
       userId: _id,
       username,
       email,
       roles,
-      groups
+      groups,
+      avatarId
     }
 
     // Generate the login token for a user

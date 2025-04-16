@@ -67,10 +67,6 @@ app.use(userLoggedIn, (req, res, next) => {
     "/auth/login",
     "/auth/register",
   ]
-
-  if (!publicURLs.includes(req.path) && req.userId === undefined) {
-    return res.redirect(307, `/auth/login?redirect=${req.path}`)
-  }
   
   // This will be available in all EJS templates
   res.locals.user = { 
@@ -79,6 +75,10 @@ app.use(userLoggedIn, (req, res, next) => {
     email: req.email,
     roles: req.roles,
     avatarId: req.avatarId
+  }
+
+  if (!publicURLs.includes(req.path) && req.userId == "") {
+    return res.redirect(307, `/auth/login?redirect=${req.path}`)
   }
   
   next()
@@ -93,6 +93,7 @@ app.get("/", (req, res) => {
   } */
   
   res.render("index.ejs")
+  // res.render('profile-edit.ejs')
 })
 
 /* ------------------------------ About us page ----------------------------- */
@@ -463,14 +464,28 @@ app.get("/profile", async (req, res) => {
     })
 
     const response = await request.json()
-
+    console.log(res.locals.user)
     if (response.error) {
       res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
       console.log(response.error)
       return
     }
 
-    res.render("profile.ejs", response.data.user)
+    const mediaRequest = await fetch(`${API_URL}/user/my-files`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": getCookies(req, "media_authentication")
+      },
+      credentials: "include"
+    })
+
+    const mediaResponse = await mediaRequest.json()
+    console.log(mediaResponse)
+    res.render("profile.ejs", {
+      userInfo: response.data.user,
+      media: mediaResponse
+    })
   } catch (error) {
     await logError(req, error)
     res.render('error.ejs', {

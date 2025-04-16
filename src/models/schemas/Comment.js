@@ -9,7 +9,11 @@ const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const commentSchema = new Schema({
-  user: SubUser,
+  // user: SubUser,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   date: {
     type: Date,
     default: Date.now

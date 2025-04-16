@@ -6,6 +6,8 @@ const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
+/* --------------------------------- Helpers -------------------------------- */
+const { smallUpload, deleteFiles } = require("../helpers/gridFsMethods")
 /* -------------------------------------------------------------------------- */
 
 /* ---------------------- Get one user for profile page --------------------- */
@@ -213,6 +215,41 @@ exports.unfollow = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to unfollow user",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+
+exports.uploadAvatar = async (req, res) => {
+  try {
+    const fileId = await smallUpload(req, res)
+
+    const user = await User.findById(req.userId)
+
+    await User.findByIdAndUpdate(user._id, {
+      avatarId: fileId
+    })
+
+    // TODO: Fix this not actually deleting the old image, works fine for now.
+    /* await deleteFiles(req, res, {
+      fileIds: [user.avatarId],
+      mimetype: "image"
+    }) */
+
+    res.status(200).json({
+      success: true,
+      message: "Avatar uploaded",
+      data: {
+        user
+      }
+    })
+  } catch (error) {
+    await logError(req, error)
+    res.status(500).json({
+      success: false,
+      message: "Failed to upload avatar",
       errorMessage: error.message,
       error
     })

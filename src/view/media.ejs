@@ -59,6 +59,7 @@
                 <% if (media.comments.length) { %>
                     <% media.comments.forEach(comment => { %>
                         <hr>
+                        <% console.log(comment) %>
                     <%- include('./partials/comment.ejs', { comment, uploader }) %>
                     <% }) %>
                 <% } else { %>

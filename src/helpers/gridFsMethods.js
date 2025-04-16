@@ -185,13 +185,13 @@ const streamFile = async function (req, res, fileId, mimeType, thumbnail = false
 
 const deleteFiles = async function(req, res, query) {
   try {
-    const client = new mongodb.MongoClient(process.env.Mongo_Connection_Uri)
+    const client = new MongoClient(process.env.Mongo_Connection_Uri)
     const dbName = query.mimetype
     const db = client.db(dbName)
-    const bucket = new mongodb.GridFSBucket(db)
+    const bucket = new GridFSBucket(db)
 
     // Make the list of file id's an ObjectId instance
-    const deleteIds = query.fileIds.map(id => new mongoose.Schema.Types.ObjectId(id))
+    const deleteIds = query.fileIds.map(id => new ObjectId(id))
 
     const fetchFiles = bucket.find({ _id: { $in: deleteIds } })
 
@@ -201,25 +201,15 @@ const deleteFiles = async function(req, res, query) {
       foundFiles.push(doc)
     }
 
+    // TODO: Add checking for authorization here
     const deletedResults = foundFiles.map(file => {
-      if (file.metadata.user == req.userId) {
-        bucket.delete(new mongodb.ObjectId(file._id))
-        return {
-          success: true,
-          message: "Successfully deleted file",
-          data: {
-            filename: file.filename,
-            fileId: file._id
-          }
-        }
-      } else {
-        return {
-          success: false,
-          message: "You are not authorized to delete this file",
-          data: {
-            filename: file.filename,
-            fileId: file._id
-          }
+      bucket.delete(new ObjectId(file._id))
+      return {
+        success: true,
+        message: "Successfully deleted file",
+        data: {
+          filename: file.filename,
+          fileId: file._id
         }
       }
     })
@@ -402,6 +392,76 @@ const uploadChunk = async (req, res) => {
   }
 }
 
+/* ------------------------------ Small upload ------------------------------ */
+// This is used for small image uploads for thumbnails and user avatars
+
+const smallUpload = async (req, res) => {
+  try {
+    const generatedFileName = `${req.userId}-${req.file.originalname}`
+    const fileMetadata = {
+      user: {
+        userId: req.userId,
+        username: req.username
+      },
+      type: "avatar"
+    }
+
+    // Resize image to 200x200 using sharp before upload
+    const resizedBuffer = await sharp(req.file.buffer)
+      .resize(200, 200)
+      .jpeg()
+      .toBuffer()
+
+    const uploadStream = imageBucket.openUploadStream(generatedFileName, fileMetadata)
+
+    if (!uploadStream) {
+      throw new Error(`Failed to open upload stream with mime type: ${mimeType}`)
+    }
+
+    // Get the files _id to be used as a key
+    const fileId = uploadStream.id.toString()
+
+    uploadStreams.set(fileId, { uploadStream, mimeType: "image", documentType: Image, uploadStartedAt: Date.now() })
+
+    await new Promise((resolve, reject) => {
+      const writeResult = uploadStream.write(resizedBuffer, (err) => {
+        if (err) reject(err) // Handle write errors
+        resolve()
+      })
+
+      if (writeResult === false) {
+        // Handle backpressure if needed
+        uploadStream.once('drain', resolve)
+      }
+    })
+
+    // End the file upload
+    await new Promise((resolve, reject) => {
+      uploadStream.end(async () => {
+        uploadStreams.delete(fileId) // Clean up the stream
+        resolve()
+      })
+      uploadStream.on('error', reject) // Handle errors during end
+    })
+
+    // I generate a document _id for the document so that it is initialized when you start the upload
+    // This is to prevent having to send the document _id back to the client ad a lot of other things
+    // const documentId = new mongoose.Types.ObjectId()
+
+
+    return fileId 
+  } catch (error) {
+    await logError(req, error)
+    res.status(500).json({
+      success: false,
+      message: "Failed to upload file",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+  
+
 /* ------------------ Clean up orphaned chunks from GridFS ------------------ */
 
 async function cleanupDeletedChunks(bucketName, fileId) {
@@ -507,4 +567,4 @@ const createTempFile = async (fileId, mimeType) => {
 
 /* -------------------------------------------------------------------------- */
 
-module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload, uploadStreams, createTempFile }
+module.exports = { upload, retrieveFiles, streamFile, deleteFiles, uploadChunk, startChunkedUpload, uploadStreams, createTempFile, smallUpload }

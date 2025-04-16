@@ -16,7 +16,7 @@ h1 {
     cursor: pointer;
 }
 
-.theme-light {
+:root {
     --royal-purple: #9a72c6;
     --violet-blaze: #b377d6;
     --lavender-haze: #c9a3df;
@@ -24,7 +24,7 @@ h1 {
     --golden-glow: #ffe078;
 }
 
-.theme-dark {
+.dark {
     --royal-purple: #7e22ce;
     --violet-blaze: #8d43ad;
     --lavender-haze: #a66abe;

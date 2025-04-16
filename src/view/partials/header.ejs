@@ -267,3 +267,25 @@
     console.log(response)
   }
 </script>
+
+<!--  Dark mode -->
+<script>
+  const toggle = document.getElementById('darkToggle');
+
+  // Load saved preference
+  if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.classList.add('dark');
+  }
+
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    html.classList.toggle('dark');
+
+    // Save preference
+    if (html.classList.contains('dark')) {
+      localStorage.setItem('theme', 'dark');
+    } else {
+      localStorage.setItem('theme', 'light');
+    }
+  });
+</script>

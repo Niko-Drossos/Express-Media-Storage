@@ -72,6 +72,8 @@ with information about the file.
 
 Make routes to upload avatar with 200 by 200
 
+Make "tool tip" type component
+
 
 Color palette:
 

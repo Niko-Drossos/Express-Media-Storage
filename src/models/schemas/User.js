@@ -23,7 +23,6 @@ const userSchema = new Schema({
     required: true,
     unique: true
   },
-  // TODO: Not yet in use
   avatarId: {
     type: Schema.Types.ObjectId,
     required: false
