@@ -24,11 +24,7 @@ router.post("/create/comment/:commentId", commentController.commentOnComment)
 
 router.post("/create/user/:userId", commentController.commentOnUser)
 
-router.post("/create/video/:videoId", commentController.commentOnVideo)
-
-router.post("/create/image/:imageId", commentController.commentOnImage)
-
-router.post("/create/audio/:audioId", commentController.commentOnAudio)
+router.post("/create/upload/:uploadId", commentController.commentOnUpload)
 
 /* -------------------------------------------------------------------------- */
 /*                             Edit comment routes                            */

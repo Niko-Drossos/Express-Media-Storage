@@ -3,7 +3,7 @@ const User = require("../models/schemas/User")
 const Pool = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
+const Upload = require("../models/schemas/Upload")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
@@ -116,7 +116,7 @@ exports.voteOnUser = async (req, res) => {
 
 /* ---------------------------- Vote on video ---------------------------- */
 
-exports.voteOnVideo = async (req, res) => {
+/* exports.voteOnVideo = async (req, res) => {
   try {
     // Update the video with the new vote
     const { videoId } = req.params
@@ -147,27 +147,27 @@ exports.voteOnVideo = async (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ---------------------------- Vote on image ---------------------------- */
 
-exports.voteOnImage = async (req, res) => {
+exports.voteOnUpload = async (req, res) => {
   try {
     // Update the user with the new comment
-    const { imageId } = req.params
+    const { uploadId } = req.params
 
     const newVote = {
       user: req.userId,
       vote: req.body.vote
     }
     
-    const image = await Image.findById(imageId)
+    const upload = await Upload.findById(uploadId).populate("user")
     
-    const updated = await castVote(image, newVote)
+    const updated = await castVote(upload, newVote)
 
     res.status(200).json({
       success: true,
-      message: "Voted on image",
+      message: "Voted on upload",
       data: {
         vote: req.body.vote,
         voteCount: updated.voteCount
@@ -177,7 +177,7 @@ exports.voteOnImage = async (req, res) => {
     await logError(req, error)
     res.status(500).json({
       success: false,
-      message: "Failed to vote on image",
+      message: "Failed to vote on upload",
       errorMessage: error.message,
       error
     })
@@ -186,7 +186,7 @@ exports.voteOnImage = async (req, res) => {
 
 /* ---------------------------- Vote on audio ---------------------------- */
 
-exports.voteOnAudio = async (req, res) => {
+/* exports.voteOnAudio = async (req, res) => {
   try {
     // Update the user with the new comment
     const { audioId } = req.params
@@ -217,4 +217,4 @@ exports.voteOnAudio = async (req, res) => {
       error
     })
   }
-}
+} */

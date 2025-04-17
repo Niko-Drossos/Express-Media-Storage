@@ -14,10 +14,10 @@ router.post("/comment/:commentId", voteController.voteOnComment)
 
 router.post("/user/:userId", voteController.voteOnUser)
 
-router.post("/video/:videoId", voteController.voteOnVideo)
+// router.post("/video/:videoId", voteController.voteOnVideo)
 
-router.post("/image/:imageId", voteController.voteOnImage)
+router.post("/upload/:uploadId", voteController.voteOnUpload)
 
-router.post("/audio/:audioId", voteController.voteOnAudio)
+// router.post("/audio/:audioId", voteController.voteOnAudio)
 
 module.exports = router

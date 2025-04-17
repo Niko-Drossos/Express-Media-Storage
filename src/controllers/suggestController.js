@@ -1,8 +1,6 @@
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Image = require("../models/schemas/Image")
-const Video = require("../models/schemas/Video")
-const Audio = require("../models/schemas/Audio")
+const Upload = require("../models/schemas/Upload")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
 /* -------------------------------------------------------------------------- */
@@ -42,26 +40,9 @@ exports.usernames = async (req, res) => {
 
 exports.tags = async (req, res) => {
   try {
-    const collection = req.params.collection
     const partialTag = req.query.query || ""
 
-    // Determine which model to use
-    let Model
-    switch (collection) {
-      case "image":
-        Model = Image
-        break
-      case "video":
-        Model = Video
-        break
-      case "audio":
-        Model = Audio
-        break
-      default:
-        throw new Error("Invalid collection")
-    }
-
-    const tagDocs = await Model.aggregate([
+    const tagDocs = await Upload.aggregate([
       { $match: { tags: { $regex: partialTag, $options: 'i' } } }, // Match partial tag
       { $unwind: '$tags' }, // Flatten tags array
       // { $match: { tags: { $regex: partialTag, $options: 'i' } } }, // Match again to filter unwound tags

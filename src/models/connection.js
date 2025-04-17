@@ -3,7 +3,7 @@ const User = require('./schemas/User')
 const Pool = require('./schemas/Pool')
 const Comment = require('./schemas/Comment')
 const Video = require('./schemas/Video')
-const Image = require('./schemas/Image')
+const Upload = require('./schemas/Upload')
 const Audio = require('./schemas/Audio')
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require('./middleware/logging/logError')
@@ -26,7 +26,7 @@ const connectDB = async () => {
     await Pool.syncIndexes()
     await Comment.syncIndexes()
     await Video.syncIndexes()
-    await Image.syncIndexes()
+    await Upload.syncIndexes()
     await Audio.syncIndexes()
   } catch (error) {
     await logError(req, error)

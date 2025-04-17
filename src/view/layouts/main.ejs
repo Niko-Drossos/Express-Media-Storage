@@ -6,10 +6,10 @@
     <link rel="stylesheet" href="../styles/output.css">
     <title>Story</title>
 </head>
-<body class=" container mx-auto sm:px-6 lg:px-8">
+<body class=" container mx-auto sm:px-6">
     <%- include('../partials/header.ejs') %>
     <!-- <%- include('../UNUSED COMPONENTS/banner-link.ejs', { text: "This is a banner", action: { name: "Click here", url: "#" }}) %> -->
-    <main class="container bg-slate-200 min-h-[calc(100vh-128px)] h-full">
+    <main class="container bg-slate-200 min-h-[calc(100vh-64px)] h-full">
         <%- body %>
     </main>
     <%- include('../partials/footer.ejs') %>
@@ -81,11 +81,11 @@
 
   // <!-- ------------------------- Vote functionality ------------------------- -->
 
-  async function vote(vote, { id, mediaType }) {
+  async function vote(vote, { id, documentType }) {
     const voteCounter = document.getElementById(`vote-count-${id}`)
 
     // Vote on a document
-    const request = await fetch(`/vote/${mediaType}/${id}`, {
+    const request = await fetch(`/vote/${documentType}/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

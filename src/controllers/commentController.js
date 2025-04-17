@@ -3,7 +3,7 @@ const User = require("../models/schemas/User")
 const Pool = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
+const Upload = require("../models/schemas/Upload")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
@@ -162,7 +162,7 @@ exports.commentOnUser = async (req, res) => {
 
 /* ---------------------------- Comment on video ---------------------------- */
 
-exports.commentOnVideo = async (req, res) => {
+/* exports.commentOnVideo = async (req, res) => {
   try {
     const postedComment = await Comment.create({
       user: { 
@@ -175,7 +175,7 @@ exports.commentOnVideo = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Video.findOneAndUpdate({ 
+    await Upload.findOneAndUpdate({ 
       _id: req.params.videoId,
       $or: [
         { privacy: "Public" },
@@ -203,13 +203,13 @@ exports.commentOnVideo = async (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ---------------------------- Comment on image ---------------------------- */
 
-exports.commentOnImage = async (req, res) => {
+/* exports.commentOnImage = async (req, res) => {
   try {
-    /* const postedComment = await Comment.create({
+    const postedComment = await Comment.create({
       user: { 
         userId: req.userId,
         username: req.username
@@ -218,7 +218,7 @@ exports.commentOnImage = async (req, res) => {
       originId: req.params.imageId,
       content: req.body.content
     })
- */
+
     const postedComment = await Comment.create({
       user: req.userId,
       originType: "Image",
@@ -227,7 +227,7 @@ exports.commentOnImage = async (req, res) => {
     })
 
     // Update the user with the new comment
-    await Image.findOneAndUpdate({ 
+    await Upload.findOneAndUpdate({ 
       _id: req.params.imageId,
       $or: [
         { privacy: "Public" },
@@ -255,11 +255,11 @@ exports.commentOnImage = async (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ---------------------------- Comment on audio ---------------------------- */
 
-exports.commentOnAudio = async (req, res) => {
+/* exports.commentOnAudio = async (req, res) => {
   try {
     const postedComment = await Comment.create({
       user: { 
@@ -296,6 +296,50 @@ exports.commentOnAudio = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to comment on audio",
+      errorMessage: error.message,
+      error
+    })
+  }
+} */
+
+exports.commentOnUpload = async (req, res) => {
+  try {
+    // Update the user with the new comment
+    const upload = await Upload.findOne({ 
+      _id: req.params.uploadId,
+      $or: [
+        { privacy: "Public" },
+        { "user": req.userId }
+      ]
+    })
+
+    // The values for originId need to be titles of, Video, Audio, Image, Post, User
+    const originType = String(upload.mediaType)[0].toUpperCase() + String(upload.mediaType).slice(1)
+
+    const postedComment = await Comment.create({
+      user: req.userId,
+      originType: originType,
+      originId: req.params.uploadId,
+      content: req.body.content
+    })
+
+    // Actually save the changes to the user
+    upload.comments.push(postedComment._id)
+    await upload.save()
+
+
+    res.status(200).json({
+      success: true,
+      message: "Commented on upload",
+      data: {
+        comment: postedComment
+      }
+    })
+  } catch (error) {
+    await logError(req, error)
+    res.status(500).json({
+      success: false,
+      message: "Failed to comment on upload",
       errorMessage: error.message,
       error
     })

@@ -13,9 +13,9 @@
             <% searchResults.map((media, index) => { %>
                 <!-- Only show the first documents returned until the limit -->
                 <% if (index >= response.limit) return %>
-                <% let header = include('./partials/cards/cardHeader.ejs', { id: media._id, mediaType: query.mediaType, user: media.user, date: media.date, title: media.title, description: media.description }) %>
-                <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: media._id, mediaType: query.mediaType, fileId: media.fileId }) %>
-                <% let footer = include('./partials/cards/cardFooter.ejs', { id: media._id, mediaType: query.mediaType.slice(0, -1), favorited: media.favorited, voteCount: media.voteCount }) %>
+                <% let header = include('./partials/cards/cardHeader.ejs', { id: media._id, documentType: 'upload', mediaType: media.mediaType, user: media.user, date: media.date, title: media.title, description: media.description }) %>
+                <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: media._id, mediaType: media.mediaType, fileId: media.fileId }) %>
+                <% let footer = include('./partials/cards/cardFooter.ejs', { id: media._id, documentType: 'upload', favorited: media.favorited, voteCount: media.voteCount }) %>
                 <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
               <% }) %>
         <% } %>

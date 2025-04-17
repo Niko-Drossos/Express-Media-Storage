@@ -13,8 +13,7 @@
                 </label>
                 <div class="relative">
                     <select class="block appearance-none w-full bg-grey-lighter border border-grey-lighter text-grey-darker py-3 px-4 pr-8 rounded" id="mediaType" name="mediaType">
-                        <!-- TODO: Maybe add support for multiple media type search at a time  -->
-                        <!-- <option>Any</option> -->
+                        <option value="any">Any</option>
                         <option value="images">Image</option>
                         <option value="videos">Video</option>
                         <option value="audios">Audio</option>
@@ -70,7 +69,7 @@
 </form>
 
 <script>
-    const mediaType = "<%= query.mediaType %>" || "images";
+    const mediaType = "<%= query.mediaType %>" || "any";
     
     // Set the selected option based on query media type
     const mediaTypeSelect = document.getElementById("mediaType");

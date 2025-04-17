@@ -1,7 +1,7 @@
 const fs = require("fs-extra")
 /* --------------------------------- Schemas -------------------------------- */
 const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
+const Upload = require("../models/schemas/Upload")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------ Middle wares ------------------------------ */
 const logError = require("../models/middleware/logging/logError");
@@ -43,7 +43,7 @@ exports.findFiles = async (req, res) => {
 
 exports.startChunkUpload = async (req, res) => {
   try {
-    const { mimeType, metadata } = req.body
+    const { metadata } = req.body
 
     // Generate a unique file name to send back to the client for uploading
     req.generatedFileName = `${Date.now()}-${metadata.fileName}`
@@ -55,25 +55,23 @@ exports.startChunkUpload = async (req, res) => {
     let documentBody = {
       // I set the document _id so that it is initialized when you start the upload.
       // I do this to prevent having to send the document _id back to the client
-      _id :documentId,
+      _id: documentId,
       title: metadata.title || metadata.fileName.split(".").slice(0, -1).join("."),
       filename: `${req.userId}-${metadata.fileName}`,
       description: metadata.description || "",
       fileId: fileId,
       date: metadata.date ? new Date(metadata.date) : Date.now(),
       privacy: metadata.privacy,
-      user: {
-        userId: req.userId,
-        username: req.username
-      },
+      user: req.userId,
       tags: metadata.tags ? metadata.tags.split(",") : [],
-      status: "uploading"
+      status: "uploading",
+      mediaType: metadata.mediaType
     }
 
     try {
-      switch (mimeType) {
+      /* switch (mimeType) {
         case "image":
-          document = await Image.create(documentBody).catch(err => new Error("Error creating image document"))
+          document = await Upload.create(documentBody).catch(err => new Error("Error creating image document"))
           break;
         case "video":
           document = await Video.create(documentBody).catch(err => new Error("Error creating video document"))
@@ -81,8 +79,11 @@ exports.startChunkUpload = async (req, res) => {
         case "audio":
           document = await Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
           break;
-      }
+      } */
+          document = await Upload.create(documentBody).catch(err => new Error("Error creating image document"))
+
     } catch (error) {
+      console.log(error)
       await logError(req, error)
       return res.status(500).json({
         success: false,

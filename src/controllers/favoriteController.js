@@ -3,7 +3,7 @@ const User = require("../models/schemas/User")
 const Pool = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
+const Upload = require("../models/schemas/Upload")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
@@ -80,7 +80,7 @@ exports.favoriteImage = async (req, res) => {
     const { imageId } = req.params
 
     const user = await User.findById(req.userId).select("favorites.images")
-    const image = await Image.findById(imageId)
+    const image = await Upload.findById(imageId)
 
     // Return a 404 if the audioId is not in the database
     if (!image) {

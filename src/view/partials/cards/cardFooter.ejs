@@ -1,8 +1,8 @@
 <div class="flex items-center justify-between px-4 py-3 bg-gray-100">
   <!-- Vote Arrows -->
-  <%- include('../favoriteButton.ejs', { id, favorited, mediaType }) %>
+  <%- include('../favoriteButton.ejs', { id, favorited, documentType }) %>
   <div class="flex justify-end items-center space-x-2 w-full">
-    <%- include('../voteControls.ejs', { id, voteCount, mediaType }) %>
+    <%- include('../voteControls.ejs', { id, voteCount, documentType }) %>
   </div>
 
 </div>

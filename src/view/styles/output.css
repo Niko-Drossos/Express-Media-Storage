@@ -800,6 +800,11 @@ video {
   margin-bottom: -2rem;
 }
 
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
 .mx-3 {
   margin-left: 0.75rem;
   margin-right: 0.75rem;
@@ -1131,6 +1136,10 @@ video {
 
 .min-h-full {
   min-height: 100%;
+}
+
+.min-h-\[calc\(100vh-64px\)\] {
+  min-height: calc(100vh - 64px);
 }
 
 .w-0 {
@@ -2005,6 +2014,14 @@ video {
 
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-\[url\(\/icons\/image-placeholder\.png\)\] {
+  background-image: url(/icons/image-placeholder.png);
+}
+
+.bg-\[url\(\/images\/hero\.png\)\] {
+  background-image: url(/images/hero.png);
 }
 
 .from-\[\#80caff\] {

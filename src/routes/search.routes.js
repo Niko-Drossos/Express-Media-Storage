@@ -14,10 +14,12 @@ router.get("/pools", searchController.searchPools)
 
 router.get("/comments", searchController.searchComments)
 
-router.get("/videos", searchController.searchVideos)
+router.get("/uploads", searchController.searchUploads)
+
+/* router.get("/videos", searchController.searchVideos)
 
 router.get("/images", searchController.searchImages)
 
-router.get("/audios", searchController.searchAudios)
+router.get("/audios", searchController.searchAudios) */
 
 module.exports = router

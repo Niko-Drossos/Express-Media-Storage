@@ -1,8 +1,8 @@
-<a class="w-full flex flex-col bg-[#E4E4E4] rounded-xl relative" href="/media/<%= mediaType.slice(0, -1) %>?id=<%= _id %>">
+<a class="w-full flex flex-col bg-[#E4E4E4] rounded-xl relative" href="/media/<%= mediaType %>?id=<%= _id %>">
   <img 
     class="rounded lazy-thumb"
     src="../../icons/image-placeholder.png"
-    data-src="/stream/<%= mediaType.slice(0, -1) %>/<%= fileId %>?thumbnail=true"
+    data-src="/stream/<%= mediaType %>/<%= fileId %>?thumbnail=true"
     data-spinnerId="<%= _id %>"
     alt=""
   >

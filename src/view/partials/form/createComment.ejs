@@ -12,26 +12,25 @@
     event.preventDefault();
   
     // Get the routing information from the URL
-    const mediaType = window.location.pathname.split("/")[2]
     const params = new URLSearchParams(window.location.search)
   
     // Create a new comment
-    const request = await fetch(`/comment/create/${mediaType}/${params.get("id")}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-            content: document.getElementById("comment").value
-        })
+    const request = await fetch(`/comment/create/upload/${params.get("id")}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+          content: document.getElementById("comment").value
+      })
     })
   
     const response = await request.json()
   
     if (response.error) {
-        alert(response.error)
-        return
+      alert(response.error)
+      return
     }
   
     // Clear comment field

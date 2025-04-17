@@ -27,6 +27,10 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: false
   },
+  aboutMe: {
+    type: String,
+    required: false
+  },
   tags: {
     type: [String],
     default: []

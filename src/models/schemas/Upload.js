@@ -9,14 +9,19 @@ const Privacy = require('./sub-documents/Privacy')
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
-const imageSchema = new Schema({
+const uploadSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  mediaType: {
+    type: String,
+    enum: ['image', 'video', 'audio'],
+    required: true
+  },
   date: {
     type: Date,
-    default: Date.now
+    required: false
   },
   title: {
     type: String,
@@ -30,14 +35,16 @@ const imageSchema = new Schema({
   filename: {
     type: String,
     required: true,
-    // unique: true
   },
   fileId: {
     type: String,
     required: true,
-    // unique: true
   },
   status: Status,
+  transcription: {
+    type: Schema.Types.ObjectId,
+    ref: 'Transcription'
+  },
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment',
@@ -46,6 +53,16 @@ const imageSchema = new Schema({
     type: String 
   }],
   privacy: Privacy,
+  dimensions: {
+    width: {
+      type: Number,
+      required: false
+    },
+    height: {
+      type: Number,
+      required: false
+    },
+  },
   votes: [{
     type: Vote,
     select: false
@@ -56,19 +73,19 @@ const imageSchema = new Schema({
   }
 }, {
   timestamps: true,
-  collection: 'images'
+  collection: 'uploads'
 })
 
 /* --------------------------------- Indexes -------------------------------- */
 
-imageSchema.index({ tags: 1 })
+uploadSchema.index({ tags: 1 })
 
 /* ------------------------------- Middleware ------------------------------- */
 
-imageSchema.pre('save', function (next) { 
+uploadSchema.pre('save', function (next) { 
   updateVoteCount.call(this, next)
 })
 
-const Image = mongoose.model('Image', imageSchema)
+const Upload = mongoose.model('Upload', uploadSchema)
 
-module.exports = Image
+module.exports = Upload

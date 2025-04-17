@@ -7,10 +7,7 @@ async function logError(req, error) {
       level: "error",
       message: error.message || "Unknown error occurred",
       service: "Story-api", // Modify based on your app module
-      user: {
-        userId: req.userId,
-        username: req.username
-      }, 
+      user: req.userId, 
       request: {
         method: req.method,
         url: req.originalUrl,

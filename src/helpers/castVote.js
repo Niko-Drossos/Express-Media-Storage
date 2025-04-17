@@ -8,8 +8,8 @@ const castVote = async (doc, newVote) => {
   try {
     
     // Update the doc with the new vote
-    const existingVoteIndex = doc.votes.findIndex(vote => vote.user.userId.toString() === newVote.user.userId);
-    
+    const existingVoteIndex = doc.votes.findIndex(vote => vote.user.toString() == newVote.user);
+
     // Check if the vote already exists
     if (existingVoteIndex == -1) {
       // Push a new vote if no existing vote was found

@@ -1,9 +1,7 @@
 const { createFromHexString } = require("mongoose").Types.ObjectId
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Image = require("../models/schemas/Image")
-const Video = require("../models/schemas/Video")
-const Audio = require("../models/schemas/Audio")
+const Upload = require("../models/schemas/Upload")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
 /* --------------------------------- Helpers -------------------------------- */
@@ -57,18 +55,8 @@ exports.getMyFiles = async (req, res) => {
 
     const userId = createFromHexString(req.userId)
 
-    const fetchImages = await Image.aggregate([
-      { $match: { "user.userId": userId }},
-      { $project: includedFields }
-    ])
-
-    const fetchVideos = await Video.aggregate([
-      { $match: { "user.userId": userId }},
-      { $project: includedFields }
-    ])
-
-    const fetchAudios = await Audio.aggregate([
-      { $match: { "user.userId": userId }},
+    const fetchUploads = await Upload.aggregate([
+      { $match: { "user": userId }},
       { $project: includedFields }
     ])
 
@@ -97,7 +85,7 @@ exports.getMyFiles = async (req, res) => {
 // This is used for getting data to add media to Pools
 exports.mediaTitles = async (req, res) => {
   try {
-    const images = await Image.find({ "user.userId": req.userId })
+    const images = await Upload.find({ "user.userId": req.userId })
     const videos = await Video.find({ "user.userId": req.userId })
     const audios = await Audio.find({ "user.userId": req.userId })
 

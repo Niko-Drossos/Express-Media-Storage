@@ -129,6 +129,8 @@
             return
         }
 
+        const mediaType = file.type.split('/')[0] // Returns video, image, or audio
+
         const uploadRequest = await fetch('/file/start-chunk-upload', {
             method: 'POST',
             credentials: 'include',
@@ -136,14 +138,14 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                mimeType: file.type.split('/')[0],  // Returns video, image, or audio
                 metadata: {
                     title: event.target['title'].value,
                     description: event.target['description'].value,
                     date: new Date(event.target['date'].valueAsNumber).setSeconds(1), // Add one second to make sure it is "bigger" then midnight
                     privacy: event.target['privacy'].value,
                     fileName: file.name,
-                    tags: event.target['tags'].value
+                    tags: event.target['tags'].value,
+                    mediaType: mediaType
                 }
             })
         })
@@ -160,6 +162,7 @@
         } else {
             // alert(uploadResponse.message)
             showModal('file', uploadResponse.errorMessage, uploadResponse.message)
+            enableForm()
             return
         }
     }

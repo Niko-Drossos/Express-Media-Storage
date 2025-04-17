@@ -11,7 +11,7 @@ dotenv.config()
 const { whisper_modelName } = process.env
 /* --------------------------------- Schemas -------------------------------- */
 const User = require("../models/schemas/User")
-const Image = require("../models/schemas/Image")
+const Upload = require("../models/schemas/Upload")
 const Video = require("../models/schemas/Video")
 const Audio = require("../models/schemas/Audio")
 const Transcription = require("../models/schemas/Transcription")

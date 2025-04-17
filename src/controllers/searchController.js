@@ -3,7 +3,7 @@ const User = require("../models/schemas/User")
 const Pool = require("../models/schemas/Pool")
 const Comment = require("../models/schemas/Comment")
 const Video = require("../models/schemas/Video")
-const Image = require("../models/schemas/Image")
+const Upload = require("../models/schemas/Upload")
 const Audio = require("../models/schemas/Audio")
 /* ------------------------------- Middleware ------------------------------- */
 const logError = require("../models/middleware/logging/logError")
@@ -253,7 +253,7 @@ exports.searchComments = async (req, res) => {
 
 /* ------------------------------ Search videos ----------------------------- */
 
-exports.searchVideos = async (req, res) => {
+/* exports.searchVideos = async (req, res) => {
   try {
     const query = req.query
 
@@ -342,11 +342,113 @@ exports.searchVideos = async (req, res) => {
     })
   }
 }
-
+ */
 
 /* ------------------------------ Search images ----------------------------- */
 
-exports.searchImages = async (req, res) => {
+exports.searchUploads = async (req, res) => {
+  try {
+    // Get the query parameters
+    const { 
+      userId, 
+      usernames, 
+      title, 
+      startDate, 
+      endDate, 
+      tags, 
+      ids, 
+      mediaType="any",
+      comments=false, 
+      page=1, 
+      limit=12
+    } = req.query
+
+    // TODO: Fix this after database refactoring that removed the "username" field
+    // Search a list of usernames
+    /* if (usernames) {
+      const usernamesArray = usernames.split(",")
+      searchQuery["user.username"] = { $in: usernamesArray }
+    } */
+    
+    // Object that will be searched for in the db
+    const searchQuery = {}
+
+    // Add the search query's properties to the searchQuery object
+    if (userId) searchQuery["user"] = userId
+    if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
+    if (title) searchQuery.title = new RegExp(title, 'i')
+    if (tags) searchQuery.tags = { $all: tags.split(",") }
+    if (ids) searchQuery._id = { $in: ids.split(',') }
+    if (mediaType != "any") searchQuery.mediaType = mediaType
+
+    // Only allow for searching of a users own documents or those made public
+    searchQuery.$or = [
+      { "user": req.userId },
+      { privacy: "Public" }
+    ]
+
+    // Only allow for searching of completed images
+    searchQuery.status = "completed"
+
+    // Get the total number of documents that match the search query
+    const totalDocuments = await Upload.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    const searchResults = await Upload.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .populate([
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        },
+        ...(comments ? [{
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'username _id avatarId'
+          }
+        }] : [])
+      ])
+      .lean()
+
+    // Get the users favorite images
+    const user = await User.findById(req.userId).select("favorites.images")
+    const favoritedImages = user?.favorites?.images || []
+
+    // Middleware to add and remove document properties
+    searchResults.forEach(doc => addVotedAndFavorited(doc, favoritedImages, req.userId))
+    
+    res.status(200).json({
+      success: true, 
+      message: "Successfully searched for uploads" ,
+      data: {
+        documents: {
+          start: (page - 1) * limit + 1,
+          end: Math.min((page * limit), totalDocuments),
+          count: totalDocuments,
+        },
+        page: page,
+        pageCount: totalPages,
+        limit: limit,
+        query: req.query,
+        searchResults: searchResults
+      }
+    })
+  } catch (error) {
+    await logError(req, error)
+    res.status(500).json({
+      success: false,
+      message: "Failed to search for uploads",
+      errorMessage: error.message,
+      error
+    })
+  }
+}
+
+/* exports.searchImages = async (req, res) => {
   try {
     const query = req.query
 
@@ -354,12 +456,6 @@ exports.searchImages = async (req, res) => {
     const searchQuery = {}
     
     const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=12 } = query
-
-    // Search a list of usernames
-    /* if (usernames) {
-      const usernamesArray = usernames.split(",")
-      searchQuery["user.username"] = { $in: usernamesArray }
-    } */
     
     // Add the search query's properties to the searchQuery object
     if (userId) searchQuery["user"] = userId
@@ -378,11 +474,11 @@ exports.searchImages = async (req, res) => {
     searchQuery.status = "completed"
 
     // Get the total number of documents that match the search query
-    const totalDocuments = await Image.countDocuments(searchQuery);
+    const totalDocuments = await Upload.countDocuments(searchQuery);
 
     const totalPages = Math.ceil(totalDocuments / limit);
-
-    const searchResults = await Image.find(searchQuery)
+    console.log(await Upload.find(searchQuery))
+    const searchResults = await Upload.find(searchQuery)
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
@@ -433,11 +529,11 @@ exports.searchImages = async (req, res) => {
       error
     })
   }
-}
+} */
 
 /* ------------------------------ Search audios ----------------------------- */
 
-exports.searchAudios = async (req, res) => {
+/* exports.searchAudios = async (req, res) => {
   try {
     const query = req.query
 
@@ -525,4 +621,4 @@ exports.searchAudios = async (req, res) => {
       error
     })
   }
-}
+} */

@@ -1,22 +1,22 @@
 
 <div class="mr-1 flex items-center">
   <% if (favorited) { %>
-    <button onclick="favoriteDoc('<%= id %>', '<%= mediaType %>')">
+    <button onclick="favoriteDoc('<%= id %>', '<%= documentType %>')">
       <img src="../icons/gold-star.svg" alt="Gold star, click to unfavorite">
     </button>
   <% } else if (!favorited) { %>
-    <button onclick="favoriteDoc('<%= id %>', '<%= mediaType %>')">
+    <button onclick="favoriteDoc('<%= id %>', '<%= documentType %>')">
       <img src="../icons/hollow-star.svg" alt="Hollow star, click to favorite">
     </button>
   <% } %>
 </div>
 
 <script>
-  async function favoriteDoc(id, mediaType) {
+  async function favoriteDoc(id, documentType) {
     /* const mediaType = window.location.pathname.split("/")[2]
     console.log(mediaType) */
 
-    const request = await fetch(`/favorite/${mediaType}/${id}`, {
+    const request = await fetch(`/favorite/${documentType}/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,6 +26,7 @@
 
     const response = await request.json()
 
+    // TODO: Add error handling
     if (response.error) {
       
     }

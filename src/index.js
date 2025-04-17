@@ -224,11 +224,10 @@ app.get("/search-media", async (req, res) => {
   try {
 
     const query = req.query
-
     if (query.mediaType) {   
       // Construct the search URL
-      const searchURL = `${API_URL}/search/${query.mediaType}?${new URLSearchParams(query)}`
-
+      const searchURL = `${API_URL}/search/uploads?${new URLSearchParams(query)}`
+      
       const request = await fetch(searchURL, {
         method: "GET",
         headers: {
@@ -239,7 +238,7 @@ app.get("/search-media", async (req, res) => {
       })
 
       const response = await request.json()
-
+      console.log(response)
       // Handle error cases
       if (!response.success) {
         await logError(req, response.error)
@@ -259,12 +258,12 @@ app.get("/search-media", async (req, res) => {
         return res.render("error.ejs", {
           status: request.status,
           message: response.message,
-          action: action
+          action: action,
+          title: 'Error'
         })
       }
 
       res.render("search-media.ejs", {
-        searchType: "media",
         query,
         response: response.data,
         searchResults: response.data.searchResults
@@ -272,7 +271,6 @@ app.get("/search-media", async (req, res) => {
     } else { 
       // Render the page without searching for anything
       res.render("search-media.ejs", {
-        searchType: "media",
         query,
         // Default response to prevent throwing "undefined" errors
         response: {
@@ -308,7 +306,6 @@ app.get("/search-media", async (req, res) => {
 // TODO: Add support for these routes later
 /* app.get("/search-users", (req, res) => {
   res.render("404.ejs", {
-    searchType: "users"
   })
 })
 */
@@ -381,7 +378,8 @@ app.get("/media/:mediaType", async (req, res) => {
       return
     } */
 
-    const request = await fetch(`${API_URL}/search/${mediaType}s?ids=${id}&comments=true`, {
+    // TODO: make an API call to get the media directly without going through the search
+    const request = await fetch(`${API_URL}/search/uploads?ids=${id}&comments=true`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -464,7 +462,7 @@ app.get("/profile", async (req, res) => {
     })
 
     const response = await request.json()
-    console.log(res.locals.user)
+
     if (response.error) {
       res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
       console.log(response.error)
