@@ -26,7 +26,7 @@
                 <!-- TODO: Add border to top of user when in mobile view -->
                 <!-- <hr class="md:hidden border-4"> -->
                 <div class="flex justify-between items-center sm:border-white">
-                    <a href="/profile/<%= uploader.userId %>" class="cursor-pointer py-2 flex items-center text-sm outline-none focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
+                    <a href="/profile/<%= uploader._id %>" class="cursor-pointer py-2 flex items-center text-sm outline-none focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
                         <img class="h-12 w-12 rounded-full object-cover" src="<%= uploader.profilePhoto || '../icons/defaultUser.svg'%>" alt="user photo" />
                         <p class="block ml-2 font-bold"><%= uploader.username %></p>
                     </a>
@@ -81,14 +81,7 @@
                 </div>
                 <hr>
 
-                <div class="py-2">
-                    <div class="flex items-center">
-                        <textarea class="w-full resize-none appearance-none rounded-lg p-2 leading-tight outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
-                        <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="postComment(event)">
-                            <img src="../icons/arrows/right-arrow.svg" alt="Send">
-                        </button>
-                    </div>
-                </div>
+                <%- include('./partials/form/createComment.ejs', { id: media._id, mediaType }) %>
             </div>
         </div>
     </div>
@@ -125,38 +118,6 @@
         }
     }
 
-
-    async function postComment(event) {
-        event.preventDefault();
-        
-        // Get the routing information from the URL
-        const mediaType = window.location.pathname.split("/")[2]
-        const params = new URLSearchParams(window.location.search)
-
-        // Create a new comment
-        const request = await fetch(`/comment/create/${mediaType}/${params.get("id")}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                content: document.getElementById("comment").value
-            })
-        })
-
-        const response = await request.json()
-
-        if (response.error) {
-            alert(response.error)
-            return
-        }
-
-        // Clear comment field
-        document.getElementById("comment").value = ""
-
-        window.location.reload()
-    }
 
     let transcription = null
 

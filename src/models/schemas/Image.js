@@ -4,13 +4,16 @@ const Schema = mongoose.Schema
 /* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
 const Status = require('./sub-documents/Status')
-const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const imageSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   date: {
     type: Date,
     default: Date.now
@@ -35,7 +38,6 @@ const imageSchema = new Schema({
     // unique: true
   },
   status: Status,
-  user: SubUser,
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment',

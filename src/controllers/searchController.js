@@ -36,7 +36,20 @@ exports.searchUsers = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
-      .populate(comments ? 'comments' : '')
+      .populate([
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        },
+        ...(comments ? [{
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'username _id avatarId'
+          }
+        }] : [])
+      ])
+      .lean()
 
     res.status(200).json({
       success: true,
@@ -77,13 +90,13 @@ exports.searchPools = async (req, res) => {
     const { userId, usernames, tags, startDate, endDate, title, description, transcription, ids, comments=false, populate=false, page=1, limit=12 } = query
 
     // Search a list of usernames
-    if (usernames) {
+    /* if (usernames) {
       const usernamesArray = usernames.split(",")
       searchQuery["user.username"] = { $in: usernamesArray }
-    }
+    } */
     
     // Add the search query's properties to the searchQuery object
-    if (userId) searchQuery["user.userId"] = userId
+    if (userId) searchQuery["user"] = userId
     if (tags) searchQuery.tags = { $all: tags.split(",") }
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
@@ -93,7 +106,7 @@ exports.searchPools = async (req, res) => {
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
-      { "user.userId": req.userId },
+      { "user": req.userId },
       { privacy: "Public" }
     ]
 
@@ -167,13 +180,14 @@ exports.searchComments = async (req, res) => {
     const { userId, usernames, originId, startDate, endDate, content, ids, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
-    if (usernames) {
+    // TODO: Fix usernames no longer being searchable
+    /* if (usernames) {
       const usernamesArray = usernames.split(",")
-      searchQuery["user.username"] = { $in: usernamesArray }
-    }
+      searchQuery["user"] = { $in: usernamesArray }
+    } */
 
     // Add the search query's properties to the searchQuery object
-    if (userId) searchQuery["user.userId"] = userId
+    if (userId) searchQuery["user"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (content) searchQuery.content = new RegExp(content, 'i')
     if (originId) searchQuery.originId = originId
@@ -188,7 +202,19 @@ exports.searchComments = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
-      .populate(comments ? 'comments' : '')
+      .populate([
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        },
+        ...(comments ? [{
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'username _id avatarId'
+          }
+        }] : [])
+      ])
       .lean()
 
     // Get the users favorite comments
@@ -243,7 +269,7 @@ exports.searchVideos = async (req, res) => {
     }
 
     // Add the search query's properties to the searchQuery object
-    if (userId) searchQuery["user.userId"] = userId
+    if (userId) searchQuery["user"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (content) searchQuery.transcription.text = new RegExp(content, 'i')
@@ -252,7 +278,7 @@ exports.searchVideos = async (req, res) => {
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
-      { "user.userId": req.userId },
+      { "user": req.userId },
       { privacy: "Public" }
     ]
 
@@ -268,7 +294,19 @@ exports.searchVideos = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
-      .populate(comments ? 'comments' : '')
+      .populate([
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        },
+        ...(comments ? [{
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'username _id avatarId'
+          }
+        }] : [])
+      ])
       .lean()
 
     // Get the users favorite videos
@@ -318,13 +356,13 @@ exports.searchImages = async (req, res) => {
     const { userId, usernames, title, startDate, endDate, tags, ids, comments=false, page=1, limit=12 } = query
 
     // Search a list of usernames
-    if (usernames) {
+    /* if (usernames) {
       const usernamesArray = usernames.split(",")
       searchQuery["user.username"] = { $in: usernamesArray }
-    }
+    } */
     
     // Add the search query's properties to the searchQuery object
-    if (userId) searchQuery["user.userId"] = userId
+    if (userId) searchQuery["user"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (tags) searchQuery.tags = { $all: tags.split(",") }
@@ -332,7 +370,7 @@ exports.searchImages = async (req, res) => {
 
     // Only allow for searching of a users own documents or those made public
     searchQuery.$or = [
-      { "user.userId": req.userId },
+      { "user": req.userId },
       { privacy: "Public" }
     ]
 
@@ -348,7 +386,19 @@ exports.searchImages = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
-      .populate(comments ? 'comments' : '')
+      .populate([
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        },
+        ...(comments ? [{
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'username _id avatarId'
+          }
+        }] : [])
+      ])
       .lean()
 
     // Get the users favorite images
@@ -404,7 +454,7 @@ exports.searchAudios = async (req, res) => {
 
     // Add the search query's properties to the searchQuery object
     // TODO: Maybe make userId a list? 
-    if (userId) searchQuery["user.userId"] = userId
+    if (userId) searchQuery["user"] = userId
     if (startDate || endDate) searchDateRange(searchQuery, startDate, endDate)
     if (title) searchQuery.title = new RegExp(title, 'i')
     if (tags) searchQuery.tags = { $all: tags.split(",") }
@@ -428,7 +478,19 @@ exports.searchAudios = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
-      .populate(comments ? 'comments' : '')
+      .populate([
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        },
+        ...(comments ? [{
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'username _id avatarId'
+          }
+        }] : [])
+      ])
       .lean()
 
     // Get the users favorite audios

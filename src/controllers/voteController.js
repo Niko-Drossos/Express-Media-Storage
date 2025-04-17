@@ -15,13 +15,9 @@ exports.voteOnPool = async (req, res) => {
   try {
     // Update the pool with the new vote
     const { poolId } = req.params
-    const { userId, username } = req
 
     const newVote = {
-      user: {
-        userId,
-        username
-      },
+      user: req.userId,
       vote: req.body.vote
     }
     
@@ -54,13 +50,9 @@ exports.voteOnComment = async (req, res) => {
   try {
     // Update the comment with the new vote
     const { commentId } = req.params
-    const { userId, username } = req
 
     const newVote = {
-      user: {
-        userId,
-        username
-      },
+      user: req.userId,
       vote: req.body.vote
     }
     
@@ -93,13 +85,9 @@ exports.voteOnUser = async (req, res) => {
   try {
     // Update the user with the new comment
     const paramUserId = req.params.userId
-    const { userId, username } = req
 
     const newVote = {
-      user: {
-        userId,
-        username
-      },
+      user: req.userId,
       vote: req.body.vote
     }
     
@@ -132,13 +120,9 @@ exports.voteOnVideo = async (req, res) => {
   try {
     // Update the video with the new vote
     const { videoId } = req.params
-    const { userId, username } = req
 
     const newVote = {
-      user: {
-        userId,
-        username
-      },
+      user: req.userId,
       vote: req.body.vote
     }
 
@@ -171,13 +155,9 @@ exports.voteOnImage = async (req, res) => {
   try {
     // Update the user with the new comment
     const { imageId } = req.params
-    const { userId, username } = req
 
     const newVote = {
-      user: {
-        userId,
-        username
-      },
+      user: req.userId,
       vote: req.body.vote
     }
     
@@ -210,13 +190,9 @@ exports.voteOnAudio = async (req, res) => {
   try {
     // Update the user with the new comment
     const { audioId } = req.params
-    const { userId, username } = req
 
     const newVote = {
-      user: {
-        userId,
-        username
-      },
+      user: userId,
       vote: req.body.vote
     }
     

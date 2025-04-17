@@ -3,7 +3,6 @@ const Schema = mongoose.Schema
 
 /* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
-const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 const Journal = require('./sub-documents/Journal')
 /* ------------------------------- Middleware ------------------------------- */
@@ -11,7 +10,10 @@ const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const poolSchema = new Schema({
-  user: SubUser,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   date: {
     type: Date,
     default: Date.now

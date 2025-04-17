@@ -2,10 +2,13 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 /* ------------------------------ SubDocuments ------------------------------ */
-const SubUser = require('./sub-documents/SubUser')
 /* -------------------------------------------------------------------------- */
 
 const errorLogSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   level: { 
     type: String,
     enum: ["error", "warn", "debug"],
@@ -19,7 +22,6 @@ const errorLogSchema = new Schema({
     type: String,
     required: true
   },
-  user: SubUser,
   request: {
     method: {
       type: String,

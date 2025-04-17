@@ -2,14 +2,12 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const Vote = require('./sub-documents/Vote')
-const SubUser = require('./sub-documents/SubUser')
 
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const commentSchema = new Schema({
-  // user: SubUser,
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',

@@ -4,14 +4,16 @@ const Schema = mongoose.Schema
 /* ------------------------------ Sub-Documents ----------------------------- */
 const Vote = require('./sub-documents/Vote')
 const Status = require('./sub-documents/Status')
-const SubUser = require('./sub-documents/SubUser')
 const Privacy = require('./sub-documents/Privacy')
 /* ------------------------------- Middleware ------------------------------- */
 const updateVoteCount = require('../middleware/mongoose/updateVoteCount')
 /* -------------------------------------------------------------------------- */
 
 const videoSchema = new Schema({
-  user: SubUser,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   date: {
     type: Date,
     default: Date.now
@@ -31,8 +33,7 @@ const videoSchema = new Schema({
   },
   fileId: {
     type: String,
-    required: true,
-    // unique: trues
+    required: true
   },
   status: Status,
   transcription: {

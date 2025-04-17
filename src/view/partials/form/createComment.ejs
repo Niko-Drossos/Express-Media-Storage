@@ -1,0 +1,42 @@
+<div class="py-2">
+  <div class="flex items-center">
+      <textarea class="w-full resize-none appearance-none rounded-lg p-2 leading-tight outline-1" id="comment" rows="1" placeholder="Say something nice..."></textarea>
+      <button class="focus:outline-none border-none bg-transparent text-blue-600" onclick="postComment(event)">
+          <img src="../icons/arrows/right-arrow.svg" alt="Send">
+      </button>
+  </div>
+</div>
+<script>
+  
+  async function postComment(event) {
+    event.preventDefault();
+  
+    // Get the routing information from the URL
+    const mediaType = window.location.pathname.split("/")[2]
+    const params = new URLSearchParams(window.location.search)
+  
+    // Create a new comment
+    const request = await fetch(`/comment/create/${mediaType}/${params.get("id")}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            content: document.getElementById("comment").value
+        })
+    })
+  
+    const response = await request.json()
+  
+    if (response.error) {
+        alert(response.error)
+        return
+    }
+  
+    // Clear comment field
+    document.getElementById("comment").value = ""
+  
+    window.location.reload()
+  }
+</script>
