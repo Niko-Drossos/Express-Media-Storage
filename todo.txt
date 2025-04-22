@@ -74,6 +74,9 @@ Make routes to upload avatar with 200 by 200
 
 Make "tool tip" type component
 
+Make "tool tip" type component
+
+Add buttons/pages to edit media and pools.
 
 Color palette:
 

@@ -161,4 +161,27 @@
     const spinner = document.getElementById(`loading-spinner-${id}`)
     spinner.classList.add('hidden')
   }
+
+  // <!-- ------------------------- Lazy loading functionality ------------------------- -->
+
+  function replaceSkeleton(card) {
+      const img = card.querySelector('.lazy-thumb');
+      const spinner = card.querySelector('.spinner');
+      const actualSrc = img.dataset.src;
+
+      // Replace the src with the actual image    
+      const preloader = new Image();
+      preloader.onload = () => {
+        img.src = actualSrc;
+        if (spinner) hideSpinner(img.dataset.spinnerId)
+      };
+
+      preloader.src = actualSrc;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.card').forEach(card => {
+        replaceSkeleton(card);
+      });
+    });
 </script>

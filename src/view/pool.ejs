@@ -25,7 +25,10 @@
     <h2 class="text-xl font-bold mb-8">Images</h2>
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10">
       <% pool.images.forEach(image => { %>
-        <%- include('./partials/cards/mediaCard.ejs', { ...image, query: { mediaType: 'images' }, thumbnail: null }) %>
+        <% let header = include('./partials/cards/cardHeader.ejs', { id: image._id, mediaType: 'images', user: image.user, date: image.date, title: image.title, description: image.description }) %>
+        <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: image._id, mediaType: 'images', fileId: image.fileId }) %>
+        <% let footer = include('./partials/cards/cardFooter.ejs', { id: image._id, mediaType: 'image', favorited: image.favorited, voteCount: image.voteCount }) %>
+        <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
       <% }) %>
     </div>
   </div>
@@ -35,7 +38,10 @@
       <h2 class="text-xl font-bold mb-8">Videos</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10">
         <% pool.videos.forEach(video => { %>
-          <%- include('./partials/cards/mediaCard.ejs', { ...video, query: { mediaType: 'videos' }, thumbnail: null }) %>
+          <% let header = include('./partials/cards/cardHeader.ejs', { id: video._id, mediaType: 'videos', user: video.user, date: video.date, title: video.title, description: video.description }) %>
+          <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: video._id, mediaType: 'videos', fileId: video.fileId }) %>
+          <% let footer = include('./partials/cards/cardFooter.ejs', { id: video._id, mediaType: 'video', favorited: video.favorited, voteCount: video.voteCount }) %>
+          <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
         <% }) %>
       </div>
   </div>
@@ -45,7 +51,10 @@
       <h2 class="text-xl font-bold mb-8">Audios</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10">
         <% pool.audios.forEach(audio => { %>
-          <%- include('./partials/cards/mediaCard.ejs', { ...audio, query: { mediaType: 'audios' }, thumbnail: null }) %>
+          <% let header = include('./partials/cards/cardHeader.ejs', { id: audio._id, mediaType: 'audios', user: audio.user, date: audio.date, title: audio.title, description: audio.description }) %>
+          <% let content = include('./partials/cards/mediaCardContent.ejs', { _id: audio._id, mediaType: 'audios', fileId: audio.fileId }) %>
+          <% let footer = include('./partials/cards/cardFooter.ejs', { id: audio._id, mediaType: 'audio', favorited: audio.favorited, voteCount: audio.voteCount }) %>
+          <%- include('./partials/cards/card.ejs', { header, content, footer }) %>
         <% }) %>
       </div>
   </div>
@@ -55,7 +64,7 @@
     <div id="journals" class="tab-content mt-4 hidden">
         <h2 class="text-xl font-bold mb-4">Journal Entries</h2>
         <div class="space-y-4">
-          <!-- TODO: Add sorting to journal -->
+          <!-- TODO: Add sorting/searching to journal -->
           <% pool.journal.sort((a, b) => new Date(a.time) - new Date(b.time)) %>
           <% pool.journal.forEach(entry => { %>
             <div class="bg-royal-purple text-white p-4 rounded-lg">

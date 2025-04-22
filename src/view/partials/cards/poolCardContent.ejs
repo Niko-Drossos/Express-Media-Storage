@@ -1,4 +1,4 @@
 <a class="w-full flex flex-col bg-[#E4E4E4] rounded-xl" href="/pools/<%= _id %>">
   <!-- Main section for picture -->
-  <img class="rounded-t" src="../icons/image-placeholder.png" alt="">
+  <img class="rounded-t" src="<%= thumbnailId ? `/stream/image/${thumbnailId}` : '../icons/image-placeholder.png' %>" alt="">
 </a>

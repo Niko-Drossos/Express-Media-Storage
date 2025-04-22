@@ -33,6 +33,10 @@ const poolSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  thumbnailId: {
+    type: String,
+    required: true,
+  },
   privacy: Privacy,
   edited: {
     type: {
