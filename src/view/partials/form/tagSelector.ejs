@@ -1,7 +1,10 @@
 <div class="w-full flex flex-col">
     <div class="mb-3 md:mb-0 relative">
-        <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="add-tag">
+        <label class="block tracking-wide text-grey-darker text-xs font-bold mb-2" for="add-tag">
             Tags
+            <%- include('../tooltip.ejs', {
+                message: '<b class="text-green-800 text-sm">Tags</b> are used to categorize your files and make\nthem easier to search. You can add many tags to a file.'
+            }) %>
         </label>
         <input class="appearance-none block w-full bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-3 px-4 pr-10" id="add-tag" type="text" placeholder="Festival" oninput="fetchTagSuggestions(this.value)" list="tag-datalist">
         <datalist id="tag-datalist"></datalist>

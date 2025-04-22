@@ -5,23 +5,46 @@
                 <div class="w-full flex flex-col lg:flex-row">
                     <div class="lg:w-1/2  mb-3">
                         <div class="w-full md:w-full px-3 mb-3">
-                            <label class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2" for="title">Title</label>
+                            <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="title">
+                                Title
+                                <%- include('../tooltip.ejs', {
+                                    message: 'Give your file a clear and descriptive title that helps identify its content.'
+                                }) %>
+                            </label>
+                            
                             <input class="appearance-none block w-full bg-white text-gray-900 font-medium border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d]" type="text" name="title" id="title" placeholder="File name" required />
                         </div>
                         <div class="w-full md:w-full px-3">
-                            <label class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2" for="date">Date</label>
+                            <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="date">
+                                Date
+                                <%- include('../tooltip.ejs', {
+                                    message: 'This is the date that the file was created,\nnot the date you upload it.'
+                                }) %>
+                            </label>
                             <input class="appearance-none block w-full bg-white text-gray-900 font-medium border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d]" type="date" name="date" id="date" />
                         </div>
                     </div>   
                     <div class="lg:w-1/2 px-3 pb-3 flex flex-col h-full">
-                        <label class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2" for="description">Description</label>
+                        <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="description">
+                            Description
+                            <%- include('../tooltip.ejs', {
+                                message: 'Add a detailed description of your file to help others understand its content and purpose.'
+                            }) %>
+                        </label>
                         <textarea textarea class="appearance-none block w-full bg-white text-gray-900 border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d] flex-grow" type="text" name="description" placeholder="File description" ></textarea>
                     </div>
                 </div>                
 
                 <div class="w-full flex flex-col lg:flex-row-reverse">
                     <div class="w-full md:w-full px-3 pb-3">
-                        <label class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2" for="privacy">Privacy</label>
+                        <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="privacy">
+                            Privacy
+                            <%- include('../tooltip.ejs', {
+                                message: '<b class="text-green-800 text-sm">Private</b>: Only you can see the file\n' +
+                                         '<b class="text-blue-800 text-sm">Public</b>: Everyone can see the file\n' +
+                                         '<b class="text-red-800 text-sm">Unlisted</b>: Only people you allow can see the file (coming soon)'
+                            }) %>
+                        </label>
                         <select class="appearance-none block w-full bg-white text-gray-900 font-medium border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d]" type="select" name="privacy" id="privacy" required>
                             <option value="Private">Private</option>
                             <option value="Public">Public</option>
@@ -47,6 +70,21 @@
 
                         <input id="file" type="file" class="hidden" name="file0" accept="image/*,video/*,audio/*" onchange="fileChanged(event)" required />
                     </label>
+                </div>
+
+                <!-- Preview section -->
+                <div class="w-full px-3 mb-3 hidden" id="preview-container">
+                    <div class="bg-white rounded-lg shadow-md p-4 relative">
+                        <button onclick="clearFile()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <h3 class="text-lg font-semibold mb-2">File Preview</h3>
+                        <div id="preview-content" class="flex justify-center items-center">
+                            <!-- Preview content will be inserted here -->
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Progress bar -->
@@ -109,14 +147,78 @@
         form.reset(); // Reset form to its initial state
     }
 
+    function clearFile() {
+        const fileInput = document.getElementById('file')
+        const previewContainer = document.getElementById('preview-container')
+        const displayFileName = document.getElementById('display-file-name')
+        
+        // Clear the file input
+        fileInput.value = ''
+        
+        // Hide the preview container
+        previewContainer.classList.add('hidden')
+        
+        // Hide the file name display
+        displayFileName.classList.add('hidden')
+        displayFileName.classList.remove('block')
+        
+        // Clear the preview content
+        const previewContent = document.getElementById('preview-content')
+        previewContent.innerHTML = ''
+    }
+
     function fileChanged(event) {
         const file = event.target.files[0]
+        if (!file) {
+            clearFile()
+            return
+        }
+
         const fileName = file.name
         const displayFileName = document.getElementById('display-file-name')
         displayFileName.innerHTML = `Selected: ${fileName}`
 
         displayFileName.classList.toggle('hidden')
         displayFileName.classList.toggle('block')
+
+        // Handle file preview
+        const previewContainer = document.getElementById('preview-container')
+        const previewContent = document.getElementById('preview-content')
+        previewContainer.classList.remove('hidden')
+        previewContent.innerHTML = '' // Clear previous preview
+
+        const fileType = file.type.split('/')[0] // Get the main type (image, video, audio)
+        const fileURL = URL.createObjectURL(file)
+
+        // Display the preview content based on the file type
+        switch(fileType) {
+            case 'image':
+                const img = document.createElement('img')
+                img.src = fileURL
+                img.className = 'max-h-64 rounded-lg'
+                img.alt = 'Image preview'
+                previewContent.appendChild(img)
+                break
+            case 'video':
+                const video = document.createElement('video')
+                video.src = fileURL
+                video.controls = true
+                video.className = 'max-h-64 rounded-lg'
+                previewContent.appendChild(video)
+                break
+            case 'audio':
+                const audio = document.createElement('audio')
+                audio.src = fileURL
+                audio.controls = true
+                audio.className = 'w-full'
+                previewContent.appendChild(audio)
+                break
+        }
+
+        // Clean up the URL when the file input changes
+        event.target.addEventListener('change', () => {
+            URL.revokeObjectURL(fileURL)
+        })
     }
     
     async function uploadFileForm(event) {
