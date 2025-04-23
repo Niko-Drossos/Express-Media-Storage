@@ -1,39 +1,244 @@
+# Express Media Storage API Documentation
 
-view
-(all routes return a populated document to be rendered , all GET requests)
-/pool/:poolId
-/comment/:commentId
-/video/:videoId
-/image/:imageId
-/audio/:audioId
-(Maybe use users in view, probably in the user routes though)
-/user/:userId
+## Authentication
 
-user
-(Im not sure what im going to add yet)
-GET
-/:userId
-/media-titles
-/my-files
+All API endpoints (except auth endpoints) require authentication via JWT token in the `media_authentication` cookie.
 
-POST
-/follow/:userId
-/unfollow/:userId
+### POST /auth/register
+Register a new user account.
 
+**Request Body:**
+```json
+{
+    "username": "string (unique)",
+    "password": "string",
+    "email": "string (unique)"
+}
+```
 
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Successfully registered user",
+    "data": {
+        "JWT": "jwt_token"
+    }
+}
+```
 
-file
-GET
-- /get/:username      This might be removed
+### POST /auth/login
+Login to an existing account.
 
-POST
-/upload  (Uploads a batch of files)
-/delete
+**Request Body:**
+```json
+{
+    "username": "string",
+    "password": "string"
+}
+```
 
-vote
-POST
-/:poolId
-/:commentId
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Successfully logged in",
+    "data": {
+        "JWT": "jwt_token"
+    }
+}
+```
+
+## Media Management
+
+### File Upload
+Files are uploaded in chunks. First initialize the upload, then send chunks.
+
+#### POST /file/start-chunk-upload
+Initialize a file upload.
+
+**Request Body:**
+```json
+{
+    "metadata": {
+        "title": "string",
+        "description": "string",
+        "date": "date",
+        "privacy": "Public|Private|Unlisted",
+        "fileName": "string",
+        "tags": ["string"],
+        "mediaType": "image|video|audio"
+    }
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "ext": "file_extension",
+        "fileId": "file_id"
+    }
+}
+```
+
+#### POST /file/chunked-upload
+Upload a file chunk.
+
+**Form Data:**
+- chunk: File chunk
+- chunkIndex: Number
+- totalChunks: Number
+- fileExt: String
+- fileId: String
+
+### Media Streaming
+
+#### GET /stream/video/:fileId
+Stream a video file.
+
+**Query Parameters:**
+- thumbnail: boolean (optional)
+
+#### GET /stream/image/:fileId
+Stream an image file.
+
+**Query Parameters:**
+- thumbnail: boolean (optional)
+
+#### GET /stream/audio/:fileId
+Stream an audio file.
+
+## Search
+
+### GET /search/uploads
+Search for uploaded media.
+
+**Query Parameters:**
+- userId: string (optional)
+- title: string (optional)
+- startDate: date (optional)
+- endDate: date (optional)
+- tags: string (comma-separated, optional)
+- ids: string (comma-separated, optional)
+- mediaType: "any"|"image"|"video"|"audio" (optional)
+- comments: boolean (optional)
+- page: number (optional, default: 1)
+- limit: number (optional, default: 12)
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "documents": {
+            "start": number,
+            "end": number,
+            "count": number
+        },
+        "page": number,
+        "pageCount": number,
+        "limit": number,
+        "query": object,
+        "searchResults": array
+    }
+}
+```
+
+### GET /search/users
+Search for users.
+
+**Query Parameters:**
+- username: string (optional)
+- tags: string (comma-separated, optional)
+- id: string (optional)
+- comments: boolean (optional)
+- page: number (optional, default: 1)
+- limit: number (optional, default: 12)
+
+## User Interactions
+
+### POST /user/follow/:userId
+Follow a user.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "user": {
+            "username": "string",
+            "id": "string"
+        },
+        "followed": {
+            "username": "string",
+            "id": "string"
+        }
+    }
+}
+```
+
+### POST /user/unfollow/:userId
+Unfollow a user.
+
+### POST /favorite/:mediaType/:mediaId
+Favorite/unfavorite media.
+
+**mediaType:** "image"|"video"|"audio"|"pool"
+
+### POST /vote/:mediaType/:mediaId
+Vote on media or comments.
+
+**Request Body:**
+```json
+{
+    "vote": "up"|"down"
+}
+```
+
+## Transcription
+
+### POST /transcription/generate/:mimetype/:documentId
+Generate transcription for audio/video.
+
+**mimetype:** "video"|"audio"
+
+### GET /transcription/:transcriptionId
+Get transcription details.
+
+### GET /transcription/:transcriptionId/subtitles
+Get transcription in VTT format for subtitles.
+
+## Error Responses
+
+All endpoints may return the following error responses:
+
+**401 Unauthorized:**
+```json
+{
+    "success": false,
+    "message": "No token provided, please log in"
+}
+```
+
+**403 Forbidden:**
+```json
+{
+    "success": false,
+    "message": "Failed to validate user",
+    "errorMessage": "error message"
+}
+```
+
+**500 Server Error:**
+```json
+{
+    "success": false,
+    "message": "Error message",
+    "errorMessage": "Detailed error message"
+}
+```
 
 # Middleware
 This is a list of all the middlewares used in the server. <br>
@@ -628,6 +833,168 @@ This is all the comment routes.  Comments can be placed on <code>pools</code>, <
     error
 }
 ```
+
+## Error Handling
+
+All API endpoints follow a consistent error response format. Here are the possible error scenarios and their meanings:
+
+### Authentication Errors (401)
+These errors occur when there are issues with authentication.
+
+```json
+{
+    "success": false,
+    "message": "No token provided, please log in"
+}
+```
+- **401 Unauthorized**: The request is missing the authentication token or the token is invalid
+- **401 Token Expired**: The authentication token has expired, user needs to log in again
+
+### Permission Errors (403)
+These errors occur when a user tries to access something they don't have permission for.
+
+```json
+{
+    "success": false,
+    "message": "Access denied",
+    "errorMessage": "Detailed error message"
+}
+```
+- **403 Forbidden**: User doesn't have permission to access the resource
+- **403 Private Content**: Trying to access private content without permission
+- **403 Admin Only**: Attempting to perform an admin-only action
+- **403 Not Owner**: Trying to modify content you don't own
+
+### Not Found Errors (404)
+These errors occur when the requested resource doesn't exist.
+
+```json
+{
+    "success": false,
+    "message": "Resource not found",
+    "errorMessage": "Detailed error message"
+}
+```
+- **404 User Not Found**: The requested user doesn't exist
+- **404 Media Not Found**: The requested media file doesn't exist
+- **404 Comment Not Found**: The requested comment doesn't exist
+- **404 Transcription Not Found**: The requested transcription doesn't exist
+
+### Validation Errors (400)
+These errors occur when the request data is invalid.
+
+```json
+{
+    "success": false,
+    "message": "Invalid request",
+    "errorMessage": "Detailed error message"
+}
+```
+- **400 Invalid File Type**: Uploaded file type is not supported
+- **400 File Too Large**: Uploaded file exceeds size limits
+- **400 Invalid Date Format**: Date format in request is incorrect
+- **400 Missing Required Fields**: Required fields are missing from the request
+- **400 Invalid Privacy Setting**: Privacy setting is not one of: Public, Private, Unlisted
+- **400 Already Favorited**: Trying to favorite content that's already favorited
+- **400 Already Voted**: Trying to vote on content you've already voted on
+
+### Server Errors (500)
+These errors occur when something goes wrong on the server side.
+
+```json
+{
+    "success": false,
+    "message": "Server error",
+    "errorMessage": "Detailed error message"
+}
+```
+- **500 Database Error**: Error accessing or modifying the database
+- **500 File System Error**: Error accessing or modifying files
+- **500 Upload Error**: Error during file upload process
+- **500 Transcription Error**: Error during transcription generation
+- **500 Streaming Error**: Error during media streaming
+
+### Rate Limiting (429)
+These errors occur when too many requests are made in a short time.
+
+```json
+{
+    "success": false,
+    "message": "Too many requests",
+    "errorMessage": "Please try again later"
+}
+```
+- **429 Too Many Requests**: Rate limit exceeded, try again later
+
+### Common Error Scenarios by Endpoint
+
+#### Authentication Endpoints
+- **/auth/register**
+  - 400: Username or email already exists
+  - 400: Password doesn't meet requirements
+  - 400: Missing required fields
+- **/auth/login**
+  - 401: Invalid credentials
+  - 400: Missing username or password
+
+#### Media Management
+- **/file/start-chunk-upload**
+  - 400: Invalid file type
+  - 400: File too large
+  - 403: Uploads are currently disabled
+  - 500: Error initializing upload
+- **/file/chunked-upload**
+  - 400: Invalid chunk data
+  - 404: Upload session not found
+  - 500: Error processing chunk
+
+#### Search
+- **/search/uploads**
+  - 400: Invalid date format
+  - 400: Invalid media type
+  - 500: Search query failed
+
+#### User Interactions
+- **/user/follow/:userId**
+  - 404: User not found
+  - 400: Already following
+- **/favorite/:mediaType/:mediaId**
+  - 404: Media not found
+  - 403: Private content
+  - 400: Already favorited
+- **/vote/:mediaType/:mediaId**
+  - 404: Media not found
+  - 403: Private content
+  - 400: Already voted
+
+#### Transcription
+- **/transcription/generate/:mimetype/:documentId**
+  - 404: Media not found
+  - 400: Already transcribed
+  - 500: Transcription generation failed
+- **/transcription/:transcriptionId**
+  - 404: Transcription not found
+  - 500: Error retrieving transcription
+
+### Error Response Format
+All error responses follow this format:
+```json
+{
+    "success": false,
+    "message": "Human-readable error message",
+    "errorMessage": "Detailed technical error message",
+    "error": "Original error object (in development mode)"
+}
+```
+
+### Best Practices for Error Handling
+1. Always check the `success` field first
+2. Use the `message` field to display user-friendly error messages
+3. Use the `errorMessage` field for debugging
+4. Implement proper retry logic for 429 and 500 errors
+5. Handle authentication errors by redirecting to login
+6. Validate all user input to prevent 400 errors
+7. Implement proper error boundaries in your application
 
 
 
