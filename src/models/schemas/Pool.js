@@ -66,15 +66,15 @@ const poolSchema = new Schema({
   }],
   videos: [{
     type: Schema.Types.ObjectId,
-    ref: 'Video'
+    ref: 'Upload'
   }],
   images: [{
     type: Schema.Types.ObjectId,
-    ref: 'Image'
+    ref: 'Upload'
   }],
   audios: [{
     type: Schema.Types.ObjectId,
-    ref: 'Audio'
+    ref: 'Upload'
   }],
   tags: [{
     type: String

@@ -3,9 +3,10 @@
       <input type="text" id="search" placeholder="Search files..." 
           class="w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
       <select class="ml-2 p-2 border rounded-md shadow-sm bg-gray-100 hover:bg-gray-200" id="mediaType">
-        <option value="images" selected>Images</option>
-        <option value="videos">Videos</option>
-        <option value="audios">Audios</option>
+        <option value="any" selected>Any</option>
+        <option value="image">Images</option>
+        <option value="video">Videos</option>
+        <option value="audio">Audios</option>
       </select>
       <button class="ml-2 p-2 border rounded-md shadow-sm bg-gray-100 hover:bg-gray-200" onclick="filterMedia()">
         Filter
@@ -97,9 +98,9 @@
   // Initialize the global variable to store the currently rendered data 
   let renderedData = []
   let selectedCheckboxes = {
-    images: [],
-    videos: [],
-    audios: []
+    image: [],
+    video: [],
+    audio: []
   }
 
   // Ask the user before the page reloads to avoid losing the selections and reset cache on page reload to prevent stale data
@@ -112,6 +113,7 @@
   // <!-- ------------------------- START OF FUNCTIONS -------------------------- -->
 
   function renderTable(data) {
+    console.log(data)
     const tbody = document.getElementById("tableBody")
 
     // Display message if there is no media to display
@@ -154,8 +156,9 @@
           </td>
           <td class="p-2 border">${item.length}</td>
           <td class="p-2 border text-center">
-            <a href="edit/${item.mediaType.split(0, -1)}/${item.id}" target="_blank" class="bg-green-500 text-white px-3 py-1 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-400 " disabled>Edit</a>
-            <a href="${item.mediaType}?id=${item.id}" target="_blank" class="bg-blue-500 text-white px-3 py-1 rounded-md shadow-md hover:bg-blue-600">Open</a>
+            <!-- TODO: Add edit and delete routes and pages -->
+            <a href="/media/view?id=${item.id}" target="_blank" class="bg-green-500 text-white px-3 py-1 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-400 " disabled>Edit</a>
+            <a href="/media/view?id=${item.id}" target="_blank" class="bg-blue-500 text-white px-3 py-1 rounded-md shadow-md hover:bg-blue-600">Open</a>
           </td>
         </label>
       </tr>
@@ -172,14 +175,14 @@
   async function filterMedia() {
     const mediaSelect = document.getElementById("mediaType")
 
-    renderedData = await search(mediaSelect.value, { title: document.getElementById("search").value.toLowerCase() })
+    renderedData = await search({ title: document.getElementById("search").value.toLowerCase(), mediaType: mediaSelect.value })
 
     renderTable(renderedData)
   }
 
   // <!-- ------------------------- Call the search API ------------------------- -->
 
-  async function search(mediaType, query) {
+  async function search(query) {
     // Construct query
     const queryParams = new URLSearchParams()
 
@@ -207,7 +210,7 @@
       }
       
       // Convert the data to the table format and update the cache
-      updatedData = response.data.searchResults.map((doc) => tableInformation(doc, mediaType))
+      updatedData = response.data.searchResults.map((doc) => tableInformation(doc))
       
       // updateCache(query.mediaType, renderedData)
     } else {
@@ -219,13 +222,13 @@
   }
 
   // This just is a way to trim the data to fit the table to avoid wasting memory
-  function tableInformation(doc, mediaType) {
+  function tableInformation(doc) {
     return {
       id: doc._id,
       title: doc.title,
       description: doc.description || "(No description)",
       length: 'N/A', // TODO: Remove placeholder
-      mediaType: mediaType
+      mediaType: doc.mediaType
     }
   }
 
@@ -233,9 +236,9 @@
     event.preventDefault()
 
     // Return only the document _id's
-    const audios = selectedCheckboxes.audios.map(doc => doc.id).join(',')
-    const images = selectedCheckboxes.images.map(doc => doc.id).join(',')
-    const videos = selectedCheckboxes.videos.map(doc => doc.id).join(',')
+    const audios = selectedCheckboxes.audio.map(doc => doc.id).join(',')
+    const images = selectedCheckboxes.image.map(doc => doc.id).join(',')
+    const videos = selectedCheckboxes.video.map(doc => doc.id).join(',')
 
     const title = document.getElementById("title").value
     const description = document.getElementById("description").value
@@ -322,23 +325,23 @@
 
     // Use the selected checkboxes to update the lists with the new documents.
     imageList.innerHTML = `
-      <h3 class='border-b-2'>Images (${selectedCheckboxes.images.length})</h3>
+      <h3 class='border-b-2'>Images (${selectedCheckboxes.image.length})</h3>
       <ul>
-        ${renderBoxes(selectedCheckboxes.images)}
+        ${renderBoxes(selectedCheckboxes.image)}
       </ul>
     `
 
     audioList.innerHTML = `
-      <h3 class='border-b-2'>Audios (${selectedCheckboxes.audios.length})</h3>
+      <h3 class='border-b-2'>Audios (${selectedCheckboxes.audio.length})</h3>
       <ul>
-        ${renderBoxes(selectedCheckboxes.audios)}
+        ${renderBoxes(selectedCheckboxes.audio)}
       </ul>
     `
 
     videoList.innerHTML = `
-      <h3 class='border-b-2'>Videos (${selectedCheckboxes.videos.length})</h3>
+      <h3 class='border-b-2'>Videos (${selectedCheckboxes.video.length})</h3>
       <ul>
-        ${renderBoxes(selectedCheckboxes.videos)}
+        ${renderBoxes(selectedCheckboxes.video)}
       </ul>
     `
   }

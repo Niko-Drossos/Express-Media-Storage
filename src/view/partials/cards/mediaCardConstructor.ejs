@@ -1,0 +1,4 @@
+<% let header = include('./cardHeader.ejs', { id: media._id, documentType: 'upload', mediaType: media.mediaType, user: media.user, date: media.date, title: media.title, description: media.description }) %>
+<% let content = include('./mediaCardContent.ejs', { _id: media._id, mediaType: media.mediaType, fileId: media.fileId }) %>
+<% let footer = include('./cardFooter.ejs', { id: media._id, documentType: 'upload', favorited: media.favorited, voteCount: media.voteCount }) %>
+<%- include('./card.ejs', { header, content, footer }) %>

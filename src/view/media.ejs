@@ -1,16 +1,16 @@
 <div class="bg-white shadow-none flex flex-1 lg:h-[calc(100vh-128px)]">
     <div class="flex flex-col pb-8 lg:grid lg:grid-cols-3 min-w-full max-h-min">
         <div class="col-span-2 w-full h-full flex justify-center items center">
-            <% if (mediaType === 'image') { %>
+            <% if (media.mediaType === 'image') { %>
                 <img class="w-full max-h-[calc(100vh-8rem)] object-contain" src="/stream/image/<%= media.fileId %>" alt="<%= media.title %>">
-            <% } else if (mediaType === 'video') { %>
+            <% } else if (media.mediaType === 'video') { %>
                 <video class="w-full max-h-[calc(100vh-8rem)] object-contain" id="mediaPlayer" controls> 
                     <source src="/stream/video/<%= media.fileId %>" type="video/mp4">
                     <% if (media.transcription) { %>
                         <track src="/transcription/subtitles/<%= media.transcription %>" kind="subtitles" srclang="en" label="English">
                     <% } %>
                 </video>
-            <% } else if (mediaType === 'audio') { %>
+            <% } else if (media.mediaType === 'audio') { %>
                 <!-- TODO: Fix subtitles for audio files -->
                 <audio class="w-full max-h-[calc(100vh-8rem)] object-contain" id="mediaPlayer" controls>
                     <source src="/stream/audio/<%= media.fileId %>" type="audio/mpeg">
@@ -74,7 +74,7 @@
             </header>
 
             <!-- Switch between comment section and transcription ONLY for videos and audios -->
-             <% if (mediaType === 'video' || mediaType === 'audio') { %>
+             <% if (media.mediaType === 'video' || media.mediaType === 'audio') { %>
                 <div class="flex font-bold border-grey-400 border-y py-2">
                     <button class="flex justify-center w-1/2 bg-violet-blaze rounded-l-lg" id="commentSwitch" onclick="switchScreen('comment')">
                         Comments
@@ -114,7 +114,7 @@
                 </div>
                 <hr>
 
-                <%- include('./partials/form/createComment.ejs', { id: media._id, mediaType }) %>
+                <%- include('./partials/form/createComment.ejs', { id: media._id, documentType: 'upload'}) %>
             </div>
         </div>
     </div>

@@ -51,7 +51,7 @@ exports.getMyFiles = async (req, res) => {
 
     // Return only the fields used for the UI for creating pools.
     // title, _id, privacy, date, tags, voteCount, and description
-    const includedFields = { title: 1, _id: 1, privacy: 1, date: 1, tags: 1, voteCount: 1, description: 1 }
+    const includedFields = { title: 1, _id: 1, privacy: 1, date: 1, tags: 1, voteCount: 1, description: 1, mediaType: 1 }
 
     const userId = createFromHexString(req.userId)
 
@@ -60,13 +60,28 @@ exports.getMyFiles = async (req, res) => {
       { $project: includedFields }
     ])
 
+    // Filter out the files by media type
+    const images = []
+    const videos = []
+    const audios = []
+
+    fetchUploads.forEach(media => {
+      if (media.mediaType == "image") {
+        images.push(media)
+      } else if (media.mediaType == "video") {
+        videos.push(media)
+      } else if (media.mediaType == "audio") {
+        audios.push(media)
+      }
+    })
+
     res.status(200).json({
       success: true,
       message: "Fetched users files",
       data: {
-        images: fetchImages,
-        videos: fetchVideos,
-        audios: fetchAudios 
+        images,
+        videos,
+        audios
       }
     })
   } catch (error) {

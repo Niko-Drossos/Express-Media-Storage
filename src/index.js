@@ -238,7 +238,7 @@ app.get("/search-media", async (req, res) => {
       })
 
       const response = await request.json()
-      console.log(response)
+
       // Handle error cases
       if (!response.success) {
         await logError(req, response.error)
@@ -367,9 +367,8 @@ app.get("/search-pools", async (req, res) => {
 
 /* ---------------------- View a file with document id ---------------------- */
 
-app.get("/media/:mediaType", async (req, res) => {
+app.get("/media/view", async (req, res) => {
   try {
-    const { mediaType } = req.params
     const { id } = req.query
 
     /* if (mediaType !== ("image" || "video" || "audio")) {
@@ -392,7 +391,6 @@ app.get("/media/:mediaType", async (req, res) => {
     
     res.render("media.ejs", {
       // Send information for the file request on the client side
-      mediaType,
       media: response.data.searchResults[0],
       uploader: response.data.searchResults[0].user
     })
@@ -421,6 +419,7 @@ app.get("/pools/:id", async (req, res) => {
 
     if (response.error) {
       res.render('error.ejs', { 
+        title: "Pool not found",
         status: request.status,
         message: response.errorMessage,
         action: {
@@ -462,7 +461,6 @@ app.get("/profile", async (req, res) => {
     })
 
     const response = await request.json()
-
     if (response.error) {
       res.redirect(307, `/auth/login?redirect=${new URLSearchParams({ referer: req.headers.referer })}`)
       console.log(response.error)
@@ -479,7 +477,7 @@ app.get("/profile", async (req, res) => {
     })
 
     const mediaResponse = await mediaRequest.json()
-    console.log(mediaResponse)
+    console.log(mediaResponse.data)
     res.render("profile.ejs", {
       userInfo: response.data.user,
       media: mediaResponse
@@ -487,6 +485,7 @@ app.get("/profile", async (req, res) => {
   } catch (error) {
     await logError(req, error)
     res.render('error.ejs', {
+      title: "Error loading profile",
       status: 500,
       message: "Something went wrong",
       action: {
@@ -605,16 +604,16 @@ async function ensureAdminRoleExists() {
 /* --------------------- Temporary global error handler --------------------- */
 
 // Global uncaught exception handler
-process.on('uncaughtException', (err) => {
+/* process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   process.exit(1); // Optionally restart the process
-});
+}); */
 
 // Global unhandled rejection handler
-process.on('unhandledRejection', (reason, promise) => {
+/* process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1); // Optionally restart the process
-});
+}); */
 
 /* ---------------------------- Start the server ---------------------------- */
 

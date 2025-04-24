@@ -18,7 +18,11 @@ exports.getPool = async (req, res) => {
         'comments',
         'videos',
         'images',
-        'audios'
+        'audios',
+        {
+          path: 'user',
+          select: 'username _id avatarId'
+        }
       ])
       .lean()
 
@@ -29,7 +33,7 @@ exports.getPool = async (req, res) => {
     }
 
     // Throw error on invalid access
-    if (foundPool.user.userId != req.userId && foundPool.privacy != 'Public') {
+    if (foundPool.user._id != req.userId && foundPool.privacy != 'Public') {
       res.status(403)
       throw new Error('This is a private pool that you don\'t have access to.')
     }
@@ -37,7 +41,7 @@ exports.getPool = async (req, res) => {
     // Filter out any media documents that are not public and not posted by the user.
     // This is for when you are viewing a single pool, as that's the only real use case when pools are populated.
     function onlyPublic(doc) {
-      if (doc.privacy != 'Public' && doc.user.userId != req.userId) return false
+      if (doc.privacy != 'Public' && doc.user._id != req.userId) return false
       return true
     }
     
@@ -79,10 +83,7 @@ exports.createPool = async (req, res) => {
     const { title, description, privacy, images, videos, audios, tags, journal } = req.body
 
     const createdPool = await Pool.create({
-      user: {
-        userId: req.userId,
-        username: req.username
-      },
+      user: req.userId,
       title: title || undefined, // This is so that mongoose defaults to the date it was created
       description,
       privacy,
@@ -151,7 +152,7 @@ exports.editPool = async (req, res) => {
     }
 
     const updatedPool = await Pool.findOneAndUpdate({
-      "user.userId": req.userId,
+        user: req.userId,
         _id: poolId
       }, 
       updatedInformation,
@@ -198,7 +199,7 @@ exports.addJournal = async (req, res) => {
     }
 
     const updatedPool = await Pool.updateOne({ 
-      "user.userId": req.userId,
+      user: req.userId,
       _id: poolId,
     },{
       $push: {
@@ -236,7 +237,7 @@ exports.deletePool = async (req, res) => {
     const deletedPool = await Pool.findOneAndUpdate({
       _id: req.params.poolId,
       // This is to prevent users from deleting other users' pools
-      "user.userId": req.userId
+      user: req.userId
     }, {
       title: "Deleted",
       description: `Pool deleted ${new Date().toLocaleDateString}`,

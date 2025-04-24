@@ -68,7 +68,7 @@
 
                         <p class="mt-2 text-gray-500 tracking-wide">Upload or drag & drop your file image, video or audio</p>
 
-                        <input id="file" type="file" class="hidden" name="file0" accept="image/*,video/*,audio/*" onchange="fileChanged(event)" required />
+                        <input id="file" type="file" class="hidden" name="file" accept="image/*,video/*,audio/*" onchange="fileChanged(event)" required />
                     </label>
                 </div>
 
@@ -111,8 +111,21 @@
 <script>
     // Ask the user before the page reloads to avoid losing the selections
     window.addEventListener("beforeunload", function (event) {
-        event.preventDefault()
-        event.returnValue = "Are you sure you want to leave this page?"
+        const form = document.getElementById('fileForm')
+        
+        const fields = new FormData(form)
+
+        // If any of the fields have a value, prevent the page from reloading
+        for (const [key, value] of fields.entries()) {
+            if (value) {
+                if (key === 'privacy') continue
+                if (key === 'file' && value.name === '') continue
+
+                event.preventDefault()
+                event.returnValue = "Are you sure you want to leave this page?"
+                return
+            }
+        }
     })
 
     // <!-- -------------------------- Form and function -------------------------- -->
@@ -159,8 +172,8 @@
         previewContainer.classList.add('hidden')
         
         // Hide the file name display
-        displayFileName.classList.add('hidden')
         displayFileName.classList.remove('block')
+        displayFileName.classList.add('hidden')
         
         // Clear the preview content
         const previewContent = document.getElementById('preview-content')
@@ -169,13 +182,16 @@
 
     function fileChanged(event) {
         const file = event.target.files[0]
-        if (!file) {
+        console.log(file)
+        if (!file.name) {
+            console.log('No file selected')
             clearFile()
             return
         }
 
         const fileName = file.name
         const displayFileName = document.getElementById('display-file-name')
+
         displayFileName.innerHTML = `Selected: ${fileName}`
 
         displayFileName.classList.toggle('hidden')
@@ -214,11 +230,6 @@
                 previewContent.appendChild(audio)
                 break
         }
-
-        // Clean up the URL when the file input changes
-        event.target.addEventListener('change', () => {
-            URL.revokeObjectURL(fileURL)
-        })
     }
     
     async function uploadFileForm(event) {
@@ -265,6 +276,7 @@
             // alert(uploadResponse.message)
             showModal('file', uploadResponse.errorMessage, uploadResponse.message)
             enableForm()
+            clearFile()
             return
         }
     }

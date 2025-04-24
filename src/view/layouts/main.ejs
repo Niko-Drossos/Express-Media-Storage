@@ -135,6 +135,12 @@
     }
   }
 
+  function copyWindowURL() {
+    const url = window.location.href
+    navigator.clipboard.writeText(url)
+    alert("URL copied to clipboard! 📋")
+  }
+
   // <!-- ---------------------- Media card functionality ----------------------- -->
 
   // Toggle dropdown menu for media cards
