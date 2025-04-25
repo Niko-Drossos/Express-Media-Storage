@@ -3,6 +3,7 @@ const router = express.Router()
 
 /* ------------------------------- Controllers ------------------------------ */
 const fileController = require("../controllers/fileController")
+const uploadController = require("../controllers/uploadController")
 /* ------------------------------- Middleware ------------------------------- */
 const authenticateUserJWT = require("../models/middleware/authenticateUserJWT")
 const { allowUploads } = require("../models/middleware/allowUploads")
@@ -17,10 +18,10 @@ router.all("/*", authenticateUserJWT)
 
 // Start chunked file uploading only if you are allowed to upload
 // The server wont accept any new uploads if the server is shutting down, but if will finish the ongoing uploads
-router.post("/start-chunk-upload", allowUploads, fileController.startChunkUpload)
+router.post("/start-chunk-upload", allowUploads, uploadController.startChunkUpload)
 
 // TODO: Fix compression middleware to accept file chunks and use it when ready
-router.post("/chunked-upload", upload.single("chunk"), /* compressMedia, */ fileController.chunkedUpload)
+router.post("/chunked-upload", upload.single("chunk"), uploadController.chunkedUpload)
 
 router.post("/delete", fileController.deleteFiles)
 

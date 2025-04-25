@@ -1,4 +1,7 @@
 const fs = require("fs-extra")
+const path = require("path")
+const os = require("os")
+const ffmpeg = require('fluent-ffmpeg')
 /* --------------------------------- Schemas -------------------------------- */
 const Video = require("../models/schemas/Video")
 const Upload = require("../models/schemas/Upload")
@@ -44,22 +47,35 @@ exports.findFiles = async (req, res) => {
 exports.startChunkUpload = async (req, res) => {
   try {
     const { metadata } = req.body
-
-    // Generate a unique file name to send back to the client for uploading
-    req.generatedFileName = `${Date.now()}-${metadata.fileName}`
-
-    const { uploadStream, fileId, documentId } = await startChunkedUpload(req, res)
     
-    // Create a document for the file
-    let document
+    // Generate unique upload ID
+    const uploadId = `${req.userId}-${Date.now()}`
+    
+    // Create temporary file path
+    const tempFilePath = path.join(os.tmpdir(), `${uploadId}-${metadata.fileName}`)
+    
+    // Initialize upload session data
+    if (!req.session.uploads) {
+      req.session.uploads = {}
+    }
+    
+    // Store upload metadata in session
+    req.session.uploads[uploadId] = {
+      tempFilePath,
+      fileName: metadata.fileName,
+      totalChunks: metadata.totalChunks,
+      receivedChunks: 0,
+      startTime: Date.now(),
+      metadata: metadata
+    }
+
+    // Create the document as before
     let documentBody = {
-      // I set the document _id so that it is initialized when you start the upload.
-      // I do this to prevent having to send the document _id back to the client
       _id: documentId,
       title: metadata.title || metadata.fileName.split(".").slice(0, -1).join("."),
       filename: `${req.userId}-${metadata.fileName}`,
       description: metadata.description || "",
-      fileId: fileId,
+      fileId: uploadId,
       date: metadata.date ? new Date(metadata.date) : Date.now(),
       privacy: metadata.privacy,
       user: req.userId,
@@ -68,37 +84,15 @@ exports.startChunkUpload = async (req, res) => {
       mediaType: metadata.mediaType
     }
 
-    try {
-      /* switch (mimeType) {
-        case "image":
-          document = await Upload.create(documentBody).catch(err => new Error("Error creating image document"))
-          break;
-        case "video":
-          document = await Video.create(documentBody).catch(err => new Error("Error creating video document"))
-          break;
-        case "audio":
-          document = await Audio.create(documentBody).catch(err => new Error("Error creating audio document"))
-          break;
-      } */
-          document = await Upload.create(documentBody).catch(err => new Error("Error creating image document"))
-
-    } catch (error) {
-      console.log(error)
-      await logError(req, error)
-      return res.status(500).json({
-        success: false,
-        message: "Failed to create document for file",
-        errorMessage: error.message,
-        error
-      })
-    }
+    const document = await Upload.create(documentBody)
 
     res.status(200).json({
       success: true,
       message: "Initialized chunked upload",
       data: {
+        uploadId,
         ext: getFileExt(metadata.fileName),
-        fileId: fileId // Return the file ID to the client for uploading
+        fileId: document._id
       }
     })
   } catch (error) {
@@ -106,8 +100,7 @@ exports.startChunkUpload = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to start chunked upload",
-      errorMessage: error.message,
-      error
+      error: error.message
     })
   }
 }
@@ -116,19 +109,87 @@ exports.startChunkUpload = async (req, res) => {
 
 exports.chunkedUpload = async (req, res) => {
   try {
-    const message = await uploadChunk(req, res)
-    return message
+    const { uploadId, chunkIndex, totalChunks } = req.body
+    
+    // Validate session and upload data
+    if (!req.session.uploads || !req.session.uploads[uploadId]) {
+      throw new Error('Upload session not found')
+    }
+
+    const uploadSession = req.session.uploads[uploadId]
+    const tempFilePath = uploadSession.tempFilePath
+
+    // Append chunk to temporary file
+    await fs.appendFile(tempFilePath, req.file.buffer)
+    
+    // Update received chunks count
+    uploadSession.receivedChunks++
+    
+    // If this is the last chunk
+    if (uploadSession.receivedChunks === parseInt(totalChunks)) {
+      // Process the complete file
+      await processCompleteFile(tempFilePath, uploadId, req, res)
+      
+      // Clean up session data
+      delete req.session.uploads[uploadId]
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Chunk uploaded successfully",
+        progress: {
+          received: uploadSession.receivedChunks,
+          total: totalChunks
+        }
+      })
+    }
   } catch (error) {
     await logError(req, error)
     res.status(500).json({
       success: false,
-      message: "Failed to chunked upload",
-      errorMessage: error.message,
-      error
+      message: "Failed to process chunk",
+      error: error.message
     })
   }
 }
-  
+
+// Add a cleanup function for abandoned uploads
+async function cleanupAbandonedUploads() {
+  try {
+    const maxAge = 24 * 60 * 60 * 1000 // 24 hours
+    const now = Date.now()
+
+    // Find expired sessions in MongoDB
+    const expiredSessions = await store.collection.find({
+      'session.uploads': { $exists: true },
+      'expires': { $lt: new Date(now) }
+    })
+
+    for (const session of await expiredSessions.toArray()) {
+      const uploads = session.session.uploads
+      
+      // Clean up temporary files
+      for (const uploadId in uploads) {
+        try {
+          await fs.unlink(uploads[uploadId].tempFilePath)
+          
+          // Update associated document status
+          await Upload.findOneAndUpdate(
+            { fileId: uploadId },
+            { status: 'failed', error: 'Upload abandoned' }
+          )
+        } catch (err) {
+          console.error(`Failed to cleanup upload ${uploadId}:`, err)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to cleanup abandoned uploads:', error)
+  }
+}
+
+// Run cleanup every hour
+setInterval(cleanupAbandonedUploads, 60 * 60 * 1000)
+
 /* ------------------------------ Delete files ------------------------------ */
 
 exports.deleteFiles = async (req, res) => {

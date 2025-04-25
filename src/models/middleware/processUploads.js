@@ -1,4 +1,4 @@
-const mediaCompressor = require('../../helpers/mediaCompressor')
+const mediaCompressor = require('./mediaCompressor')
 const getFileDetails = require('../../helpers/getFileDetails')
 const fs = require('fs-extra')
 const path = require('path');

@@ -133,7 +133,7 @@ const streamFile = async function (req, res, fileId, mimeType, thumbnail = false
     const contentType = `${mimeType}/${getFileExt(file.filename)}`
 
     if (mimeType === 'image' && thumbnail) {
-      const sharp = require('sharp') // ensure you’ve installed it via npm
+      const sharp = require('sharp') // ensure you've installed it via npm
       res.writeHead(200, {
         'Content-Type': 'image/jpeg'
       })
@@ -352,6 +352,10 @@ const uploadChunk = async (req, res) => {
       })
     }
 
+    const uploadPercentage = Math.round(((chunkIndex + 1) / totalChunks) * 100, 2) // round percentage to 2 decimal places
+
+    console.log(`Upload percentage: ${uploadPercentage}`)
+
     // Send success response after processing the chunk
     return res.json({
       success: true,
@@ -360,7 +364,7 @@ const uploadChunk = async (req, res) => {
         chunkIndex,
         totalChunks,
         fileId,
-        uploadPercentage: Math.round(((chunkIndex + 1) / totalChunks) * 100, 2) // round percentage to 2 decimal places
+        uploadPercentage
       }
     })
   } catch (err) {
