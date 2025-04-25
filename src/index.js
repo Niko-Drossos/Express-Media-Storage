@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const expressLayouts = require('express-ejs-layouts')
 const path = require('path')
+const session = require('express-session')
+const MongoDBStore = require('connect-mongodb-session')(session)
 /* ------------------------------- Middlewares ------------------------------- */
 const userLoggedIn = require("./models/middleware/userLoggedIn")
 const getCookies = require('./models/middleware/getCookies')
@@ -36,6 +38,35 @@ app.set("layout", "./layouts/main")
 app.use(express.static(path.join(__dirname, "/view")))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' })) // This is to allow for large file uploads
 app.use(cookieParser())
+
+const store = new MongoDBStore({
+  uri: process.env.Mongo_Connection_Uri, // Your existing MongoDB connection string
+  collection: 'sessions',
+  expires: 24 * 60 * 60 * 1000, // Sessions expire in 24 hours
+})
+
+// Handle store errors
+store.on('error', function(error) {
+  console.error('Session store error:', error)
+})
+
+// Set up session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key', // Add SESSION_SECRET to your .env file
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  },
+  store: store,
+  resave: false,
+  saveUninitialized: false,
+  name: 'sessionId'
+}))
+
+// After setting up the session middleware
+const uploadController = require('./controllers/uploadController');
+uploadController.initSessionStore(store);
 
 /* ------------------------------- App router ------------------------------- */
 
@@ -604,16 +635,16 @@ async function ensureAdminRoleExists() {
 /* --------------------- Temporary global error handler --------------------- */
 
 // Global uncaught exception handler
-/* process.on('uncaughtException', (err) => {
+process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   process.exit(1); // Optionally restart the process
-}); */
+});
 
 // Global unhandled rejection handler
-/* process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1); // Optionally restart the process
-}); */
+}); 
 
 /* ---------------------------- Start the server ---------------------------- */
 

@@ -232,80 +232,140 @@
         }
     }
     
-    async function uploadFileForm(event) {
-        event.preventDefault()
-
-        const file = event.target['file'].files[0]
-        
-        if (!event.target['file'].files[0]) {
-            alert('Please select a file')
-            return
-        }
-
-        const mediaType = file.type.split('/')[0] // Returns video, image, or audio
-
-        const uploadRequest = await fetch('/file/start-chunk-upload', {
+    let sessionId = ''; // Store the session ID
+    
+    async function startUpload(file, metadata) {
+        const response = await fetch('/file/start-chunk-upload', {
             method: 'POST',
-            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                metadata: {
-                    title: event.target['title'].value,
-                    description: event.target['description'].value,
-                    date: new Date(event.target['date'].valueAsNumber).setSeconds(1), // Add one second to make sure it is "bigger" then midnight
-                    privacy: event.target['privacy'].value,
-                    fileName: file.name,
-                    tags: event.target['tags'].value,
-                    mediaType: mediaType
-                }
-            })
-        })
-
-        const uploadResponse = await uploadRequest.json()
-
-        disableForm()
-
-        if (uploadResponse.success) {
-            // Wait half a second to allow the server to process the request
-            setTimeout(async () => {
-                await uploadFile(file, uploadResponse.data.ext, uploadResponse.data.fileId)
-            }, 500)
-        } else {
-            // alert(uploadResponse.message)
-            showModal('file', uploadResponse.errorMessage, uploadResponse.message)
-            enableForm()
-            clearFile()
-            return
+            body: JSON.stringify({ metadata }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Store the session ID
+            sessionId = data.data.sessionId;
+            
+            // Now upload chunks, passing the session ID
+            uploadChunks(file, data.data.uploadId);
         }
     }
+    
+    async function uploadChunk(chunk, index, uploadId, totalChunks) {
+        const formData = new FormData();
+        formData.append('chunk', chunk);
+        formData.append('chunkIndex', index);
+        formData.append('uploadId', uploadId);
+        formData.append('totalChunks', totalChunks);
+        formData.append('sessionId', sessionId); // Include session ID
+        
+        return fetch('/file/chunked-upload', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include' // Important for cookies
+        });
+    }
 
+    async function uploadFileForm(event) {
+        event.preventDefault();
+
+        const file = event.target['file'].files[0];
+        
+        if (!file) {
+            alert('Please select a file');
+            return;
+        }
+
+        const mediaType = file.type.split('/')[0]; // Returns video, image, or audio
+        
+        // Create a proper metadata object
+        const metadata = {
+            title: event.target['title'].value,
+            description: event.target['description'].value,
+            date: event.target['date'].value ? new Date(event.target['date'].valueAsNumber).setSeconds(1) : Date.now(), // Add one second to make sure it is "bigger" then midnight
+            privacy: event.target['privacy'].value,
+            fileName: file.name,
+            tags: event.target['tags'].value,
+            mediaType: mediaType,
+            totalChunks: Math.ceil(file.size / (4 * 1024 * 1024)) // Calculate total chunks
+        };
+
+        console.log("Sending metadata:", metadata);
+
+        try {
+            const uploadRequest = await fetch('/file/start-chunk-upload', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ metadata })
+            });
+
+            const uploadResponse = await uploadRequest.json();
+
+            if (uploadResponse.success) {
+                disableForm();
+                // Store session ID
+                sessionId = uploadResponse.data.sessionId;
+                
+                // Wait half a second to allow the server to process the request
+                setTimeout(async () => {
+                    try {
+                        await uploadChunks(file, uploadResponse.data.uploadId);
+                    } catch (error) {
+                        console.error("Error uploading chunks:", error);
+                        showModal('file', 'Upload failed', error.message);
+                        enableForm();
+                    }
+                }, 500);
+            } else {
+                showModal('file', uploadResponse.error || 'Upload failed', uploadResponse.message);
+                enableForm();
+                clearFile();
+            }
+        } catch (error) {
+            console.error("Error starting upload:", error);
+            showModal('file', 'Network error', 'Could not connect to the server');
+            enableForm();
+            clearFile();
+        }
+    }
 
     const progressBar = document.getElementById('progress-bar')
     const progressBarFill = document.getElementById('progress-bar-fill')
 
 
     function updateProgressBar(uploadPercentage) {
-        stringUploadPercentage = `${uploadPercentage}%`
-        progressBarFill.style.width = stringUploadPercentage
+        if (uploadPercentage === undefined && result && result.data && result.data.progress) {
+            // Calculate percentage from progress data if uploadPercentage is not provided
+            const { received, total } = result.data.progress;
+            uploadPercentage = Math.round((received / total) * 100);
+        }
+
+        stringUploadPercentage = `${uploadPercentage}%`;
+        progressBarFill.style.width = stringUploadPercentage;
 
         if (stringUploadPercentage === '100%') {
             // When the upload completes, change the text but not the width
-            stringUploadPercentage = 'Complete'
+            stringUploadPercentage = 'Complete';
         }
 
-        progressBarFill.textContent = stringUploadPercentage
+        progressBarFill.textContent = stringUploadPercentage;
 
         if (uploadPercentage === 100) {
             setTimeout(() => {
-                alert('File successfully uploaded')
-                progressBar.classList.add('hidden')
-            }, 0)
+                alert('File successfully uploaded');
+                progressBar.classList.add('hidden');
+            }, 0);
         }
     }
 
-    async function uploadFile(file, fileExt, fileId) {
+    async function uploadChunks(file, uploadId) {
         const CHUNK_SIZE = 4 * 1024 * 1024 // 4MB
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
 
@@ -317,31 +377,15 @@
             const end = Math.min(start + CHUNK_SIZE, file.size)
             const chunk = file.slice(start, end)
 
-            const formData = new FormData()
-            formData.append('chunk', chunk)
-            formData.append('chunkIndex', chunkIndex)
-            formData.append('totalChunks', totalChunks)
-            formData.append('fileExt', fileExt)
-            formData.append('fileId', fileId)
+            const uploadResponse = await uploadChunk(chunk, chunkIndex, uploadId, totalChunks)
 
-            try {
-                const response = await fetch('/file/chunked-upload', {
-                    method: 'POST',
-                    body: formData
-                })
+            const result = await uploadResponse.json()
+            console.log(result)
 
-                const result = await response.json()
-                console.log(result.message)
-
-                if (result.success) {
-                    updateProgressBar(result.data.uploadPercentage)
-                } else {
-                    throw new Error(result.message)
-                }
-            } catch (error) {
-                console.error('Error uploading chunk:', error)
-                // Retry the last failed chunk
-                chunkIndex--
+            if (result.success) {
+                updateProgressBar(result.data.uploadPercentage)
+            } else {
+                throw new Error(result.message)
             }
         }
 
