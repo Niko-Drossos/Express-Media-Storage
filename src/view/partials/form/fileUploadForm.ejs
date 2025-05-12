@@ -5,7 +5,7 @@
                 <div class="w-full flex flex-col lg:flex-row">
                     <div class="lg:w-1/2  mb-3">
                         <div class="w-full md:w-full px-3 mb-3">
-                            <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="title">
+                            <label class="block tracking-wide text-gray-darker text-sm font-bold mb-2" for="title">
                                 Title
                                 <%- include('../tooltip.ejs', {
                                     message: 'Give your file a clear and descriptive title that helps identify its content.'
@@ -15,17 +15,17 @@
                             <input class="appearance-none block w-full bg-white text-gray-900 font-medium border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d]" type="text" name="title" id="title" placeholder="File name" required />
                         </div>
                         <div class="w-full md:w-full px-3">
-                            <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="date">
+                            <label class="block tracking-wide text-gray-darker text-sm font-bold mb-2" for="date">
                                 Date
                                 <%- include('../tooltip.ejs', {
-                                    message: 'This is the date that the file was created,\nnot the date you upload it.'
+                                    message: 'This is the date that the file was <b class="font-">created</b>,\nnot the date you upload it.'
                                 }) %>
                             </label>
                             <input class="appearance-none block w-full bg-white text-gray-900 font-medium border border-gray-400 rounded-lg py-3 px-3 leading-tight focus:outline-none focus:border-[#98c01d]" type="date" name="date" id="date" />
                         </div>
                     </div>   
                     <div class="lg:w-1/2 px-3 pb-3 flex flex-col h-full">
-                        <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="description">
+                        <label class="block tracking-wide text-gray-darker text-sm font-bold mb-2" for="description">
                             Description
                             <%- include('../tooltip.ejs', {
                                 message: 'Add a detailed description of your file to help others understand its content and purpose.'
@@ -37,7 +37,7 @@
 
                 <div class="w-full flex flex-col lg:flex-row-reverse">
                     <div class="w-full md:w-full px-3 pb-3">
-                        <label class="block tracking-wide text-gray-700 text-sm font-bold mb-2" for="privacy">
+                        <label class="block tracking-wide text-gray-darker text-sm font-bold mb-2" for="privacy">
                             Privacy
                             <%- include('../tooltip.ejs', {
                                 message: '<b class="text-green-800 text-sm">Private</b>: Only you can see the file\n' +
@@ -107,7 +107,7 @@
     </div>
 </div>
 <%- include('../modals/error.ejs', { name: 'file' }) %>
-
+<%- include('../modals/success.ejs', { name: 'file-success', redirect: null, cancelable: false }) %>
 <script>
     // Ask the user before the page reloads to avoid losing the selections
     window.addEventListener("beforeunload", function (event) {
@@ -359,7 +359,8 @@
 
         if (uploadPercentage === 100) {
             setTimeout(() => {
-                alert('File successfully uploaded');
+                showModal('file-success', 'Upload complete', 'File successfully uploaded');
+                clearFile()
                 progressBar.classList.add('hidden');
             }, 0);
         }
@@ -380,10 +381,11 @@
             const uploadResponse = await uploadChunk(chunk, chunkIndex, uploadId, totalChunks)
 
             const result = await uploadResponse.json()
-            console.log(result)
 
-            if (result.success) {
+            if (result.success && uploadResponse.status === 200) {
                 updateProgressBar(result.data.uploadPercentage)
+            } else if (result.success && uploadResponse.status === 201) { // If the upload successfully completes, the status is 201
+                updateProgressBar(100)
             } else {
                 throw new Error(result.message)
             }

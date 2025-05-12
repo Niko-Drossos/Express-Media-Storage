@@ -352,7 +352,7 @@ async function processCompleteFile(tempFilePath, uploadId, req, res) {
       console.error('Cleanup error:', cleanupError);
     }
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "File upload completed and optimized successfully",
       data: {
