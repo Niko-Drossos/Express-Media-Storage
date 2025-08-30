@@ -1,4 +1,3 @@
-
 <!-- <button onclick={logout()}>Logout</button> -->
 
 
@@ -20,11 +19,12 @@
           <div class="flex flex-col">
             <span class="text-gray-700 uppercase font-bold tracking-wider mb-2">Gifts</span>
             <ul>
-              <li class="mb-2">JavaScript</li>
+            <!-- TODO: Make reactive to user's gifts -->
+              <!-- <li class="mb-2">JavaScript</li>
               <li class="mb-2">React</li>
               <li class="mb-2">Node.js</li>
               <li class="mb-2">HTML/CSS</li>
-              <li class="mb-2">Tailwind Css</li>
+              <li class="mb-2">Tailwind Css</li> -->
             </ul>
           </div>
         </div>
@@ -45,14 +45,18 @@
              -->
   
       <!-- About Me Section -->
+      <% if (user.aboutMe) { %>
       <div class="col-span-12 lg:col-span-9">
         <div class="bg-white shadow rounded-lg p-6">
           <h2 class="text-xl font-bold mb-4">About Me</h2>
           <p class="text-gray-700">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed finibus est vitae tortor ullamcorper, ut vestibulum velit convallis. Aenean posuere risus non velit egestas suscipit. Nunc finibus vel ante id euismod. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam erat volutpat. Nulla vulputate pharetra tellus, in luctus risus rhoncus id.
+            <!-- TODO: Make reactive to user's about me -->
+            <%= user.aboutMe %>
           </p>
         </div>
       </div>
+      <% } %>
+      <div class="col-span-12 lg:col-span-9" id="pagination-root"></div>
     </div>
   </div>
 <!-- </div> -->
@@ -245,3 +249,55 @@
       </svg>
   </a>
 </div> -->
+<script>
+async function loadMedia() {
+    const res = await fetch(`/user/my-files`);
+    const data = await res.json();
+    if (!data.success) {
+        document.getElementById('pagination-root').innerHTML = '<p>Error loading files.</p>';
+        return;
+    }
+    renderMediaComponent(data.data);
+}
+
+function renderMediaComponent({ images, videos, audios }) {
+    let html = `
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">My Media</h2>
+        <div>
+          <h3 class="font-semibold mb-2">Images</h3>
+          <ul class="mb-4">
+            ${images.length ? images.map(img => `
+              <li class="mb-2">
+                <span class="font-medium">${img.title}</span>
+                <span class="text-gray-500 text-sm">(${img.privacy})</span>
+              </li>
+            `).join('') : '<li class="text-gray-400">No images found.</li>'}
+          </ul>
+          <h3 class="font-semibold mb-2">Videos</h3>
+          <ul class="mb-4">
+            ${videos.length ? videos.map(vid => `
+              <li class="mb-2">
+                <span class="font-medium">${vid.title}</span>
+                <span class="text-gray-500 text-sm">(${vid.privacy})</span>
+              </li>
+            `).join('') : '<li class="text-gray-400">No videos found.</li>'}
+          </ul>
+          <h3 class="font-semibold mb-2">Audios</h3>
+          <ul>
+            ${audios.length ? audios.map(aud => `
+              <li class="mb-2">
+                <span class="font-medium">${aud.title}</span>
+                <span class="text-gray-500 text-sm">(${aud.privacy})</span>
+              </li>
+            `).join('') : '<li class="text-gray-400">No audios found.</li>'}
+          </ul>
+        </div>
+      </div>
+    `;
+    document.getElementById('pagination-root').innerHTML = html;
+}
+
+// Initial load
+loadMedia();
+</script>

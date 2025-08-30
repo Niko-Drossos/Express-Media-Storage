@@ -87,6 +87,7 @@ Light-theme:
 #ffe078
 
 Components to use:
+Use this theme:
   Profile customization: https://tailwindcss.com/plus/ui-blocks/preview#component-1c3f9860d66ce5cd9fb35ba7fde6721a
   Dropdown menu: https://tailwindcss.com/plus/ui-blocks/preview#component-f8a14da22f26a67757b19f2fe3ca00ed
   Dropdown menu with dividers: https://tailwindcss.com/plus/ui-blocks/preview#component-1f10562f6266c9b3ef15ff792edd508e
